@@ -1,0 +1,20 @@
+<h2 mat-dialog-title>Invest in {{ data.crypto.name }}</h2>
+
+<div mat-dialog-content class="dialog-content">
+  <div class="row"><strong>Symbol:</strong> {{ data.crypto.symbol }}</div>
+  <div class="row"><strong>Exchange:</strong> {{ data.crypto.exchangeCurrency }}</div>
+  <div class="row"><strong>Current price:</strong> {{ data.currentPrice | number:'1.2-6' }}</div>
+
+  <div class="form">
+    <label class="form-label">Amount ($)</label>
+    <input class="input" type="number" min="1" step="0.01" [(ngModel)]="amount" />
+
+    <label class="form-label">Description</label>
+    <textarea class="input" rows="3" [(ngModel)]="description" placeholder="Optional note..."></textarea>
+  </div>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
+  <button class="btn btn-primary" (click)="confirm()" [disabled]="!amount || amount <= 0">Invest</button>
+</div>

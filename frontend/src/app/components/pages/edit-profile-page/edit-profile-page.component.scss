@@ -1,0 +1,67 @@
+.edit-profile-page {
+  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+
+  .profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+
+    h1 {
+      color: var(--text-primary);
+      margin: 0;
+    }
+  }
+
+  .profile-content {
+    .edit-form {
+      .form-group {
+        margin-bottom: 1.5rem;
+
+        .form-label {
+          display: block;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+          color: var(--text-primary);
+        }
+
+        .input {
+          width: 100%;
+          padding: 0.75rem;
+          border: 1px solid var(--border-color);
+          border-radius: 4px;
+          background-color: var(--bg-secondary);
+          color: var(--text-primary);
+          font-size: 1rem;
+
+          &:focus {
+            outline: none;
+            border-color: var(--primary-color);
+          }
+        }
+
+        .avatar-preview {
+          margin-top: 1rem;
+          text-align: center;
+
+          .avatar-image {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--border-color);
+          }
+        }
+      }
+
+      .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+        margin-top: 2rem;
+      }
+    }
+  }
+}

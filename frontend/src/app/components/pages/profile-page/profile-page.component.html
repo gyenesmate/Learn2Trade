@@ -1,0 +1,113 @@
+<div class="profile-page">
+  <header class="profile-header">
+    <h1>My Profile</h1>
+    <button class="btn btn-secondary" (click)="editProfile()">Edit Profile</button>
+  </header>
+
+  <div class="profile-content">
+    <section class="personal-info card">
+      <h2>Personal Information</h2>
+      <div class="info-grid" *ngIf="user$ | async as user">
+        <div class="avatar-section">
+          <div class="avatar-container">
+            <img *ngIf="avatarDisplayUrl" [src]="avatarDisplayUrl" alt="Avatar" class="avatar-image">
+            <div *ngIf="!avatarDisplayUrl" class="avatar-placeholder">
+              {{ user.userName.charAt(0).toUpperCase() }}
+            </div>
+          </div>
+        </div>
+        <div class="info-item">
+          <label>Name:</label>
+          <span>{{ user.userName }}</span>
+        </div>
+        <div class="info-item">
+          <label>Email:</label>
+          <span>{{ user.email }}</span>
+        </div>
+        <div class="info-item">
+          <label>Theme:</label>
+          <span>{{ user.preferences.theme }}</span>
+        </div>
+        <div class="info-item">
+          <label>Account Balance:</label>
+          <span class="balance">${{ user.preferences.websiteCurrencyBalance }}</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="add-currency card">
+      <h2>Add Currency to Account</h2>
+      <form class="currency-form" (ngSubmit)="addCurrency()">
+        <div class="form-group">
+          <label for="amount" class="form-label">Amount ($)</label>
+          <input
+            type="number"
+            id="amount"
+            class="input"
+            placeholder="Enter amount"
+            min="1"
+            step="0.01"
+            [(ngModel)]="addAmount"
+            name="amount"
+            required
+          >
+        </div>
+        <button type="submit" class="btn btn-primary" [disabled]="addAmount <= 0">Add Funds</button>
+      </form>
+    </section>
+
+    <section class="watchlist-management card" id="watchlist">
+      <app-data-table
+        [title]="'My watchlist'"
+        [columns]="watchlistColumns"
+        [data]="watchlistRows"
+        [actionBar]="[]"
+        [rowActions]="watchlistRowActions">
+      </app-data-table>
+    </section>
+    
+      <section class="watchlist-management card" id="investments">
+        <app-data-table
+          [title]="'My investments'"
+          [columns]="investmentsColumns"
+          [data]="investmentsRows"
+          [actionBar]="[]"
+          [rowActions]="investmentsRowActions">
+        </app-data-table>
+      </section>
+
+    <section class="alerts-management card">
+      <app-data-table
+        [title]="'My alerts'"
+        [columns]="alertsColumns"
+        [data]="alertsRows"
+        [actionBar]="[]"
+        [rowActions]="alertsRowActions">
+      </app-data-table>
+    </section>
+
+    <ng-container *ngIf="isAdmin">
+      <section class="admin-management card">
+          <div *ngIf="adminLoading" class="admin-loading">Loading...</div>
+          <app-data-table *ngIf="!adminLoading"
+            [title]="'Crypto currencies'"
+            [columns]="cryptoColumns"
+            [data]="cryptoCurrencies"
+            [actionBar]="cryptoActionBar"
+            [rowActions]="cryptoRowActions">
+          </app-data-table>
+      </section>
+
+      <section class="admin-management card">
+        <div *ngIf="adminLoading" class="admin-loading">Loading...</div>
+        <app-data-table *ngIf="!adminLoading"
+          [title]="'Users'"
+          [columns]="userColumns"
+          [data]="users"
+          [actionBar]="[]"
+          [rowActions]="userRowActions">
+        </app-data-table>
+      </section>
+    </ng-container>
+  </div>
+</div>

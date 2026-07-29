@@ -1,0 +1,73 @@
+<div class="register-page">
+  <div class="register-container">
+    <div class="register-header">
+      <h1>Join CryptoWatcher</h1>
+      <p>Create your account to start tracking cryptocurrencies</p>
+    </div>
+
+    <form class="register-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="userName" class="form-label">Username</label>
+        <input
+          type="text"
+          id="userName"
+          class="input"
+          placeholder="Enter your username"
+          formControlName="userName"
+          required
+        >
+        <p class="field-error" *ngIf="submitted && userNameControl?.invalid">Username is required.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          id="email"
+          class="input"
+          placeholder="Enter your email"
+          formControlName="email"
+          required
+        >
+        <p class="field-error" *ngIf="submitted && emailControl?.invalid">Please enter a valid email.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          id="password"
+          class="input"
+          placeholder="Create a password"
+          formControlName="password"
+          required
+        >
+        <p class="field-error" *ngIf="submitted && passwordControl?.invalid">
+          Password must be at least 8 characters and include a capital letter and a number.
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword" class="form-label">Confirm Password</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          class="input"
+          placeholder="Confirm your password"
+          formControlName="confirmPassword"
+          required
+        >
+        <p class="field-error" *ngIf="submitted && confirmPasswordControl?.invalid">Please confirm your password.</p>
+        <p class="field-error" *ngIf="submitted && confirmPasswordControl?.valid && passwordMismatch">
+          Passwords do not match.
+        </p>
+      </div>
+
+      <button type="submit" class="btn btn-primary register-btn">Create Account</button>
+    </form>
+
+    <div class="register-footer">
+      <p>Already have an account? <a [routerLink]="['/login']" class="login-link">Sign in</a></p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,123 @@
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%);
+  padding: var(--space-md);
+}
+
+.register-container {
+  background-color: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-xxl);
+  width: 100%;
+  max-width: 500px;
+}
+
+.register-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+
+  h1 {
+    font-size: var(--font-size-xxl);
+    color: var(--color-primary);
+    margin-bottom: var(--space-sm);
+  }
+
+  p {
+    color: var(--color-muted);
+    margin: 0;
+  }
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.form-label {
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text);
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  cursor: pointer;
+  line-height: 1.4;
+}
+
+.terms-link {
+  color: var(--color-primary);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.register-btn {
+  width: 100%;
+  padding: var(--space-md);
+  font-size: var(--font-size-lg);
+  margin-top: var(--space-md);
+}
+
+.register-footer {
+  text-align: center;
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-border);
+
+  p {
+    margin: 0;
+    color: var(--color-muted);
+  }
+
+  .login-link {
+    color: var(--color-primary);
+    font-weight: var(--font-weight-bold);
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.field-error {
+  color: var(--color-danger, #d93025);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
+// Mobile responsive
+@media (max-width: 600px) {
+  .register-container {
+    padding: var(--space-lg);
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .register-header h1 {
+    font-size: var(--font-size-xl);
+  }
+}

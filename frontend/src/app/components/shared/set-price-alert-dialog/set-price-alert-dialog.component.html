@@ -1,0 +1,40 @@
+<h2 mat-dialog-title>Set alert for {{ data.crypto.name }}</h2>
+
+<div mat-dialog-content class="content">
+  <p class="hint">
+    Current price: <strong>${{ data.currentPrice | number: '1.2-6' }}</strong>
+  </p>
+
+  <div class="form-row">
+    <label class="form-label" for="alertPrice">Alert price</label>
+    <input
+      id="alertPrice"
+      class="input"
+      type="number"
+      min="0"
+      step="0.000001"
+      [(ngModel)]="alertPrice"
+      name="alertPrice"
+      placeholder="Enter target price">
+  </div>
+
+  <div class="form-row">
+    <label class="form-label" for="description">Description (optional)</label>
+    <input
+      id="description"
+      class="input"
+      type="text"
+      [(ngModel)]="description"
+      name="description"
+      placeholder="e.g. Take profit zone">
+  </div>
+
+  <p class="hint small">
+    Type is set automatically: below if target is lower than current, otherwise above.
+  </p>
+</div>
+
+<div mat-dialog-actions align="end">
+  <button class="btn btn-secondary" type="button" (click)="cancel()">Cancel</button>
+  <button class="btn btn-primary" type="button" (click)="confirm()" [disabled]="!alertPrice || alertPrice <= 0">Set alert</button>
+</div>

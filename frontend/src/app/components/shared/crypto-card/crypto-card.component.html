@@ -1,0 +1,61 @@
+@if (data) {
+	<div class="crypto-card" [class.detailed]="state === 'detailed'" [class.compact]="state === 'compact'">
+		<div class="crypto-header">
+			<span class="crypto-name">{{ data.name }} ({{ data.symbol }})</span>
+			<span class="crypto-exchange">{{ exchangeLabel }} / {{ data.exchangeCurrency }}</span>
+			<button
+				mat-icon-button
+				class="watchlist-toggle"
+				[class.is-in-watchlist]="isInWatchlist"
+				(click)="saveToWatchlist()"
+				[disabled]="watchlistSaving"
+				[attr.aria-label]="isInWatchlist ? 'Already in watchlist' : 'Save to watchlist'"
+				[title]="isInWatchlist ? 'In watchlist' : (watchlistSaving ? 'Saving...' : 'Save to watchlist')">
+				<mat-icon>{{ isInWatchlist ? 'star' : 'star_border' }}</mat-icon>
+				<span class="sr-only">
+					{{ isInWatchlist ? 'In watchlist' : (watchlistSaving ? 'Saving...' : 'Save to watchlist') }}
+				</span>
+			</button>
+		</div>
+		<div class="crypto-info">
+			<span class="crypto-price">${{ livePrice | number:'1.2-2' }}</span>
+			<span *ngIf="change24h !== undefined" class="crypto-change" [ngClass]="{'up': change24h > 0, 'down': change24h < 0}">
+				{{ change24h > 0 ? '+' : '' }}{{ change24h | number:'1.2-2' }}%
+			</span>
+		</div>
+	
+		<ng-container *ngIf="state === 'detailed'">
+			<div class="chart-controls">
+				<button (click)="toggleType()">Switch: {{ currentType === 'line' ? 'Line' : 'Candles' }}</button>
+				<button (click)="setRange(1)">1D</button>
+				<button (click)="setRange(7)">7D</button>
+				<button (click)="setRange(30)">1M</button>
+				<button (click)="toggleDrawing()">{{ isDrawing ? 'Disable' : 'Enable' }} Draw</button>
+				<span class="price-detail"></span>
+			</div>
+		</ng-container>
+	
+		<div [class]="state === 'compact' ? 'crypto-chart-compact' : 'crypto-chart'" #chart>
+			<!-- chart renders here -->
+			<div #chartTooltip class="chart-tooltip" [style.left.px]="tooltipX" [style.top.px]="tooltipY" [style.display]="tooltipVisible ? 'block' : 'none'">
+				<div [innerHTML]="tooltipHtml"></div>
+			</div>
+		</div>
+	</div>
+} @else {
+	<div class="crypto-card placeholder">
+		<div class="crypto-header">
+			<span class="crypto-name">Loading...</span>
+			<span class="crypto-exchange">&nbsp;</span>
+		</div>
+		<div class="crypto-info">
+			<span class="crypto-price">&nbsp;</span>
+			<span class="crypto-change">&nbsp;</span>
+		</div>
+	
+		<div class="crypto-chart-placeholder">
+			<!-- loading spinner or skeleton -->
+			<div class="spinner"></div>
+		</div>
+	</div>
+}

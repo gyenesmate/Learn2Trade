@@ -1,0 +1,48 @@
+<div class="dashboard">
+  <header class="dashboard-header">
+    <h1>Dashboard</h1>
+    <div class="header-actions">
+      <button class="btn btn-secondary">Export Report</button>
+      <button class="btn btn-primary">Add Investment</button>
+    </div>
+  </header>
+
+  <div class="dashboard-content">
+    <section class="portfolio-overview card" *ngIf="portfolio">
+      <h2>Portfolio Overview</h2>
+      <div class="overview-grid">
+        <div class="overview-item">
+          <label>Total Value</label>
+          <span class="value">${{ portfolio.totalValue }}</span>
+          <span class="change" [class]="portfolio.totalChange > 0 ? 'price-up' : 'price-down'">
+            {{ portfolio.totalChange }}%
+          </span>
+        </div>
+        <div class="overview-item">
+          <label>Total Invested</label>
+          <span class="value">${{ portfolio.totalInvested }}</span>
+        </div>
+        <div class="overview-item">
+          <label>Total Profit/Loss</label>
+          <span class="value" [class]="portfolio.totalPnL > 0 ? 'profit' : 'loss'">
+            ${{ portfolio.totalPnL }}
+          </span>
+        </div>
+        <div class="overview-item">
+          <label>Best Performer</label>
+          <span class="value">{{ portfolio.bestPerformer.name }}</span>
+          <span class="change price-up">{{ portfolio.bestPerformer.change }}%</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="analytics-section card" *ngIf="investments.length">
+      <h2>Analytics</h2>
+      <div class="analytics-grid">
+        <app-analytics-card [state]="'best'" [investments]="investments"></app-analytics-card>
+        <app-analytics-card [state]="'average'" [investments]="investments"></app-analytics-card>
+        <app-analytics-card [state]="'timeline'" [investments]="investments"></app-analytics-card>
+      </div>
+    </section>
+  </div>
+</div>

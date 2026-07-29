@@ -1,0 +1,187 @@
+/* Modern card-like data table styles */
+.table-container {
+	border-radius: 12px;
+	overflow: hidden;
+	background: var(--color-surface);
+	box-shadow: 0 6px 18px rgba(20,20,30,0.08);
+	padding: 12px;
+}
+
+.table-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 8px 12px;
+	border-bottom: 1px solid var(--color-border);
+}
+
+.table-title h3 {
+	margin: 0;
+	font-size: 1.05rem;
+	font-weight: 600;
+	color: var(--color-text);
+}
+
+.table-controls {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.table-controls .search input {
+	border: 1px solid var(--color-border);
+	padding: 8px 10px;
+	border-radius: 8px;
+	min-width: 180px;
+	background: var(--color-surface);
+	color: var(--color-text);
+}
+
+.table-controls .actions button {
+	margin-left: 8px;
+}
+
+table.mdc-data-table--modern {
+	width: 100%;
+	border-collapse: separate;
+	border-spacing: 0;
+}
+
+th.mat-header-cell, td.mat-cell {
+	padding: 12px 16px;
+	color: var(--color-text);
+}
+
+.mat-mdc-row,
+.mat-mdc-cell {
+	color: var(--color-text);
+}
+
+tr.mat-row:hover {
+	background: rgba(0, 123, 255, 0.06);
+}
+
+mat-paginator {
+	margin-top: 12px;
+	display: block;
+}
+
+.mat-mdc-paginator .mat-mdc-paginator-container {
+	flex-wrap: wrap;
+	row-gap: 8px;
+	column-gap: 12px;
+}
+
+.table-row--detail td.mat-cell {
+	padding-top: 0;
+}
+
+.mobile-detail {
+	border-top: 1px dashed var(--color-border);
+	display: grid;
+	row-gap: 8px;
+}
+
+.mobile-detail__row {
+	display: flex;
+	justify-content: start;
+	gap: 12px;
+}
+
+.mobile-detail__label {
+	color: var(--color-muted);
+	font-size: var(--font-size-sm);
+}
+
+.mobile-detail__value {
+	color: var(--color-text);
+	font-weight: 600;
+	text-align: right;
+}
+
+/* Responsive behavior: mobile narrow screens */
+@media (max-width: 640px) {
+	/* keep the table from growing wider than the viewport */
+	table.mdc-data-table--modern {
+		table-layout: fixed;
+	}
+
+	.table-controls {
+		flex-direction: column;
+		align-items: stretch;
+		width: 100%;
+	}
+
+	.table-header {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.table-title,
+	.table-controls {
+		width: 100%;
+	}
+
+	/* hide all non-primary columns in table rows and header */
+	/* We use attribute selectors to hide by column key; the table renders cells in order,
+		 so we apply a general rule: hide all header and cell except first and actions */
+	.mat-header-row .mat-header-cell,
+	.mat-row .mat-cell {
+		display: none;
+	}
+
+	/* show first column header and cells */
+	.mat-header-row .mat-header-cell:first-child,
+	.mat-row .mat-cell:first-child {
+		display: table-cell;
+	}
+
+	/* show actions column if present (last column) */
+	.mat-header-row .mat-header-cell.mat-column-actions,
+	.mat-row .mat-cell.mat-column-actions {
+		display: table-cell;
+		width: 52px;
+		padding: 8px 6px;
+		text-align: right;
+	}
+
+	/* tighten the primary column so it doesn't push actions off-screen */
+	.mat-header-row .mat-header-cell:first-child,
+	.mat-row .mat-cell:first-child {
+		padding: 8px 6px;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* compact action buttons (icon-only) */
+	.mat-row .mat-cell.mat-column-actions button[mat-button],
+	.mat-row .mat-cell.mat-column-actions button.mat-mdc-button,
+	.mat-row .mat-cell.mat-column-actions button.mat-mdc-unelevated-button,
+	.mat-row .mat-cell.mat-column-actions button.mat-mdc-raised-button {
+		min-width: 0;
+		padding: 0 6px;
+		line-height: 32px;
+		height: 32px;
+	}
+
+	.mat-row .mat-cell.mat-column-actions mat-icon {
+		font-size: 20px;
+		width: 20px;
+		height: 20px;
+		line-height: 20px;
+	}
+
+	/* Make header controls stacked buttons full width */
+	.table-controls .actions button,
+	.table-controls .search input {
+		width: 100%;
+	}
+
+	.no-data {
+		padding: 12px;
+		text-align: center;
+	}
+}
+

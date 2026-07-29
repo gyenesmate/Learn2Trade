@@ -1,0 +1,37 @@
+<div class="edit-profile-page">
+  <header class="profile-header">
+    <h1>Edit Profile</h1>
+  </header>
+
+  <div class="profile-content">
+    <section class="edit-form card">
+      <h2>Edit Your Information</h2>
+      <form (ngSubmit)="saveProfile()">
+        <div class="form-group">
+          <label for="userName" class="form-label">Username</label>
+          <input
+            type="text"
+            id="userName"
+            class="input"
+            [(ngModel)]="userName"
+            name="userName"
+            required
+          >
+        </div>
+
+        <div class="form-group">
+          <label for="theme" class="form-label">Theme</label>
+          <select id="theme" class="input" [(ngModel)]="theme" name="theme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>

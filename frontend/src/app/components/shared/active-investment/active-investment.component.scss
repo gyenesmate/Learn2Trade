@@ -1,0 +1,48 @@
+.active-investment {
+  margin-top: var(--space-md);
+  padding: var(--space-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xxs);
+}
+
+.sub {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xs);
+}
+
+.k {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.v {
+  color: var(--color-text);
+}
+
+.desc {
+  color: var(--color-text);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

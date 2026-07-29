@@ -1,0 +1,42 @@
+<div class="login-page">
+  <div class="login-container">
+    <div class="login-header">
+      <h1>Welcome to CryptoWatcher</h1>
+      <p>Sign in to your account</p>
+    </div>
+
+    <form class="login-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input
+          type="email"
+          id="email"
+          class="input"
+          placeholder="Enter your email"
+          formControlName="email"
+          required
+        >
+        <p class="field-error" *ngIf="submitted && emailControl?.invalid">Please enter a valid email.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input
+          type="password"
+          id="password"
+          class="input"
+          placeholder="Enter your password"
+          formControlName="password"
+          required
+        >
+        <p class="field-error" *ngIf="submitted && passwordControl?.invalid">Password is required.</p>
+      </div>
+
+      <button type="submit" class="btn btn-primary login-btn">Sign In</button>
+    </form>
+
+    <div class="login-footer">
+      <p>Don't have an account? <a [routerLink]="['/register']" class="register-link">Sign up</a></p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,31 @@
+.crypto-currency-edit-page {
+  padding: var(--space-lg);
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+
+  h1 {
+    margin: 0;
+    color: var(--color-text);
+  }
+}
+
+.loading {
+  color: var(--color-muted);
+}
+
+.edit-form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+}

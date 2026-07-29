@@ -1,0 +1,46 @@
+<div class="home-page">
+  <header class="header">
+    <h1 class="header__title">CryptoWatcher</h1>
+    <nav class="header__nav">
+      <a class="btn btn-secondary" [routerLink]="['/dashboard']">Dashboard</a>
+      <a class="btn btn-secondary" [routerLink]="['/profile']">Profile</a>
+    </nav>
+  </header>
+
+  <main class="main-content">
+    <section class="crypto-browser">
+      <h2>Browse Cryptocurrencies</h2>
+      <div class="crypto-grid">
+        <div class="crypto-card card" *ngFor="let crypto of cryptocurrencies">
+          <app-crypto-card [state]="'compact'" [data]="crypto"></app-crypto-card>
+          <a class="btn btn-primary crypto-card__action" [routerLink]="['/crypto', crypto.id]">View Chart</a>
+        </div>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <section class="watchlist">
+        <h3>My Watchlist</h3>
+        <div class="watchlist-table">
+          <table class="simple-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Exchange</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let crypto of watchlistCryptos">
+                <td>{{ crypto.name }} ({{ crypto.symbol }})</td>
+                <td>{{ crypto.exchangeCurrency }}</td>
+                <td><a class="btn btn-primary" [routerLink]="['/crypto', crypto.id]">View</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <a class="btn btn-secondary" [routerLink]="['/profile']" fragment="watchlist">Manage Watchlist</a>
+      </section>
+    </aside>
+  </main>
+</div>

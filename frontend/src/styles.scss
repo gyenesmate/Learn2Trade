@@ -1,0 +1,665 @@
+/* Global styles for CryptoWatcher App - Mobile-first design */
+
+// Import Google Fonts for typography
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap');
+
+// CSS Custom Properties (Design Tokens) - Futuristic Dark Theme
+:root {
+    // 1. Colors - Futuristic Dark Theme
+    /* Base colors (minimalist palette) */
+    --color-bg: #f5f5f5;
+    /* light grey background */
+    --color-surface: #ffffff;
+    /* white surfaces/cards */
+    --color-primary: #007bff;
+    /* subtle blue primary */
+    --color-secondary: #6c757d;
+    /* muted grey secondary */
+    --color-accent: #28a745;
+    /* soft green accent */
+    --color-error: #dc3545;
+    /* bootstrap red */
+    --color-success: #198754;
+    /* bootstrap green */
+    --color-text: #212529;
+    /* dark text */
+    --color-muted: #6c757d;
+    /* muted text/icons */
+    --color-border: #e0e0e0;
+    /* light border */
+
+    /* Crypto-specific colors */
+    --color-crypto-up: #198754;
+    /* green for price up */
+    --color-crypto-down: #dc3545;
+    /* red for price down */
+    --color-crypto-neutral: #ffc107;
+    /* yellow for neutral */
+
+    // Dark mode variants (already dark)
+    --color-bg-dark: #000000;
+    --color-surface-dark: #0f0f0f;
+    --color-text-dark: #ffffff;
+
+    // Gradient backgrounds
+    --gradient-primary: linear-gradient(120deg, rgba(0, 123, 255, 0.08), rgba(40, 167, 69, 0.06));
+    --gradient-secondary: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.86));
+    --gradient-bg: linear-gradient(180deg, #fbfcff 0%, #f7f9fc 55%, #f4f7fb 100%);
+
+    // Crypto-specific colors (additional for modern crypto app)
+    --color-crypto-up: #198754;
+    /* green for price up */
+    --color-crypto-down: #dc3545;
+    /* red for price down */
+    --color-crypto-neutral: #ffc107;
+    /* yellow for neutral */
+
+    // Dark mode variants (for future implementation)
+    --color-bg-dark: #1a1a1a;
+    --color-surface-dark: #2d2d2d;
+    --color-text-dark: #f5f5f5;
+
+    // 2. Typography
+    /* Font families */
+    --font-family-base: 'Nunito', 'Segoe UI', Arial, sans-serif;
+    --font-family-accent: 'Nunito', 'Segoe UI', Arial, sans-serif;
+    /* Font sizes (fluid clamp) */
+    --font-size-xs: clamp(0.7rem, 0.65rem + 0.2vw, 0.8rem); // extra small
+    --font-size-sm: clamp(0.8rem, 0.75rem + 0.3vw, 1rem); // small
+    --font-size-md: clamp(1rem, 0.95rem + 0.5vw, 1.2rem); // base
+    --font-size-lg: clamp(1.2rem, 1.1rem + 0.8vw, 1.5rem); // large
+    --font-size-xl: clamp(1.5rem, 1.3rem + 1.2vw, 2rem); // extra large
+    --font-size-xxl: clamp(2rem, 1.7rem + 2vw, 3rem); // hero size
+    /* Font weights */
+    --font-weight-normal: 400;
+    --font-weight-bold: 700;
+
+    // 3. Spacing
+    --space-xxs: 0.25rem;
+    --space-xs: 0.5rem;
+    --space-sm: 0.75rem;
+    --space-md: 1rem;
+    --space-lg: 1.5rem;
+    --space-xl: 2rem;
+    --space-xxl: 3rem;
+
+    // 4. Border radius
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 16px;
+    --radius-round: 999px;
+
+    // 5. Shadows
+    --shadow-xs: 0 1px 2px rgba(74, 60, 42, 0.05);
+    --shadow-sm: 0 2px 4px rgba(74, 60, 42, 0.08);
+    --shadow-md: 0 4px 8px rgba(74, 60, 42, 0.12);
+    --shadow-lg: 0 8px 16px rgba(74, 60, 42, 0.16);
+
+    // 6. Breakpoints
+    --breakpoint-xs: 480px;
+    --breakpoint-sm: 600px;
+    --breakpoint-md: 900px;
+    --breakpoint-lg: 1200px;
+    --breakpoint-xl: 1600px;
+
+    // 7. Transitions
+    --transition-fast: 0.15s ease-in;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease-out;
+
+    // 8. Z-index scale
+    --z-index-base: 1;
+    --z-index-dropdown: 10;
+    --z-index-modal: 100;
+    --z-index-toast: 1000;
+    --z-index-overlay: 1100;
+}
+
+// Global Resets and Base Styles
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-normal);
+    color: var(--color-text);
+    background: var(--gradient-bg);
+    background-color: var(--color-bg);
+    background-attachment: fixed;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        margin: 0 0 var(--space-md) 0;
+        font-family: var(--font-family-base);
+        font-weight: var(--font-weight-bold);
+        line-height: 1.2;
+        color: var(--color-text);
+    }
+
+    h1 {
+        font-size: var(--font-size-xxl);
+    }
+
+    h2 {
+        font-size: var(--font-size-xl);
+    }
+
+    h3 {
+        font-size: var(--font-size-lg);
+    }
+
+    h4 {
+        font-size: var(--font-size-md);
+    }
+
+    h5 {
+        font-size: var(--font-size-sm);
+    }
+
+    h6 {
+        font-size: var(--font-size-xs);
+    }
+
+    p {
+        margin: 0 0 var(--space-md) 0;
+        line-height: 1.6;
+    }
+
+    a {
+        color: var(--color-primary);
+        text-decoration: none;
+        transition: color var(--transition-normal);
+    }
+
+    a:hover,
+    a:focus {
+        color: var(--color-secondary);
+    }
+
+    // Layout Utilities
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 var(--space-md);
+    }
+
+    .flex {
+        display: flex;
+    }
+
+    .flex-col {
+        flex-direction: column;
+    }
+
+    .items-center {
+        align-items: center;
+    }
+
+    .justify-center {
+        justify-content: center;
+    }
+
+    .justify-between {
+        justify-content: space-between;
+    }
+
+    .gap-sm {
+        gap: var(--space-sm);
+    }
+
+    .gap-md {
+        gap: var(--space-md);
+    }
+
+    .gap-lg {
+        gap: var(--space-lg);
+    }
+
+    // Spacing Utilities
+    .m-0 {
+        margin: 0;
+    }
+
+    .mt-sm {
+        margin-top: var(--space-sm);
+    }
+
+    .mb-sm {
+        margin-bottom: var(--space-sm);
+    }
+
+    .p-sm {
+        padding: var(--space-sm);
+    }
+
+    .p-md {
+        padding: var(--space-md);
+    }
+
+    // Color Utilities
+    .text-primary {
+        color: var(--color-primary);
+    }
+
+    .text-secondary {
+        color: var(--color-secondary);
+    }
+
+    .text-accent {
+        color: var(--color-accent);
+    }
+
+    .text-error {
+        color: var(--color-error);
+    }
+
+    .text-success {
+        color: var(--color-success);
+    }
+
+    .text-muted {
+        color: var(--color-muted);
+    }
+
+    .bg-surface {
+        background-color: var(--color-surface);
+    }
+
+    .bg-primary {
+        background-color: var(--color-primary);
+    }
+
+    // Border and Shadow Utilities
+    .border {
+        border: 1px solid var(--color-border);
+    }
+
+    .rounded-sm {
+        border-radius: var(--radius-sm);
+    }
+
+    .rounded-md {
+        border-radius: var(--radius-md);
+    }
+
+    .rounded-lg {
+        border-radius: var(--radius-lg);
+    }
+
+    .shadow-sm {
+        box-shadow: var(--shadow-sm);
+    }
+
+    .shadow-md {
+        box-shadow: var(--shadow-md);
+    }
+
+    .shadow-lg {
+        box-shadow: var(--shadow-lg);
+    }
+
+    // Button Base Styles
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: var(--space-sm) var(--space-md);
+        font-family: var(--font-family-base);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-bold);
+        text-decoration: none;
+        border: 1px solid var(--color-primary);
+        border-radius: var(--radius-md);
+        cursor: pointer;
+        transition: background 0.2s ease, color 0.2s ease;
+        outline: none;
+        background: transparent;
+        color: var(--color-primary);
+    }
+
+    .btn:hover,
+    .btn:focus {
+        background: var(--color-primary);
+        color: var(--color-bg);
+    }
+
+    .btn-primary {
+        background: var(--color-primary);
+        border: none;
+        color: white;
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus {
+        /* cannot use darken on CSS variable; use filter for slight darkening */
+        background: var(--color-primary);
+        filter: brightness(0.9);
+    }
+
+    .btn-secondary {
+        background-color: var(--color-surface);
+        color: var(--color-text);
+        border: 1px solid var(--color-border);
+    }
+
+    .btn-secondary:hover,
+    .btn-secondary:focus {
+        background-color: var(--color-surface);
+        border-color: var(--color-primary);
+        color: var(--color-primary);
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.15);
+    }
+}
+
+body.theme-dark {
+    --color-bg: #0d1117;
+    --color-surface: #111827;
+    --color-text: #e5e7eb;
+    --color-muted: #9ca3af;
+    --color-border: #1f2937;
+    --color-shadow: rgba(0, 0, 0, 0.4);
+    --gradient-primary: linear-gradient(120deg, rgba(59, 130, 246, 0.18), rgba(16, 185, 129, 0.12));
+    --gradient-secondary: linear-gradient(180deg, rgba(17, 24, 39, 0.95), rgba(15, 23, 42, 0.85));
+    --gradient-bg: linear-gradient(180deg, #0b1220 0%, #0d1526 55%, #0f172a 100%);
+    color: var(--color-text);
+    background: var(--gradient-bg);
+    background-color: var(--color-bg);
+}
+
+body.theme-light {
+    --color-bg: #f5f5f5;
+    --color-surface: #ffffff;
+    --color-text: #212529;
+    --color-muted: #6c757d;
+    --color-border: #e0e0e0;
+    --gradient-primary: linear-gradient(120deg, rgba(0, 123, 255, 0.08), rgba(40, 167, 69, 0.06));
+    --gradient-secondary: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.86));
+    --gradient-bg: linear-gradient(180deg, #fbfcff 0%, #f7f9fc 55%, #f4f7fb 100%);
+    color: var(--color-text);
+    background: var(--gradient-bg);
+    background-color: var(--color-bg);
+}
+
+/* Responsive image and button styles for accessibility and mobile compliance */
+img {
+    max-width: 100%;
+    height: auto;
+    object-fit: cover;
+}
+
+.btn, button, [type="button"], [type="submit"], [type="reset"] {
+    min-width: 44px;
+    min-height: 44px;
+    /* Optional: improve tap target visibility */
+    touch-action: manipulation;
+}
+
+// Card Styles
+.card {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-lg);
+    border: 1px solid var(--color-border);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.card:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-primary);
+}
+
+.input {
+    width: 100%;
+    padding: var(--space-sm) var(--space-md);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    transition: border-color var(--transition-normal);
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(183, 123, 87, 0.2);
+}
+
+// Responsive Design (Mobile-first)
+@media (min-width: 600px) {
+    .container {
+        padding: 0 var(--space-lg);
+    }
+}
+
+@media (min-width: 900px) {
+    .container {
+        padding: 0 var(--space-xl);
+    }
+}
+
+// Crypto-specific utilities
+.price-up {
+    color: var(--color-crypto-up);
+}
+
+.price-down {
+    color: var(--color-crypto-down);
+}
+
+.price-neutral {
+    color: var(--color-crypto-neutral);
+}
+
+// Accessibility
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+// Focus styles
+*:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+
+// Scrollbar styling
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted);
+}
+
+mat-sidenav-container,
+mat-sidenav-content,
+.mat-sidenav-container,
+.mat-sidenav-content {
+    background: transparent;
+}
+
+// Angular Material table styles
+.mat-mdc-table {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+}
+
+.mat-mdc-header-row {
+    background: var(--color-bg);
+}
+
+.mat-mdc-header-cell {
+    color: var(--color-muted);
+    font-weight: var(--font-weight-bold);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.mat-mdc-cell,
+.mat-mdc-row,
+.mat-mdc-header-row {
+    color: var(--color-text);
+}
+
+.mat-mdc-row {
+    transition: background var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.mat-mdc-row:hover,
+.mat-mdc-row:focus-within {
+    background: rgba(0, 123, 255, 0.06);
+}
+
+.mat-mdc-cell {
+    border-bottom: 1px solid var(--color-border);
+}
+
+// Angular Material context menu styles
+.mat-mdc-menu-panel {
+    background: var(--color-surface) !important;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    min-width: 200px;
+}
+
+.mat-mdc-menu-content {
+    padding: var(--space-xs);
+    background: var(--color-surface);
+}
+
+.mat-mdc-menu-item {
+    border-radius: var(--radius-sm);
+    margin: var(--space-xxs) 0;
+    color: var(--color-text);
+    transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.mat-mdc-menu-item:hover,
+.mat-mdc-menu-item:focus {
+    background: rgba(0, 123, 255, 0.08);
+    color: var(--color-primary);
+}
+
+.mat-mdc-menu-item .mat-mdc-menu-item-text {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-normal);
+}
+
+button,
+input,
+select,
+textarea,
+.mat-mdc-button,
+.mat-mdc-menu-item,
+.mat-mdc-list-item,
+.mat-mdc-option,
+.mat-mdc-tab,
+.mat-mdc-header-cell,
+.mat-mdc-cell {
+    font-family: var(--font-family-base);
+}
+
+.cdk-overlay-pane .mat-mdc-menu-panel {
+    background: var(--color-surface) !important;
+}
+
+// Angular Material tooltip styles
+.mat-mdc-tooltip,
+.mdc-tooltip__surface {
+    background: rgba(17, 24, 39, 0.92) !important;
+    color: #f9fafb !important;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+    font-size: var(--font-size-xs);
+}
+
+// Angular Material paginator/select styling
+.mat-mdc-paginator .mat-mdc-form-field {
+    --mdc-outlined-text-field-outline-color: var(--color-border);
+    --mdc-outlined-text-field-hover-outline-color: var(--color-border);
+    --mdc-outlined-text-field-focus-outline-color: var(--color-primary);
+}
+
+.mat-mdc-paginator .mdc-notched-outline__leading,
+.mat-mdc-paginator .mdc-notched-outline__notch,
+.mat-mdc-paginator .mdc-notched-outline__trailing {
+    border-color: var(--color-border) !important;
+    opacity: 0.6;
+}
+
+.mat-mdc-select-panel {
+    background: var(--color-surface) !important;
+    color: var(--color-text) !important;
+    border: 1px solid var(--color-border);
+}
+
+// Angular Material dialog styling
+.mat-mdc-dialog-container .mdc-dialog__surface {
+    background: var(--color-surface) !important;
+    color: var(--color-text) !important;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-lg);
+}
+
+/* Ensure dialog title/content/actions text respects theme tokens (Material defaults can be low-contrast in dark mode) */
+.mat-mdc-dialog-container {
+    .mat-mdc-dialog-title,
+    .mat-mdc-dialog-content,
+    .mat-mdc-dialog-actions,
+    .mdc-dialog__title,
+    .mdc-dialog__content {
+        color: var(--color-text) !important;
+    }
+}
+
+.mat-mdc-dialog-container .mdc-dialog__surface h1,
+.mat-mdc-dialog-container .mdc-dialog__surface h2,
+.mat-mdc-dialog-container .mdc-dialog__surface h3,
+.mat-mdc-dialog-container .mdc-dialog__surface h4,
+.mat-mdc-dialog-container .mdc-dialog__surface h5,
+.mat-mdc-dialog-container .mdc-dialog__surface h6 {
+    color: var(--color-text);
+}

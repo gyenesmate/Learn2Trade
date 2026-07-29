@@ -1,0 +1,88 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav mode="side" [opened]="false" class="sidenav" [class.mobile-hidden]="isMobile">
+    <mat-nav-list>
+      <a mat-list-item *ngIf="isLoggedIn$ | async" (click)="navigateTo('/dashboard')">
+        <mat-icon matListIcon>dashboard</mat-icon>
+        <span matLine>Dashboard</span>
+      </a>
+      <a mat-list-item (click)="navigateTo('/home')">
+        <mat-icon matListIcon>home</mat-icon>
+        <span matLine>Home</span>
+      </a>
+      <a mat-list-item *ngIf="isLoggedIn$ | async" (click)="navigateTo('/profile')">
+        <mat-icon matListIcon>person</mat-icon>
+        <span matLine>Profile</span>
+      </a>
+      <a mat-list-item *ngIf="!(isLoggedIn$ | async)" (click)="navigateTo('/login')">
+        <mat-icon matListIcon>login</mat-icon>
+        <span matLine>Login</span>
+      </a>
+      <a mat-list-item *ngIf="!(isLoggedIn$ | async)" (click)="navigateTo('/register')">
+        <mat-icon matListIcon>person_add</mat-icon>
+        <span matLine>Register</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar color="primary" class="toolbar" [class.mobile-toolbar]="isMobile">
+      <button mat-icon-button (click)="sidenav.toggle()" class="menu-button" *ngIf="!isMobile">
+        <mat-icon>menu</mat-icon>
+      </button>
+
+      <span class="app-title">🚀 CryptoWatcher</span>
+
+      <span class="spacer"></span>
+
+      <div class="user-info" *ngIf="!isMobile && (isLoggedIn$ | async) && (user$ | async) as user">
+        <span class="balance">${{ user.preferences.websiteCurrencyBalance }}</span>
+        <span class="username">{{ user.userName }}</span>
+        <button mat-icon-button [matMenuTriggerFor]="userMenu">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="navigateTo('/profile')">
+            <mat-icon>person</mat-icon>
+            Profile
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>exit_to_app</mat-icon>
+            Logout
+          </button>
+        </mat-menu>
+      </div>
+
+      <button mat-icon-button (click)="logout()" *ngIf="isMobile && (isLoggedIn$ | async)" class="logout-button">
+        <mat-icon>exit_to_app</mat-icon>
+      </button>
+    </mat-toolbar>
+
+    <!-- Bottom Navigation for Mobile -->
+    <nav class="bottom-nav" *ngIf="isMobile">
+      <button class="nav-item" *ngIf="isLoggedIn$ | async" (click)="navigateTo('/dashboard')" [class.active]="currentRoute === '/dashboard'">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </button>
+      <button class="nav-item" (click)="navigateTo('/home')" [class.active]="currentRoute === '/home'">
+        <mat-icon>home</mat-icon>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" *ngIf="isLoggedIn$ | async" (click)="navigateTo('/profile')" [class.active]="currentRoute === '/profile'">
+        <mat-icon>person</mat-icon>
+        <span>Profile</span>
+      </button>
+      <button class="nav-item" *ngIf="!(isLoggedIn$ | async)" (click)="navigateTo('/login')" [class.active]="currentRoute === '/login'">
+        <mat-icon>login</mat-icon>
+        <span>Login</span>
+      </button>
+      <button class="nav-item" *ngIf="!(isLoggedIn$ | async)" (click)="navigateTo('/register')" [class.active]="currentRoute === '/register'">
+        <mat-icon>person_add</mat-icon>
+        <span>Register</span>
+      </button>
+    </nav>
+
+    <main class="main-content" [class.mobile-main]="isMobile">
+      <router-outlet></router-outlet>
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>
