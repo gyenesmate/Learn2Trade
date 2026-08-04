@@ -1,19 +1,28 @@
+from __future__ import annotations
+
 from functools import lru_cache
 from pathlib import Path
 
+from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parents[2]
 
 
 class Settings(BaseSettings):
+    """Application settings loaded from environment variables or backend/.env."""
+
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",
         env_file_encoding="utf-8",
         extra="ignore",
     )
 
-    database_url: str
+    database_url: SecretStr
+
+    @property
+    def sqlalchemy_database_url(self) -> str:
+        return self.database_url.get_secret_value()
 
 
 @lru_cache

@@ -2,6 +2,7 @@
 .env
 
 # Virtual environment
+.venv/
 venv/
 
 # Python
@@ -12,3 +13,4 @@ __pycache__/
 .ruff_cache/
 .coverage
 htmlcov/
+.mypy_cache/
