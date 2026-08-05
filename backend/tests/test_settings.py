@@ -12,6 +12,7 @@ def test_settings_load_database_url_from_env(monkeypatch: pytest.MonkeyPatch) ->
         "DATABASE_URL",
         "postgresql+psycopg://user:secret@localhost:5432/testdb",
     )
+    monkeypatch.setenv("SECRET_KEY", "test-secret-key")
 
     settings = Settings(_env_file=None)
 

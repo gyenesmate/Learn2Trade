@@ -80,25 +80,52 @@ class UserCreate(BaseModel):
         stripped = value.strip()
         if "@" not in stripped or "." not in stripped.split("@")[-1]:
             raise ValueError("email must be a valid address")
-        return stripped
+        return stripped.lower()
+
+    @field_validator("password")
+    @classmethod
+    def password_policy(cls, value: str) -> str:
+        if len(value) < 8:
+            raise ValueError("password must be at least 8 characters")
+        if not any(char.isupper() for char in value):
+            raise ValueError("password must contain an uppercase letter")
+        if not any(char.isdigit() for char in value):
+            raise ValueError("password must contain a digit")
+        return value
 
 
-class UserUpdate(BaseModel):
-    username: Optional[str] = Field(default=None, min_length=1, max_length=255)
-    email: Optional[str] = Field(default=None, min_length=3, max_length=320)
-    avatar_url: Optional[str] = None
-    is_admin: Optional[bool] = None
-    is_banned: Optional[bool] = None
+class UserRegister(UserCreate):
+    """Registration payload; admin/banned flags are never accepted from clients."""
+
+
+class UserLogin(BaseModel):
+    email: str = Field(min_length=3, max_length=320)
+    password: str = Field(min_length=1, max_length=128)
 
     @field_validator("email")
     @classmethod
-    def email_has_at(cls, value: Optional[str]) -> Optional[str]:
+    def normalize_email(cls, value: str) -> str:
+        return value.strip().lower()
+
+
+class UserProfileUpdate(BaseModel):
+    username: Optional[str] = Field(default=None, min_length=1, max_length=255)
+    avatar_url: Optional[str] = None
+    theme: Optional[Theme] = None
+
+    @field_validator("username")
+    @classmethod
+    def username_not_blank(cls, value: Optional[str]) -> Optional[str]:
         if value is None:
             return value
         stripped = value.strip()
-        if "@" not in stripped or "." not in stripped.split("@")[-1]:
-            raise ValueError("email must be a valid address")
+        if not stripped:
+            raise ValueError("username must not be empty")
         return stripped
+
+
+class WalletAmountRequest(BaseModel):
+    amount: Decimal = Field(gt=0, max_digits=20, decimal_places=8)
 
 
 class UserRead(BaseModel):
@@ -112,3 +139,16 @@ class UserRead(BaseModel):
     is_banned: bool
     created_at: datetime
     updated_at: datetime
+
+
+class UserMeRead(UserRead):
+    theme: Theme = Theme.SYSTEM
+    balance: Decimal = Decimal("0")
+    currency_code: str = "USD"
+    profit_index: Decimal = Decimal("0")
+
+
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str = "bearer"
+    user: UserMeRead

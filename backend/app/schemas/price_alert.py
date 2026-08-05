@@ -14,16 +14,12 @@ class AlertType(str, Enum):
     BELOW = "below"
 
 
-class PriceAlertBase(BaseModel):
+class PriceAlertCreateRequest(BaseModel):
     crypto_currency_id: UUID
     alert_price: Decimal = Field(ge=0, max_digits=30, decimal_places=12)
     description: Optional[str] = None
     alert_type: AlertType
     is_active: bool = True
-
-
-class PriceAlertCreate(PriceAlertBase):
-    user_id: UUID
 
 
 class PriceAlertUpdate(BaseModel):
@@ -38,9 +34,14 @@ class PriceAlertUpdate(BaseModel):
     is_active: Optional[bool] = None
 
 
-class PriceAlertRead(PriceAlertBase):
+class PriceAlertRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
     user_id: UUID
+    crypto_currency_id: UUID
+    alert_price: Decimal
+    description: Optional[str]
+    alert_type: AlertType
+    is_active: bool
     created_at: datetime

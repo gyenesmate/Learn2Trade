@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import List
 
-from pydantic import SecretStr
+from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 BASE_DIR = Path(__file__).resolve().parents[2]
@@ -19,6 +20,16 @@ class Settings(BaseSettings):
     )
 
     database_url: SecretStr
+    secret_key: SecretStr
+    access_token_expire_minutes: int = 60
+    cors_origins: List[str] = ["http://localhost:4200"]
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def split_cors_origins(cls, value: object) -> object:
+        if isinstance(value, str):
+            return [item.strip() for item in value.split(",") if item.strip()]
+        return value
 
     @property
     def sqlalchemy_database_url(self) -> str:

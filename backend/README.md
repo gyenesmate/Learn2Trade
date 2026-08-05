@@ -53,6 +53,15 @@ DATABASE_URL=postgresql+psycopg://learn2trade_user:development_password@localhos
 
 Never commit `.env`. Never hard-code credentials in Python source.
 
+Required variables:
+
+```env
+DATABASE_URL=postgresql+psycopg://learn2trade_user:development_password@localhost:5432/learn2trade
+SECRET_KEY=change-me-to-a-long-random-string
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+CORS_ORIGINS=http://localhost:4200
+```
+
 ## Start FastAPI
 
 ```powershell
@@ -67,7 +76,20 @@ Optional CLI (requires `pip install "fastapi[standard]"`):
 fastapi dev app/main.py
 ```
 
-## Test the database connection
+## API overview
+
+JWT Bearer auth (`Authorization: Bearer <token>`).
+
+| Area | Endpoints |
+|------|-----------|
+| Auth | `POST /auth/register`, `POST /auth/login`, `GET /auth/me`, `POST /auth/logout` |
+| Users | `GET /users` (admin), `GET|PATCH /users/me`, wallet deposit/withdraw, ban/unban |
+| Cryptocurrencies | CRUD; writes require admin |
+| Investments | list/create/sell with atomic wallet updates |
+| Watchlist | list/subscribe/unsubscribe for current user |
+| Price alerts | list/create/update/delete for current user |
+
+Interactive docs: `http://127.0.0.1:8000/docs`
 
 With the API running:
 

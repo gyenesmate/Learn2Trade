@@ -3,37 +3,62 @@ from app.schemas.cryptocurrency import (
     CryptoCurrencyRead,
     CryptoCurrencyUpdate,
 )
-from app.schemas.investment import InvestmentCreate, InvestmentRead, InvestmentUpdate
-from app.schemas.price_alert import PriceAlertCreate, PriceAlertRead, PriceAlertUpdate
+from app.schemas.investment import (
+    InvestmentCreateRequest,
+    InvestmentRead,
+    InvestmentSellRequest,
+)
+from app.schemas.price_alert import (
+    AlertType,
+    PriceAlertCreateRequest,
+    PriceAlertRead,
+    PriceAlertUpdate,
+)
 from app.schemas.user import (
+    Theme,
+    TokenResponse,
     UserCreate,
+    UserLogin,
+    UserMeRead,
     UserPreferenceCreate,
     UserPreferenceRead,
     UserPreferenceUpdate,
+    UserProfileUpdate,
     UserRead,
-    UserUpdate,
+    UserRegister,
     UserWalletCreate,
     UserWalletRead,
     UserWalletUpdate,
+    WalletAmountRequest,
 )
+from app.schemas.watchlist import WatchlistCreateRequest, WatchlistSubscriptionRead
 
 __all__ = [
+    "AlertType",
     "CryptoCurrencyCreate",
     "CryptoCurrencyRead",
     "CryptoCurrencyUpdate",
-    "InvestmentCreate",
+    "InvestmentCreateRequest",
     "InvestmentRead",
-    "InvestmentUpdate",
-    "PriceAlertCreate",
+    "InvestmentSellRequest",
+    "PriceAlertCreateRequest",
     "PriceAlertRead",
     "PriceAlertUpdate",
+    "Theme",
+    "TokenResponse",
     "UserCreate",
+    "UserLogin",
+    "UserMeRead",
     "UserPreferenceCreate",
     "UserPreferenceRead",
     "UserPreferenceUpdate",
+    "UserProfileUpdate",
     "UserRead",
-    "UserUpdate",
+    "UserRegister",
     "UserWalletCreate",
     "UserWalletRead",
     "UserWalletUpdate",
+    "WalletAmountRequest",
+    "WatchlistCreateRequest",
+    "WatchlistSubscriptionRead",
 ]
