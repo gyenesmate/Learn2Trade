@@ -16,7 +16,7 @@ export class ActiveInvestmentComponent {
   @Output() sell = new EventEmitter<void>();
 
   get estimatedPayout(): number {
-    const buy = Number(this.investment?.buyingPrice || 0);
+    const buy = Number(this.investment?.buying_price || 0);
     const sell = Number(this.currentPrice || 0);
     const amount = Number(this.investment?.amount || 0);
     if (!buy || !sell || !amount) return 0;

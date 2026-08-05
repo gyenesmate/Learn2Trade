@@ -35,8 +35,8 @@
       <span class="spacer"></span>
 
       <div class="user-info" *ngIf="!isMobile && (isLoggedIn$ | async) && (user$ | async) as user">
-        <span class="balance">${{ user.preferences.websiteCurrencyBalance }}</span>
-        <span class="username">{{ user.userName }}</span>
+        <span class="balance">${{ user.balance }}</span>
+        <span class="username">{{ user.username }}</span>
         <button mat-icon-button [matMenuTriggerFor]="userMenu">
           <mat-icon>account_circle</mat-icon>
         </button>

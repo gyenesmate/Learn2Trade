@@ -20,7 +20,7 @@ export class CryptoCurrencyEditPageComponent implements OnInit {
   form = {
     name: '',
     symbol: '',
-    exchangeCurrency: 'USD'
+    exchange_currency: 'USD'
   };
 
   constructor(
@@ -49,7 +49,7 @@ export class CryptoCurrencyEditPageComponent implements OnInit {
       this.form = {
         name: existing.name,
         symbol: existing.symbol,
-        exchangeCurrency: existing.exchangeCurrency
+        exchange_currency: existing.exchange_currency
       };
     } catch (err) {
       console.error('Error loading crypto currency:', err);
@@ -61,10 +61,10 @@ export class CryptoCurrencyEditPageComponent implements OnInit {
 
   async save(): Promise<void> {
     const name = this.form.name.trim();
-    const exchangeCurrency = this.form.exchangeCurrency.trim();
+    const exchange_currency = this.form.exchange_currency.trim();
     const symbol = this.form.symbol.trim();
 
-    if (!name || !symbol || !exchangeCurrency) {
+    if (!name || !symbol || !exchange_currency) {
       this.notification.error('Please fill all fields');
       return;
     }
@@ -72,10 +72,10 @@ export class CryptoCurrencyEditPageComponent implements OnInit {
     this.saving = true;
     try {
       if (this.id) {
-        await this.cryptoCurrencies.update(this.id, { name, symbol, exchangeCurrency });
+        await this.cryptoCurrencies.update(this.id, { name, symbol, exchange_currency });
         this.notification.success('Crypto currency updated');
       } else {
-        await this.cryptoCurrencies.create({ name, symbol, exchangeCurrency });
+        await this.cryptoCurrencies.create({ name, symbol, exchange_currency });
         this.notification.success('Crypto currency created');
       }
       this.router.navigate(['/profile']);

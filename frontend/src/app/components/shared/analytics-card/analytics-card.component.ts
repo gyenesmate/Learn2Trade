@@ -2,6 +2,7 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AnalyticsCardState, AnalyticsCardInput } from './analytics-card-utilities';
 import { Investment } from '../../../const/models';
+import { isInvestmentSold } from '../../../core/investment.util';
 
 @Component({
   selector: 'app-analytics-card',
@@ -17,29 +18,33 @@ export class AnalyticsCardComponent {
   @Input() chartData?: any;
 
   private get soldInvestments(): Investment[] {
-    return (this.investments ?? []).filter(inv => !!inv?.isSold && inv.sellingPrice !== null);
+    return (this.investments ?? []).filter(inv => isInvestmentSold(inv) && inv.selling_price !== null);
   }
 
   profit(inv: Investment): number {
-    const buy = Number(inv?.buyingPrice || 0);
-    const sell = Number(inv?.sellingPrice || 0);
+    const buy = Number(inv?.buying_price || 0);
+    const sell = Number(inv?.selling_price || 0);
     const amount = Number(inv?.amount || 0);
     if (!Number.isFinite(buy) || !Number.isFinite(sell) || !Number.isFinite(amount)) return 0;
     return amount * (sell - buy);
   }
 
   roiPercent(inv: Investment): number {
-    const buy = Number(inv?.buyingPrice || 0);
-    const sell = Number(inv?.sellingPrice || 0);
+    const buy = Number(inv?.buying_price || 0);
+    const sell = Number(inv?.selling_price || 0);
     if (!buy || !sell) return 0;
     return ((sell - buy) / buy) * 100;
+  }
+
+  soldDate(inv: Investment): string {
+    return inv.sold_at ?? inv.created_at;
   }
 
   get timeline(): Investment[] {
     return [...this.soldInvestments]
       .sort((a, b) => {
-        const ta = (a.soldAt as any)?.toMillis?.() ?? (a.createdAt as any)?.toMillis?.() ?? 0;
-        const tb = (b.soldAt as any)?.toMillis?.() ?? (b.createdAt as any)?.toMillis?.() ?? 0;
+        const ta = Date.parse(this.soldDate(a)) || 0;
+        const tb = Date.parse(this.soldDate(b)) || 0;
         return tb - ta;
       })
       .slice(0, 6);

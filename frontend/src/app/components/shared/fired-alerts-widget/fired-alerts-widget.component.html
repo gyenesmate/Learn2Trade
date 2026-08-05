@@ -7,10 +7,10 @@
         <div class="meta">
           <div class="title">
             {{ label(a) }}
-            <span class="type">({{ a.type }})</span>
+            <span class="type">({{ a.alert_type }})</span>
           </div>
           <div class="sub">
-            Target: {{ a.alertPrice }}
+            Target: {{ a.alert_price }}
             <span *ngIf="a.description"> — {{ a.description }}</span>
           </div>
         </div>

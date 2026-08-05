@@ -1,43 +1,51 @@
-import { Injectable } from '@angular/core';
-import { FirestoreService } from './firestore.service';
-import { UsersService } from './users.service';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { CryptoCurrency } from '../const/models';
+import { ApiService } from '../core/api.service';
 
 @Injectable({ providedIn: 'root' })
 export class CryptoCurrenciesService {
-  private readonly collectionName = 'cryptoCurrencys';
-
-  constructor(private fs: FirestoreService, private users: UsersService) {}
+  private readonly http = inject(HttpClient);
+  private readonly api = inject(ApiService);
 
   getAll(): Promise<CryptoCurrency[]> {
-    return this.fs.getAll<CryptoCurrency>(this.collectionName);
+    return firstValueFrom(
+      this.http.get<CryptoCurrency[]>(this.api.url('/cryptocurrencies'))
+    );
   }
 
   getById(id: string): Promise<CryptoCurrency | null> {
-    return this.fs.getById<CryptoCurrency>(this.collectionName, id);
+    return firstValueFrom(
+      this.http.get<CryptoCurrency>(this.api.url(`/cryptocurrencies/${id}`))
+    ).catch((err) => {
+      if (err?.status === 404) return null;
+      throw err;
+    });
   }
 
-  async create(item: Omit<CryptoCurrency, 'id'>): Promise<string> {
-    const isAdmin = await this.users.isCurrentUserAdmin();
-    if (!isAdmin) {
-      throw new Error('Only admin users can add cryptocurrencies');
-    }
-    return this.fs.add<CryptoCurrency>(this.collectionName, item as any);
+  create(item: Omit<CryptoCurrency, 'id' | 'created_at' | 'updated_at'>): Promise<CryptoCurrency> {
+    return firstValueFrom(
+      this.http.post<CryptoCurrency>(this.api.url('/cryptocurrencies'), {
+        name: item.name,
+        symbol: item.symbol,
+        exchange_currency: item.exchange_currency,
+      })
+    );
   }
 
-  async update(id: string, updates: Partial<Omit<CryptoCurrency, 'id'>>): Promise<void> {
-    const isAdmin = await this.users.isCurrentUserAdmin();
-    if (!isAdmin) {
-      throw new Error('Only admin users can update cryptocurrencies');
-    }
-    await this.fs.updateById<CryptoCurrency>(this.collectionName, id, updates as any);
+  update(
+    id: string,
+    updates: Partial<Omit<CryptoCurrency, 'id' | 'created_at' | 'updated_at'>>
+  ): Promise<CryptoCurrency> {
+    return firstValueFrom(
+      this.http.patch<CryptoCurrency>(this.api.url(`/cryptocurrencies/${id}`), updates)
+    );
   }
 
   async delete(id: string): Promise<void> {
-    const isAdmin = await this.users.isCurrentUserAdmin();
-    if (!isAdmin) {
-      throw new Error('Only admin users can delete cryptocurrencies');
-    }
-    await this.fs.deleteById(this.collectionName, id);
+    await firstValueFrom(
+      this.http.delete(this.api.url(`/cryptocurrencies/${id}`))
+    );
   }
 }

@@ -2,7 +2,7 @@
 	<div class="crypto-card" [class.detailed]="state === 'detailed'" [class.compact]="state === 'compact'">
 		<div class="crypto-header">
 			<span class="crypto-name">{{ data.name }} ({{ data.symbol }})</span>
-			<span class="crypto-exchange">{{ exchangeLabel }} / {{ data.exchangeCurrency }}</span>
+			<span class="crypto-exchange">{{ exchangeLabel }} / {{ data.exchange_currency }}</span>
 			<button
 				mat-icon-button
 				class="watchlist-toggle"

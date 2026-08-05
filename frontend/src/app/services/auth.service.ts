@@ -1,89 +1,133 @@
-import { Injectable } from '@angular/core';
-import { Auth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, User as FirebaseUser, getAuth, updateEmail } from 'firebase/auth';
-import { BehaviorSubject, Observable, of, from } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
-import { User } from '../const/models';
-import { FirestoreService } from './firestore.service';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
+import { TokenResponse, UserMe } from '../const/models';
+import { ApiService } from '../core/api.service';
+import { TokenStorageService } from '../core/token.storage';
+import { toNumber } from '../core/number.util';
 
-@Injectable({
-  providedIn: 'root'
-})
+const SESSION_TIMEOUT_MS = 60 * 60 * 1000;
+
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private auth: Auth = getAuth();
-  // start with undefined so callers know we haven't checked yet
-  private currentUserSubject = new BehaviorSubject<FirebaseUser | null | undefined>(undefined);
-  public currentUser$ = this.currentUserSubject.asObservable();
+  private readonly http = inject(HttpClient);
+  private readonly api = inject(ApiService);
+  private readonly tokenStorage = inject(TokenStorageService);
 
-  // observable emitting the Firestore user doc
-  private currentUserDataSubject = new BehaviorSubject<User | null>(null);
-  public currentUserData$ = this.currentUserDataSubject.asObservable();
+  /** undefined = auth bootstrapping; null = logged out; UserMe = logged in */
+  private readonly currentUserDataSubject = new BehaviorSubject<UserMe | null | undefined>(undefined);
+  readonly currentUserData$ = this.currentUserDataSubject.asObservable();
 
-  private readonly SESSION_TIMEOUT = 60 * 60 * 1000; // 1 hour in milliseconds
-  private sessionCheckInterval: any;
+  private readonly authReadySubject = new BehaviorSubject<boolean>(false);
+  readonly authReady$ = this.authReadySubject.asObservable();
 
-  constructor(private fs: FirestoreService) {
-    onAuthStateChanged(this.auth, (user) => {
-      console.log('[AuthService] auth state changed:', user);
-      this.currentUserSubject.next(user);
-      if (user) {
-        this.startSessionTimer();
-        this.refreshUserData();
-      } else {
-        this.clearSessionTimer();
-        this.currentUserDataSubject.next(null);
-      }
-    });
+  private sessionCheckInterval: ReturnType<typeof setInterval> | null = null;
 
-    // Check session on app start
-    this.checkSessionTimeout();
+  constructor() {
+    void this.bootstrap();
   }
 
-  async refreshUserData() {
-    const firebaseUser = this.currentUserSubject.value;
-    if (!firebaseUser?.uid) {
+  private async bootstrap(): Promise<void> {
+    const token = this.tokenStorage.getAccessToken();
+    if (!token) {
       this.currentUserDataSubject.next(null);
+      this.authReadySubject.next(true);
+      return;
+    }
+
+    if (this.isSessionExpired()) {
+      this.clearSession();
+      this.currentUserDataSubject.next(null);
+      this.authReadySubject.next(true);
       return;
     }
 
     try {
-      const users = await this.fs.getWhere<User>('users', 'uid', '==', firebaseUser.uid);
-      const userData = users.length > 0 ? users[0] : null;
-      this.currentUserDataSubject.next(userData);
-    } catch (error) {
-      console.error('Error refreshing user data:', error);
+      await this.refreshUserData();
+      this.startSessionTimer();
+    } catch {
+      this.clearSession();
       this.currentUserDataSubject.next(null);
+    } finally {
+      this.authReadySubject.next(true);
     }
   }
 
-  async login(email: string, password: string): Promise<void> {
-    try {
-      const result = await signInWithEmailAndPassword(this.auth, email, password);
-        // refresh firestore-backed user data and check ban status
-        await this.refreshUserData();
-        const userData = this.currentUserDataSubject.value;
-        if (userData?.isBanned) {
-          // immediately sign out banned user
-          await signOut(this.auth);
-          // surface a specific error code so callers can react (navigate to banned page)
-          throw { code: 'auth/banned', message: 'User is banned' };
-        }
+  private normalizeUser(user: UserMe): UserMe {
+    return {
+      ...user,
+      balance: toNumber(user.balance),
+      profit_index: toNumber(user.profit_index),
+    };
+  }
 
-    } catch (err) {
+  private applyAuthSuccess(response: TokenResponse): UserMe {
+    this.tokenStorage.setAccessToken(response.access_token);
+    const user = this.normalizeUser(response.user);
+    this.currentUserDataSubject.next(user);
+    this.startSessionTimer();
+    return user;
+  }
+
+  async login(email: string, password: string): Promise<UserMe> {
+    try {
+      const response = await firstValueFrom(
+        this.http.post<TokenResponse>(this.api.url('/auth/login'), { email, password })
+      );
+      return this.applyAuthSuccess(response);
+    } catch (err: any) {
+      const detail = String(err?.error?.detail ?? '');
+      if (err?.status === 403 && detail.toLowerCase().includes('banned')) {
+        this.clearSession();
+        this.currentUserDataSubject.next(null);
+        throw { code: 'auth/banned', message: 'User is banned' };
+      }
       throw err;
     }
   }
 
-  async register(email: string, password: string): Promise<void> {
-    await createUserWithEmailAndPassword(this.auth, email, password);
+  async register(username: string, email: string, password: string): Promise<UserMe> {
+    const response = await firstValueFrom(
+      this.http.post<TokenResponse>(this.api.url('/auth/register'), {
+        username,
+        email,
+        password,
+      })
+    );
+    return this.applyAuthSuccess(response);
+  }
+
+  async refreshUserData(): Promise<void> {
+    if (!this.tokenStorage.getAccessToken()) {
+      this.currentUserDataSubject.next(null);
+      return;
+    }
+    const user = await firstValueFrom(
+      this.http.get<UserMe>(this.api.url('/auth/me'))
+    );
+    this.currentUserDataSubject.next(this.normalizeUser(user));
+  }
+
+  async logout(): Promise<void> {
+    try {
+      await firstValueFrom(this.http.post(this.api.url('/auth/logout'), null));
+    } catch {
+      // Stateless JWT logout; ignore network errors when clearing client session.
+    }
+    this.clearSession();
+    this.currentUserDataSubject.next(null);
+  }
+
+  private clearSession(): void {
+    this.tokenStorage.clear();
+    this.clearSessionTimer();
   }
 
   private startSessionTimer(): void {
-    const loginTime = Date.now();
-    localStorage.setItem('loginTime', loginTime.toString());
     this.clearSessionTimer();
     this.sessionCheckInterval = setInterval(() => {
       this.checkSessionTimeout();
-    }, 60000); // Check every minute
+    }, 60_000);
   }
 
   private clearSessionTimer(): void {
@@ -93,57 +137,33 @@ export class AuthService {
     }
   }
 
-  private async checkSessionTimeout(): Promise<void> {
-    const loginTimeStr = localStorage.getItem('loginTime');
-    if (loginTimeStr) {
-      const loginTime = parseInt(loginTimeStr, 10);
-      const currentTime = Date.now();
-      if (currentTime - loginTime > this.SESSION_TIMEOUT) {
-        await this.logout();
-        localStorage.removeItem('loginTime');
-      }
+  private checkSessionTimeout(): void {
+    if (this.isSessionExpired()) {
+      void this.logout();
     }
-  }
-
-  async logout(): Promise<void> {
-    await signOut(this.auth);
-    localStorage.removeItem('loginTime');
-    this.clearSessionTimer();
   }
 
   isSessionExpired(): boolean {
-    const loginTimeStr = localStorage.getItem('loginTime');
-    if (!loginTimeStr) return false;
-    const loginTime = parseInt(loginTimeStr, 10);
-    if (Number.isNaN(loginTime)) {
-      localStorage.removeItem('loginTime');
-      return false;
+    const loginTime = this.tokenStorage.getLoginTime();
+    if (loginTime === null) {
+      return !this.tokenStorage.getAccessToken();
     }
-    const expired = Date.now() - loginTime > this.SESSION_TIMEOUT;
+    const expired = Date.now() - loginTime > SESSION_TIMEOUT_MS;
     if (expired) {
       void this.logout();
     }
     return expired;
   }
 
-  async updateEmail(newEmail: string): Promise<void> {
-    const user = this.auth.currentUser;
-    if (user) {
-      await updateEmail(user, newEmail);
-    } else {
-      throw new Error('No authenticated user');
-    }
-  }
-
-  getCurrentUser(): FirebaseUser | null | undefined {
-    return this.currentUserSubject.value;
-  }
-
   isLoggedIn(): boolean {
-    return this.currentUserSubject.value !== null;
+    return !!this.tokenStorage.getAccessToken() && !!this.currentUserDataSubject.value;
   }
 
-  getCurrentUserObservable(): Observable<FirebaseUser | null | undefined> {
-    return this.currentUser$;
+  getCurrentUserData(): UserMe | null | undefined {
+    return this.currentUserDataSubject.value;
+  }
+
+  getCurrentUserObservable(): Observable<UserMe | null | undefined> {
+    return this.currentUserData$;
   }
 }

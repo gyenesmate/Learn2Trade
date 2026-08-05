@@ -1,27 +1,36 @@
-import { Injectable } from '@angular/core';
-import { FirestoreService } from './firestore.service';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { WatchlistSubscription } from '../const/models';
+import { ApiService } from '../core/api.service';
 
 @Injectable({ providedIn: 'root' })
 export class WatchlistSubscriptionsService {
-  private readonly collectionName = 'watchlistSubscriptions';
+  private readonly http = inject(HttpClient);
+  private readonly api = inject(ApiService);
 
-  constructor(private fs: FirestoreService) {}
+  getMe(): Promise<WatchlistSubscription[]> {
+    return firstValueFrom(
+      this.http.get<WatchlistSubscription[]>(this.api.url('/watchlist/me'))
+    );
+  }
 
+  /** @deprecated Prefer getMe(); kept for call-site compatibility during migration. */
   getAll(): Promise<WatchlistSubscription[]> {
-    return this.fs.getAll<WatchlistSubscription>(this.collectionName);
+    return this.getMe();
   }
 
-  getById(id: string): Promise<WatchlistSubscription | null> {
-    return this.fs.getById<WatchlistSubscription>(this.collectionName, id);
+  create(cryptoCurrencyId: string): Promise<WatchlistSubscription> {
+    return firstValueFrom(
+      this.http.post<WatchlistSubscription>(this.api.url('/watchlist'), {
+        crypto_currency_id: cryptoCurrencyId,
+      })
+    );
   }
 
-  create(item: Omit<WatchlistSubscription, 'id'>): Promise<string> {
-    return this.fs.add<WatchlistSubscription>(this.collectionName, item as any);
-  }
-
-  deleteById(id: string): Promise<void> {
-    return this.fs.deleteById(this.collectionName, id);
+  async deleteByCryptoCurrencyId(cryptoCurrencyId: string): Promise<void> {
+    await firstValueFrom(
+      this.http.delete(this.api.url(`/watchlist/${cryptoCurrencyId}`))
+    );
   }
 }
-

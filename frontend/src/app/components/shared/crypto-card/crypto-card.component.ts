@@ -6,7 +6,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { CryptoCurrency } from '../../../const/models';
 import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
-import { UsersService } from '../../../services/users.service';
 import { WatchlistSubscriptionsService } from '../../../services/watchlist-subscriptions.service';
 import { NotificationService } from '../../../services/notification.service';
 
@@ -32,6 +31,11 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
    * Crypto data to display
    */
   @Input() data!: CryptoCurrency;
+  /**
+   * Ids of cryptos the current user is watching. When provided by the parent,
+   * avoids each card needing to independently fetch the watchlist.
+   */
+  @Input() watchlistCryptoIds?: Set<string>;
 
   // Live fields (derived from Binance klines + websocket)
   exchangeLabel = 'Binance';
@@ -91,7 +95,6 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
     private decimalPipe: DecimalPipe,
     private destroyRef: DestroyRef,
     private auth: AuthService,
-    private users: UsersService,
     private watchlistSubscriptions: WatchlistSubscriptionsService,
     private notification: NotificationService
   ) {
@@ -113,37 +116,20 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
 
     try {
       const user = await firstValueFrom(this.auth.currentUserData$);
-      if (!user?.uid) {
+      if (!user?.id) {
         this.notification.warning('Please log in to save to watchlist');
         return;
       }
 
-      const existing = (user.preferences.watchlistSubscriptions ?? []) || [];
-      const match = existing.find(s => s?.cryptoCurrencyId === this.data.id);
-
-      if (match?.id) {
-        await this.watchlistSubscriptions.deleteById(match.id);
-        const updated = existing.filter(s => s?.id !== match.id);
-        await this.users.updateProfile(user.uid, {
-          preferences: {
-            ...user.preferences,
-            watchlistSubscriptions: updated
-          }
-        });
+      if (this.isInWatchlist) {
+        await this.watchlistSubscriptions.deleteByCryptoCurrencyId(this.data.id);
+        this.isInWatchlist = false;
         this.notification.info('Removed from watchlist');
         return;
       }
 
-      const id = await this.watchlistSubscriptions.create({ cryptoCurrencyId: this.data.id });
-      const updated = [...existing, { id, cryptoCurrencyId: this.data.id }];
-
-      await this.users.updateProfile(user.uid, {
-        preferences: {
-          ...user.preferences,
-          watchlistSubscriptions: updated
-        }
-      });
-
+      await this.watchlistSubscriptions.create(this.data.id);
+      this.isInWatchlist = true;
       this.notification.success('Saved to watchlist');
     } catch (err) {
       console.error('saveToWatchlist failed', err);
@@ -161,9 +147,21 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
 
         // watch for current user changes to determine if this crypto is in their watchlist
     try {
-      this.userSub = this.auth.currentUserData$.subscribe(user => {
-        const subs = (user?.preferences.watchlistSubscriptions ?? []) || [];
-        this.isInWatchlist = !!subs.find((s: any) => s?.cryptoCurrencyId === this.data?.id);
+      this.userSub = this.auth.currentUserData$.subscribe(async user => {
+        if (this.watchlistCryptoIds) {
+          this.isInWatchlist = !!this.data?.id && this.watchlistCryptoIds.has(this.data.id);
+          return;
+        }
+        if (!user?.id || !this.data?.id) {
+          this.isInWatchlist = false;
+          return;
+        }
+        try {
+          const subs = await this.watchlistSubscriptions.getMe();
+          this.isInWatchlist = !!subs.find(s => s.crypto_currency_id === this.data?.id);
+        } catch {
+          this.isInWatchlist = false;
+        }
       });
     } catch {}
   }
@@ -172,6 +170,10 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
     // If inputs change after init, reconnect and rerender.
     const stateChanged = !!changes['state'];
     const dataChanged = !!changes['data'];
+
+    if (changes['watchlistCryptoIds'] && this.watchlistCryptoIds) {
+      this.isInWatchlist = !!this.data?.id && this.watchlistCryptoIds.has(this.data.id);
+    }
 
     if (stateChanged) {
       this.currentType = this.state === 'detailed' ? 'candlestick' : 'line';
@@ -558,7 +560,7 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
     if (!base) return null;
 
     // Binance spot generally uses USDT rather than USD.
-    const quoteRaw = String(coin.exchangeCurrency ?? '').trim().toLowerCase();
+    const quoteRaw = String(coin.exchange_currency ?? '').trim().toLowerCase();
     const quote = quoteRaw === 'usd' ? 'usdt' : (quoteRaw || 'usdt');
 
     // Basic sanity: allow only letters/numbers to avoid malformed URLs.

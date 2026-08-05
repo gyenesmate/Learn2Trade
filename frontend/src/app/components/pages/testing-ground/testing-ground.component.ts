@@ -15,7 +15,9 @@ export class TestingGroundComponent implements OnInit {
     id: 'ethereum',
     name: 'Ethereum',
     symbol: 'ETH',
-    exchangeCurrency: 'USD',
+    exchange_currency: 'USD',
+    created_at: '',
+    updated_at: '',
   };
 
   ngOnInit(): void {}

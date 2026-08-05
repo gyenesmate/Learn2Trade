@@ -10,15 +10,15 @@
       <div class="info-grid" *ngIf="user$ | async as user">
         <div class="avatar-section">
           <div class="avatar-container">
-            <img *ngIf="avatarDisplayUrl" [src]="avatarDisplayUrl" alt="Avatar" class="avatar-image">
-            <div *ngIf="!avatarDisplayUrl" class="avatar-placeholder">
-              {{ user.userName.charAt(0).toUpperCase() }}
+            <img *ngIf="user.avatar_url" [src]="user.avatar_url" alt="Avatar" class="avatar-image">
+            <div *ngIf="!user.avatar_url" class="avatar-placeholder">
+              {{ user.username.charAt(0).toUpperCase() }}
             </div>
           </div>
         </div>
         <div class="info-item">
           <label>Name:</label>
-          <span>{{ user.userName }}</span>
+          <span>{{ user.username }}</span>
         </div>
         <div class="info-item">
           <label>Email:</label>
@@ -26,11 +26,11 @@
         </div>
         <div class="info-item">
           <label>Theme:</label>
-          <span>{{ user.preferences.theme }}</span>
+          <span>{{ user.theme }}</span>
         </div>
         <div class="info-item">
           <label>Account Balance:</label>
-          <span class="balance">${{ user.preferences.websiteCurrencyBalance }}</span>
+          <span class="balance">${{ user.balance }}</span>
         </div>
       </div>
     </section>

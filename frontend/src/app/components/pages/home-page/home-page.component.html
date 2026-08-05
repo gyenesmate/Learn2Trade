@@ -12,7 +12,7 @@
       <h2>Browse Cryptocurrencies</h2>
       <div class="crypto-grid">
         <div class="crypto-card card" *ngFor="let crypto of cryptocurrencies">
-          <app-crypto-card [state]="'compact'" [data]="crypto"></app-crypto-card>
+          <app-crypto-card [state]="'compact'" [data]="crypto" [watchlistCryptoIds]="watchlistCryptoIds"></app-crypto-card>
           <a class="btn btn-primary crypto-card__action" [routerLink]="['/crypto', crypto.id]">View Chart</a>
         </div>
       </div>
@@ -33,7 +33,7 @@
             <tbody>
               <tr *ngFor="let crypto of watchlistCryptos">
                 <td>{{ crypto.name }} ({{ crypto.symbol }})</td>
-                <td>{{ crypto.exchangeCurrency }}</td>
+                <td>{{ crypto.exchange_currency }}</td>
                 <td><a class="btn btn-primary" [routerLink]="['/crypto', crypto.id]">View</a></td>
               </tr>
             </tbody>

@@ -55,7 +55,7 @@ describe('AuthGuard', () => {
 
   it('redirects authenticated users away from /login to /dashboard', async () => {
     const resultPromise = firstValueFrom(guard.canActivate(routeWithPath('login')));
-    authState$.next({ uid: 'u1' });
+    authState$.next({ id: 'u1', username: 'tester' });
 
     const allowed = await resultPromise;
     expect(allowed).toBeFalse();

@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { UsersService } from '../../../services/users.service';
 import { NotificationService } from '../../../services/notification.service';
-import { User } from '../../../const/models';
+import { UserMe } from '../../../const/models';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -16,12 +16,9 @@ import { Observable } from 'rxjs';
   styleUrls: ['./edit-profile-page.component.scss']
 })
 export class EditProfilePageComponent implements OnInit {
-  user$: Observable<User | null>;
-  userName: string = '';
-  theme: string = 'light';
-  selectedFile: File | null = null;
-  avatarUrl: string = '';
-  avatarDisplayUrl: string = '';
+  user$: Observable<UserMe | null | undefined>;
+  username: string = '';
+  theme: 'light' | 'dark' | 'system' = 'light';
 
   constructor(
     private router: Router,
@@ -33,51 +30,25 @@ export class EditProfilePageComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.user$.subscribe(async user => {
+    this.user$.subscribe(user => {
       if (user) {
-        this.userName = user.userName;
-        this.theme = user.preferences.theme;
-        this.avatarUrl = user.avatarUrl || '';
-        if (this.avatarUrl) {
-          this.avatarDisplayUrl = await this.usersService.getAvatarUrl(this.avatarUrl);
-        } else {
-          this.avatarDisplayUrl = '';
-        }
+        this.username = user.username;
+        this.theme = user.theme;
       }
     });
   }
 
-  onFileSelected(event: any) {
-    this.selectedFile = event.target.files[0];
-  }
-
   async saveProfile() {
-    const currentUser = this.authService.getCurrentUser();
-    if (currentUser?.uid) {
-      try {
-        const currentUserData = await this.usersService.getCurrentUserData();
-        if (!currentUserData) return;
-
-        let avatarUrl = this.avatarUrl;
-
-        if (this.selectedFile) {
-          avatarUrl = await this.usersService.uploadAvatar(this.selectedFile, currentUser.uid);
-        }
-
-        await this.usersService.updateProfile(currentUser.uid, {
-          userName: this.userName,
-          avatarUrl: avatarUrl,
-          preferences: {
-            ...currentUserData.preferences,
-            theme: this.theme
-          }
-        });
-        this.notification.success('Profile updated successfully!');
-        this.router.navigate(['/profile']);
-      } catch (error) {
-        console.error('Error updating profile:', error);
-        this.notification.error('Error updating profile. Please try again.');
-      }
+    try {
+      await this.usersService.updateProfile({
+        username: this.username,
+        theme: this.theme
+      });
+      this.notification.success('Profile updated successfully!');
+      this.router.navigate(['/profile']);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      this.notification.error('Error updating profile. Please try again.');
     }
   }
 

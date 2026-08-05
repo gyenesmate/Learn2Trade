@@ -1,14 +1,20 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subscription, timer } from 'rxjs';
-import { FirestoreService } from './firestore.service';
-import { PriceAlert, CryptoCurrency } from '../const/models';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { BehaviorSubject, Subscription, firstValueFrom, timer } from 'rxjs';
+import { CryptoCurrency, PriceAlert } from '../const/models';
+import { ApiService } from '../core/api.service';
+import { toNumber } from '../core/number.util';
 import { AuthService } from './auth.service';
 import { CryptoCurrenciesService } from './crypto-currencies.service';
 import { NotificationService } from './notification.service';
 
 @Injectable({ providedIn: 'root' })
 export class PriceAlertsService {
-  private readonly collectionName = 'priceAlerts';
+  private readonly http = inject(HttpClient);
+  private readonly api = inject(ApiService);
+  private readonly auth = inject(AuthService);
+  private readonly cryptos = inject(CryptoCurrenciesService);
+  private readonly notification = inject(NotificationService);
 
   private readonly alertsSubject = new BehaviorSubject<PriceAlert[]>([]);
   readonly alerts$ = this.alertsSubject.asObservable();
@@ -20,30 +26,24 @@ export class PriceAlertsService {
   private authSub?: Subscription;
   private pollSub?: Subscription;
   private currentUserId: string | null = null;
-
   private readonly cryptoCache = new Map<string, CryptoCurrency>();
 
-  constructor(
-    private fs: FirestoreService,
-    private auth: AuthService,
-    private cryptos: CryptoCurrenciesService,
-    private notification: NotificationService
-  ) {}
+  private normalize(alert: PriceAlert): PriceAlert {
+    return {
+      ...alert,
+      alert_price: toNumber(alert.alert_price),
+    };
+  }
 
-  /**
-   * Starts background loading + polling for the current user.
-   * Safe to call multiple times.
-   */
   start(): void {
     if (this.started) return;
     this.started = true;
 
-    this.authSub = this.auth.currentUserData$.subscribe(user => {
-      const uid = user?.uid ?? null;
+    this.authSub = this.auth.currentUserData$.subscribe((user) => {
+      const uid = user?.id ?? null;
       if (uid === this.currentUserId) return;
       this.currentUserId = uid;
 
-      // reset state when user changes
       this.alertsSubject.next([]);
       this.firedAlertsSubject.next([]);
 
@@ -52,14 +52,17 @@ export class PriceAlertsService {
         return;
       }
 
-      // (re)load + start polling
       void this.reloadUserAlerts();
     });
   }
 
   stop(): void {
     this.started = false;
-    try { this.authSub?.unsubscribe(); } catch {}
+    try {
+      this.authSub?.unsubscribe();
+    } catch {
+      /* ignore */
+    }
     this.authSub = undefined;
     this.stopPollingOnly();
     this.currentUserId = null;
@@ -68,13 +71,16 @@ export class PriceAlertsService {
   }
 
   private stopPollingOnly(): void {
-    try { this.pollSub?.unsubscribe(); } catch {}
+    try {
+      this.pollSub?.unsubscribe();
+    } catch {
+      /* ignore */
+    }
     this.pollSub = undefined;
   }
 
   private startPollingOnly(): void {
     this.stopPollingOnly();
-    // Poll frequently enough for UX, but not too aggressive.
     this.pollSub = timer(0, 15000).subscribe(() => {
       void this.tick();
     });
@@ -86,7 +92,7 @@ export class PriceAlertsService {
       return;
     }
 
-    const hasActive = this.alertsSubject.value.some(a => !!a.isActive);
+    const hasActive = this.alertsSubject.value.some((a) => !!a.is_active);
     if (!hasActive) {
       this.stopPollingOnly();
       return;
@@ -97,51 +103,74 @@ export class PriceAlertsService {
     }
   }
 
-  async getAll(): Promise<PriceAlert[]> {
-    return this.fs.getAll<PriceAlert>(this.collectionName);
+  async getByUserId(_userId?: string): Promise<PriceAlert[]> {
+    const items = await firstValueFrom(
+      this.http.get<PriceAlert[]>(this.api.url('/price-alerts/me'))
+    );
+    return items.map((item) => this.normalize(item));
   }
 
-  async getById(id: string): Promise<PriceAlert | null> {
-    return this.fs.getById<PriceAlert>(this.collectionName, id);
-  }
-
-  async getByUserId(userId: string): Promise<PriceAlert[]> {
-    return this.fs.getWhere<PriceAlert>(this.collectionName, 'userId', '==', userId);
-  }
-
-  async create(item: Omit<PriceAlert, 'id'>): Promise<string> {
-    const id = await this.fs.add<PriceAlert>(this.collectionName, item as any);
-    // keep local cache in sync
-    if (this.currentUserId && item.userId === this.currentUserId) {
-      const next = [{ ...(item as any), id } as PriceAlert, ...this.alertsSubject.value];
-      this.alertsSubject.next(next);
+  async create(item: {
+    crypto_currency_id: string;
+    alert_price: number;
+    description?: string | null;
+    alert_type: 'above' | 'below';
+    is_active?: boolean;
+  }): Promise<PriceAlert> {
+    const created = await firstValueFrom(
+      this.http.post<PriceAlert>(this.api.url('/price-alerts'), {
+        crypto_currency_id: item.crypto_currency_id,
+        alert_price: Number(item.alert_price),
+        description: item.description ?? null,
+        alert_type: item.alert_type,
+        is_active: item.is_active ?? true,
+      })
+    );
+    const normalized = this.normalize(created);
+    if (this.currentUserId && normalized.user_id === this.currentUserId) {
+      this.alertsSubject.next([normalized, ...this.alertsSubject.value]);
       this.ensurePollingState();
     }
-    return id;
+    return normalized;
   }
 
-  async updateById(id: string, updates: Partial<Omit<PriceAlert, 'id'>>): Promise<void> {
-    await this.fs.updateById<PriceAlert>(this.collectionName, id, updates as any);
-    // refresh local cache (simple approach)
+  async updateById(
+    id: string,
+    updates: Partial<{
+      alert_price: number;
+      description: string | null;
+      alert_type: 'above' | 'below';
+      is_active: boolean;
+    }>
+  ): Promise<PriceAlert> {
+    const body: Record<string, unknown> = { ...updates };
+    if (updates.alert_price !== undefined) {
+      body['alert_price'] = Number(updates.alert_price);
+    }
+    const updated = await firstValueFrom(
+      this.http.patch<PriceAlert>(this.api.url(`/price-alerts/${id}`), body)
+    );
     await this.reloadUserAlerts();
+    return this.normalize(updated);
   }
 
   async deleteById(id: string): Promise<void> {
-    await this.fs.deleteById(this.collectionName, id);
-    // update local caches
-    this.alertsSubject.next(this.alertsSubject.value.filter(a => a.id !== id));
-    this.firedAlertsSubject.next(this.firedAlertsSubject.value.filter(a => a.id !== id));
+    await firstValueFrom(this.http.delete(this.api.url(`/price-alerts/${id}`)));
+    this.alertsSubject.next(this.alertsSubject.value.filter((a) => a.id !== id));
+    this.firedAlertsSubject.next(
+      this.firedAlertsSubject.value.filter((a) => a.id !== id)
+    );
     this.ensurePollingState();
   }
 
   async deactivate(id: string): Promise<void> {
-    await this.updateById(id, { isActive: false } as any);
-    // If it was fired, remove it from pinned widget.
-    this.firedAlertsSubject.next(this.firedAlertsSubject.value.filter(a => a.id !== id));
+    await this.updateById(id, { is_active: false });
+    this.firedAlertsSubject.next(
+      this.firedAlertsSubject.value.filter((a) => a.id !== id)
+    );
     this.ensurePollingState();
   }
 
-  /** Reloads alerts for current user (or clears if logged out). */
   async reloadUserAlerts(): Promise<void> {
     const uid = this.currentUserId;
     if (!uid) {
@@ -151,18 +180,16 @@ export class PriceAlertsService {
     }
     try {
       const all = await this.getByUserId(uid);
-      // newest first
       const sorted = [...all].sort((a, b) => {
-        const ta = (a.createdAt as any)?.toMillis?.() ?? (a.createdAt as any)?.seconds ?? 0;
-        const tb = (b.createdAt as any)?.toMillis?.() ?? (b.createdAt as any)?.seconds ?? 0;
+        const ta = Date.parse(a.created_at) || 0;
+        const tb = Date.parse(b.created_at) || 0;
         return tb - ta;
       });
       this.alertsSubject.next(sorted);
-      // prune fired list for deleted/inactive alerts
-      const activeIds = new Set(sorted.filter(a => a.isActive).map(a => a.id));
-      this.firedAlertsSubject.next(this.firedAlertsSubject.value.filter(a => activeIds.has(a.id)));
-
-      // start/stop background polling based on whether any alerts are active
+      const activeIds = new Set(sorted.filter((a) => a.is_active).map((a) => a.id));
+      this.firedAlertsSubject.next(
+        this.firedAlertsSubject.value.filter((a) => activeIds.has(a.id))
+      );
       this.ensurePollingState();
     } catch (err) {
       console.error('PriceAlertsService.reloadUserAlerts failed', err);
@@ -175,42 +202,44 @@ export class PriceAlertsService {
   private async tick(): Promise<void> {
     if (!this.currentUserId) return;
 
-    // periodically refresh alerts from Firestore so background stays accurate
     await this.reloadUserAlerts();
 
-    const activeAlerts = this.alertsSubject.value.filter(a => a.isActive);
+    const activeAlerts = this.alertsSubject.value.filter((a) => a.is_active);
     if (!activeAlerts.length) {
-      // nothing to poll right now
       this.ensurePollingState();
       return;
     }
 
-    // group by cryptoCurrencyId
-    const uniqueCryptoIds = Array.from(new Set(activeAlerts.map(a => a.cryptoCurrencyId)));
+    const uniqueCryptoIds = Array.from(
+      new Set(activeAlerts.map((a) => a.crypto_currency_id))
+    );
     const pricesByCryptoId = new Map<string, number>();
 
-    await Promise.all(uniqueCryptoIds.map(async (cryptoId) => {
-      const crypto = await this.getCryptoCached(cryptoId);
-      if (!crypto) return;
-      const pair = this.mapSymbolToBinancePair(crypto);
-      if (!pair) return;
-      const p = await this.fetchBinanceSpotPrice(pair);
-      if (Number.isFinite(p) && p > 0) pricesByCryptoId.set(cryptoId, p);
-    }));
+    await Promise.all(
+      uniqueCryptoIds.map(async (cryptoId) => {
+        const crypto = await this.getCryptoCached(cryptoId);
+        if (!crypto) return;
+        const pair = this.mapSymbolToBinancePair(crypto);
+        if (!pair) return;
+        const p = await this.fetchBinanceSpotPrice(pair);
+        if (Number.isFinite(p) && p > 0) pricesByCryptoId.set(cryptoId, p);
+      })
+    );
 
     if (!pricesByCryptoId.size) return;
 
-    const firedIds = new Set(this.firedAlertsSubject.value.map(a => a.id));
+    const firedIds = new Set(this.firedAlertsSubject.value.map((a) => a.id));
     const newlyFired: PriceAlert[] = [];
 
     for (const alert of activeAlerts) {
-      const price = pricesByCryptoId.get(alert.cryptoCurrencyId);
+      const price = pricesByCryptoId.get(alert.crypto_currency_id);
       if (!price) continue;
 
-      const target = Number(alert.alertPrice);
+      const target = Number(alert.alert_price);
       if (!Number.isFinite(target)) continue;
 
-      const hit = alert.type === 'above' ? price >= target : price <= target;
+      const hit =
+        alert.alert_type === 'above' ? price >= target : price <= target;
       if (!hit) continue;
       if (firedIds.has(alert.id)) continue;
 
@@ -219,12 +248,18 @@ export class PriceAlertsService {
     }
 
     if (newlyFired.length) {
-      this.firedAlertsSubject.next([...newlyFired, ...this.firedAlertsSubject.value]);
-      // Also raise a toast so user notices even if widget is minimized.
+      this.firedAlertsSubject.next([
+        ...newlyFired,
+        ...this.firedAlertsSubject.value,
+      ]);
       for (const a of newlyFired) {
-        const crypto = await this.getCryptoCached(a.cryptoCurrencyId);
-        const name = crypto?.symbol || a.cryptoCurrencyId;
-        this.notification.alert(`${name}: ${a.type === 'above' ? '≥' : '≤'} ${a.alertPrice}${a.description ? ' — ' + a.description : ''}`);
+        const crypto = await this.getCryptoCached(a.crypto_currency_id);
+        const name = crypto?.symbol || a.crypto_currency_id;
+        this.notification.alert(
+          `${name}: ${a.alert_type === 'above' ? '≥' : '≤'} ${a.alert_price}${
+            a.description ? ' — ' + a.description : ''
+          }`
+        );
       }
     }
   }
@@ -245,9 +280,10 @@ export class PriceAlertsService {
     const base = String(coin.symbol).trim().toLowerCase();
     if (!base) return null;
 
-    // Binance spot generally uses USDT rather than USD.
-    const quoteRaw = String(coin.exchangeCurrency ?? '').trim().toLowerCase();
-    const quote = quoteRaw === 'usd' ? 'usdt' : (quoteRaw || 'usdt');
+    const quoteRaw = String(coin.exchange_currency ?? '')
+      .trim()
+      .toLowerCase();
+    const quote = quoteRaw === 'usd' ? 'usdt' : quoteRaw || 'usdt';
 
     const safeBase = base.replace(/[^a-z0-9]/g, '');
     const safeQuote = quote.replace(/[^a-z0-9]/g, '');
@@ -257,8 +293,10 @@ export class PriceAlertsService {
 
   private async fetchBinanceSpotPrice(pair: string): Promise<number> {
     try {
-      const url = `https://api.binance.com/api/v3/ticker/price?symbol=${encodeURIComponent(pair.toUpperCase())}`;
-      const data = await fetch(url).then(r => r.json());
+      const url = `https://api.binance.com/api/v3/ticker/price?symbol=${encodeURIComponent(
+        pair.toUpperCase()
+      )}`;
+      const data = await fetch(url).then((r) => r.json());
       const price = Number(data?.price);
       return Number.isFinite(price) ? price : NaN;
     } catch {

@@ -1,7 +1,4 @@
-// Barrel file for services
-export * from './db';
 export * from './auth.service';
-export * from './firestore.service';
 export * from './users.service';
 export * from './crypto-currencies.service';
 export * from './watchlist-subscriptions.service';

@@ -1,16 +1,15 @@
 import { Component, OnInit, ViewChild, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { CryptoCurrency, Investment, User } from '../../../const/models';
+import { CryptoCurrency, Investment, UserMe } from '../../../const/models';
 import { CryptoCurrenciesService } from '../../../services/crypto-currencies.service';
 import { CryptoCardComponent } from '../../shared/crypto-card/crypto-card.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { InvestDialogComponent, InvestDialogResult } from '../../shared/invest-dialog/invest-dialog.component';
 import { AuthService } from '../../../services/auth.service';
-import { UsersService } from '../../../services/users.service';
 import { InvestmentsService } from '../../../services/investments.service';
 import { NotificationService } from '../../../services/notification.service';
-import { firstValueFrom, Observable, BehaviorSubject, combineLatest, map } from 'rxjs';
+import { firstValueFrom, Observable, combineLatest, map } from 'rxjs';
 import { ActiveInvestmentComponent } from '../../shared/active-investment/active-investment.component';
 import { SetPriceAlertDialogComponent, SetPriceAlertDialogResult } from '../../shared/set-price-alert-dialog/set-price-alert-dialog.component';
 import { PriceAlertsService } from '../../../services/price-alerts.service';
@@ -25,16 +24,16 @@ import { FiredAlertsWidgetComponent } from '../../shared/fired-alerts-widget/fir
 })
 export class CryptoDetailPageComponent implements OnInit {
   cryptocurrencies: CryptoCurrency[] = [
-    { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', exchangeCurrency: 'USD' },
-    { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', exchangeCurrency: 'USD' },
-    { id: 'cardano', name: 'Cardano', symbol: 'ADA', exchangeCurrency: 'USD' },
-    { id: 'binancecoin', name: 'Binance Coin', symbol: 'BNB', exchangeCurrency: 'USD' },
-    { id: 'ripple', name: 'Ripple', symbol: 'XRP', exchangeCurrency: 'USD' }
+    { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', exchange_currency: 'USD', created_at: '', updated_at: '' },
+    { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', exchange_currency: 'USD', created_at: '', updated_at: '' },
+    { id: 'cardano', name: 'Cardano', symbol: 'ADA', exchange_currency: 'USD', created_at: '', updated_at: '' },
+    { id: 'binancecoin', name: 'Binance Coin', symbol: 'BNB', exchange_currency: 'USD', created_at: '', updated_at: '' },
+    { id: 'ripple', name: 'Ripple', symbol: 'XRP', exchange_currency: 'USD', created_at: '', updated_at: '' }
   ];
 
   selectedId: string | null = null;
   selectedCrypto: CryptoCurrency | null = null;
-  user$: Observable<User | null>;
+  user$: Observable<UserMe | null | undefined>;
   activeInvestments: Investment[] = [];
   investing = false;
   selling = false;
@@ -49,7 +48,6 @@ export class CryptoDetailPageComponent implements OnInit {
     private cryptoService: CryptoCurrenciesService,
     private dialog: MatDialog,
     private auth: AuthService,
-    private users: UsersService,
     private investments: InvestmentsService,
     private priceAlerts: PriceAlertsService,
     private notification: NotificationService
@@ -68,7 +66,7 @@ export class CryptoDetailPageComponent implements OnInit {
     ]).pipe(
       map(([alerts, selectedId]) => {
         if (!selectedId) return [];
-        return (alerts || []).filter(a => a.cryptoCurrencyId === selectedId && !!a.isActive);
+        return (alerts || []).filter(a => a.crypto_currency_id === selectedId && !!a.is_active);
       })
     );
 
@@ -111,11 +109,11 @@ export class CryptoDetailPageComponent implements OnInit {
   private async loadActiveInvestments(): Promise<void> {
     try {
       const user = await firstValueFrom(this.user$);
-      if (!user?.uid || !this.selectedCrypto?.id) {
+      if (!user?.id || !this.selectedCrypto?.id) {
         this.activeInvestments = [];
         return;
       }
-      this.activeInvestments = await this.investments.getActiveByUserAndCrypto(user.uid, this.selectedCrypto.id);
+      this.activeInvestments = await this.investments.getActiveByUserAndCrypto(user.id, this.selectedCrypto.id);
     } catch {
       this.activeInvestments = [];
     }
@@ -153,7 +151,7 @@ export class CryptoDetailPageComponent implements OnInit {
 
     try {
       const user = await firstValueFrom(this.user$);
-      if (!user?.uid) {
+      if (!user?.id) {
         this.notification.warning('Please log in to set alerts');
         return;
       }
@@ -165,17 +163,15 @@ export class CryptoDetailPageComponent implements OnInit {
       }
 
       const currentPrice = Number(this.card?.livePrice || 0);
-      const type = alertPrice < currentPrice ? 'below' : 'above';
+      const alertType: 'above' | 'below' = alertPrice < currentPrice ? 'below' : 'above';
 
       await this.priceAlerts.create({
-        cryptoCurrencyId: this.selectedCrypto.id,
-        userId: user.uid,
-        alertPrice,
+        crypto_currency_id: this.selectedCrypto.id,
+        alert_price: alertPrice,
         description: String(result.description || ''),
-        type,
-        isActive: true,
-        createdAt: new Date() as any
-      } as any);
+        alert_type: alertType,
+        is_active: true
+      });
 
       this.notification.success('Alert created');
     } catch (err: any) {
@@ -191,7 +187,7 @@ export class CryptoDetailPageComponent implements OnInit {
 
     try {
       const user = await firstValueFrom(this.user$);
-      if (!user?.uid) {
+      if (!user?.id) {
         this.notification.warning('Please log in to invest');
         return;
       }
@@ -202,7 +198,7 @@ export class CryptoDetailPageComponent implements OnInit {
         return;
       }
 
-      const balance = Number(user.preferences.websiteCurrencyBalance || 0);
+      const balance = Number(user.balance || 0);
       if (balance < amount) {
         this.notification.error('Insufficient balance');
         return;
@@ -214,32 +210,13 @@ export class CryptoDetailPageComponent implements OnInit {
         return;
       }
 
-      // subtract first (atomicity is limited without transactions; keep it simple)
-      await this.users.subtractCurrencyFromBalance(user.uid, amount);
-
-      const id = await this.investments.create({
-        cryptoCurrencyId: this.selectedCrypto.id,
-        userId: user.uid,
+      const newInv = await this.investments.create({
+        crypto_currency_id: this.selectedCrypto.id,
         amount,
-        buyingPrice: currentPrice,
-        sellingPrice: null,
-        isSold: false,
-        description: result.description,
-        soldAt: null
-      } as any);
+        buying_price: currentPrice,
+        description: result.description
+      });
 
-      const newInv: Investment = {
-        id,
-        cryptoCurrencyId: this.selectedCrypto.id,
-        userId: user.uid,
-        amount,
-        buyingPrice: currentPrice,
-        sellingPrice: null,
-        isSold: false,
-        description: result.description,
-        soldAt: null as any,
-        createdAt: new Date() as any
-      };
       this.activeInvestments.push(newInv);
 
       this.notification.success('Investment created');
@@ -256,9 +233,6 @@ export class CryptoDetailPageComponent implements OnInit {
     this.selling = true;
 
     try {
-      const user = await firstValueFrom(this.user$);
-      if (!user?.uid) throw new Error('User not found');
-
       const currentPrice = Number(this.card?.livePrice || 0);
       if (!Number.isFinite(currentPrice) || currentPrice <= 0) throw new Error('Current price unavailable');
 
@@ -273,19 +247,7 @@ export class CryptoDetailPageComponent implements OnInit {
 
       if (!inv) throw new Error('Investment not found');
 
-      const buy = Number(inv.buyingPrice || 0);
-      const amountPaid = Number(inv.amount || 0);
-      if (!buy || !amountPaid) throw new Error('Invalid investment');
-
-      const payout = amountPaid * (currentPrice / buy);
-
-      await this.investments.updateById(inv.id, {
-        sellingPrice: currentPrice,
-        isSold: true,
-        soldAt: new Date() as any
-      } as any);
-
-      await this.users.addCurrencyToBalance(user.uid, payout);
+      await this.investments.sell(inv.id, currentPrice);
       this.notification.success('Investment sold');
 
       // remove from local list

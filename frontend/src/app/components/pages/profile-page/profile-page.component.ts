@@ -6,14 +6,13 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { AuthService } from '../../../services/auth.service';
 import { UsersService } from '../../../services/users.service';
 import { NotificationService } from '../../../services/notification.service';
-import { CryptoCurrency, Investment, User } from '../../../const/models';
+import { CryptoCurrency, Investment, User, UserMe } from '../../../const/models';
 import { firstValueFrom, Observable, Subscription } from 'rxjs';
 import { CryptoCurrenciesService } from '../../../services/crypto-currencies.service';
 import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/confirmation-dialog.component';
 import { DataTableComponent } from '../../shared/data-table/data-table.component';
 import { TableColumn, RowAction, TableAction } from '../../shared/data-table/data-table-utilities';
 import { WatchlistSubscriptionsService } from '../../../services/watchlist-subscriptions.service';
-import { WatchlistSubscription } from '../../../const/models';
 import { InvestmentsService } from '../../../services/investments.service';
 import { PriceAlertsService } from '../../../services/price-alerts.service';
 import { PriceAlert } from '../../../const/models';
@@ -26,27 +25,26 @@ import { PriceAlert } from '../../../const/models';
   styleUrls: ['./profile-page.component.scss']
 })
 export class ProfilePageComponent implements OnInit, OnDestroy {
-  user$: Observable<User | null>;
+  user$: Observable<UserMe | null | undefined>;
   addAmount: number = 0;
-  avatarDisplayUrl: string | null = null;
 
   // Admin tables
   isAdmin = false;
   cryptoCurrencies: CryptoCurrency[] = [];
   users: User[] = [];
   adminLoading = false;
-  
+
   // Columns and actions for admin tables
   cryptoColumns: TableColumn<CryptoCurrency>[] = [
     { key: 'name', label: 'Name' },
     { key: 'symbol', label: 'Symbol' },
-    { key: 'exchangeCurrency', label: 'Quote' }
+    { key: 'exchange_currency', label: 'Quote' }
   ];
 
   userColumns: TableColumn<User>[] = [
-    { key: 'userName', label: 'User name' },
+    { key: 'username', label: 'User name' },
     { key: 'email', label: 'Email' },
-    { key: 'isAdmin', label: 'Admin' }
+    { key: 'is_admin', label: 'Admin', type: 'boolean' }
   ];
 
   cryptoRowActions: RowAction<CryptoCurrency>[] = [
@@ -65,7 +63,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     { key: 'symbol', label: 'Symbol' },
     { key: 'exchangeCurrency', label: 'Quote' }
   ];
-  watchlistRows: Array<{ subscriptionId: string; cryptoCurrencyId: string; name: string; symbol: string; exchangeCurrency: string }> = [];
+  watchlistRows: Array<{ cryptoCurrencyId: string; name: string; symbol: string; exchangeCurrency: string }> = [];
   watchlistRowActions: RowAction<any>[] = [
     { label: 'Delete', icon: 'delete', color: 'warn', callback: (row) => void this.deleteWatchlistSubscription(row) }
   ];
@@ -119,18 +117,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     void this.bindAlertsTable();
 
     this.user$.subscribe(user => {
-      this.isAdmin = !!user?.isAdmin;
-
-      if (user?.avatarUrl) {
-        this.usersService.getAvatarUrl(user.avatarUrl).then(url => {
-          this.avatarDisplayUrl = url;
-        }).catch(error => {
-          console.error('Error fetching avatar URL:', error);
-          this.avatarDisplayUrl = null;
-        });
-      } else {
-        this.avatarDisplayUrl = null;
-      }
+      this.isAdmin = !!user?.is_admin;
 
       if (this.isAdmin) {
         void this.loadAdminTables();
@@ -141,7 +128,6 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
 
       // load investments table
       void this.loadInvestmentsTable();
-
     });
   }
 
@@ -160,17 +146,16 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
         const cryptoById = new Map(cryptos.map(c => [c.id, c] as const));
 
         this.alertsRows = (alerts || []).map((a: PriceAlert) => {
-          const crypto = cryptoById.get(a.cryptoCurrencyId);
-          const createdAt = (a.createdAt as any)?.toDate?.() ?? a.createdAt;
+          const crypto = cryptoById.get(a.crypto_currency_id);
           return {
             id: a.id,
-            cryptoCurrencyId: a.cryptoCurrencyId,
-            currencyName: crypto?.name ?? a.cryptoCurrencyId,
-            type: a.type,
-            alertPrice: Number(a.alertPrice || 0),
+            cryptoCurrencyId: a.crypto_currency_id,
+            currencyName: crypto?.name ?? a.crypto_currency_id,
+            type: a.alert_type,
+            alertPrice: Number(a.alert_price || 0),
             description: String(a.description || ''),
-            isActive: !!a.isActive,
-            createdAt: createdAt || null
+            isActive: !!a.is_active,
+            createdAt: a.created_at || null
           };
         });
       } catch (err) {
@@ -205,29 +190,27 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   private async loadInvestmentsTable(): Promise<void> {
     try {
       const user = await firstValueFrom(this.user$);
-      if (!user?.uid) {
+      if (!user?.id) {
         this.investmentsRows = [];
         return;
       }
 
       const [investments, cryptos] = await Promise.all([
-        this.investmentsService.getByUserId(user.uid).catch(() => [] as Investment[]),
+        this.investmentsService.getByUserId().catch(() => [] as Investment[]),
         this.cryptoCurrenciesService.getAll().catch(() => [] as CryptoCurrency[])
       ]);
 
       const cryptoById = new Map(cryptos.map(c => [c.id, c] as const));
       this.investmentsRows = investments.map(inv => {
-        const crypto = cryptoById.get(inv.cryptoCurrencyId);
-        const createdAt = (inv.createdAt as any)?.toDate?.() ?? inv.createdAt;
-        const soldAt = (inv.soldAt as any)?.toDate?.() ?? inv.soldAt;
+        const crypto = cryptoById.get(inv.crypto_currency_id);
         return {
           id: inv.id,
-          cryptoCurrencyId: inv.cryptoCurrencyId,
-          currencyName: crypto?.name ?? inv.cryptoCurrencyId,
-          exchange: crypto?.exchangeCurrency ?? '',
-          amount: Number((inv as any).amount || 0),
-          soldAt: soldAt || null,
-          createdAt: createdAt || null
+          cryptoCurrencyId: inv.crypto_currency_id,
+          currencyName: crypto?.name ?? inv.crypto_currency_id,
+          exchange: crypto?.exchange_currency ?? '',
+          amount: Number(inv.amount || 0),
+          soldAt: inv.sold_at || null,
+          createdAt: inv.created_at || null
         };
       });
     } catch (err) {
@@ -239,28 +222,33 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   private async loadWatchlistTable(): Promise<void> {
     try {
       const user = await firstValueFrom(this.user$);
-      const subs = (user?.preferences.watchlistSubscriptions ?? []) || [];
-      const cryptos = await this.cryptoCurrenciesService.getAll().catch(() => [] as CryptoCurrency[]);
+      if (!user?.id) {
+        this.watchlistRows = [];
+        return;
+      }
+
+      const [subs, cryptos] = await Promise.all([
+        this.watchlistSubscriptionsService.getMe().catch(() => []),
+        this.cryptoCurrenciesService.getAll().catch(() => [] as CryptoCurrency[])
+      ]);
       const cryptoById = new Map(cryptos.map(c => [c.id, c] as const));
 
-      this.watchlistRows = subs
-        .map(s => {
-          const crypto = cryptoById.get(s.cryptoCurrencyId);
-          return {
-            subscriptionId: s.id,
-            cryptoCurrencyId: s.cryptoCurrencyId,
-            name: crypto?.name ?? s.cryptoCurrencyId,
-            symbol: crypto?.symbol ?? '',
-            exchangeCurrency: crypto?.exchangeCurrency ?? ''
-          };
-        });
+      this.watchlistRows = subs.map(s => {
+        const crypto = cryptoById.get(s.crypto_currency_id);
+        return {
+          cryptoCurrencyId: s.crypto_currency_id,
+          name: crypto?.name ?? s.crypto_currency_id,
+          symbol: crypto?.symbol ?? '',
+          exchangeCurrency: crypto?.exchange_currency ?? ''
+        };
+      });
     } catch (err) {
       console.error('Error loading watchlist', err);
       this.watchlistRows = [];
     }
   }
 
-  async deleteWatchlistSubscription(row: { subscriptionId: string; cryptoCurrencyId: string }): Promise<void> {
+  async deleteWatchlistSubscription(row: { cryptoCurrencyId: string }): Promise<void> {
     const ref = this.dialog.open(ConfirmationDialogComponent, {
       data: {
         title: 'Delete watchlist subscription',
@@ -274,20 +262,7 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     if (!confirmed) return;
 
     try {
-      const user = await firstValueFrom(this.user$);
-      if (!user?.uid) throw new Error('User not found');
-
-      await this.watchlistSubscriptionsService.deleteById(row.subscriptionId);
-
-      const existing = (user.preferences.watchlistSubscriptions ?? []) || [];
-      const updated = existing.filter(s => s.id !== row.subscriptionId);
-      await this.usersService.updateProfile(user.uid, {
-        preferences: {
-          ...user.preferences,
-          watchlistSubscriptions: updated
-        }
-      });
-
+      await this.watchlistSubscriptionsService.deleteByCryptoCurrencyId(row.cryptoCurrencyId);
       this.notification.success('Removed from watchlist');
       await this.loadWatchlistTable();
     } catch (err) {
@@ -349,11 +324,11 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
   }
 
   async deleteUser(user: User): Promise<void> {
-    const action = user.isBanned ? 'Unban' : 'Ban';
+    const action = user.is_banned ? 'Unban' : 'Ban';
     const ref = this.dialog.open(ConfirmationDialogComponent, {
       data: {
         title: `${action} user`,
-        message: `${action} user ${user.userName} (${user.email})?`,
+        message: `${action} user ${user.username} (${user.email})?`,
         confirmText: action,
         cancelText: 'Cancel'
       }
@@ -363,11 +338,11 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
     if (!confirmed) return;
 
     try {
-      if (user.isBanned) {
-        await this.usersService.unbanByUid(user.uid);
+      if (user.is_banned) {
+        await this.usersService.unbanByUid(user.id);
         this.notification.success('User unbanned');
       } else {
-        await this.usersService.banByUid(user.uid);
+        await this.usersService.banByUid(user.id);
         this.notification.success('User banned');
       }
       await this.loadAdminTables();
@@ -379,16 +354,13 @@ export class ProfilePageComponent implements OnInit, OnDestroy {
 
   async addCurrency() {
     if (this.addAmount > 0) {
-      const currentUser = this.authService.getCurrentUser();
-      if (currentUser?.uid) {
-        try {
-          await this.usersService.addCurrencyToBalance(currentUser.uid, this.addAmount);
-          this.addAmount = 0; // Reset form
-          this.notification.success('Currency added successfully!');
-        } catch (error) {
-          console.error('Error adding currency:', error);
-          this.notification.error('Error adding currency. Please try again.');
-        }
+      try {
+        await this.usersService.addCurrencyToBalance(this.addAmount);
+        this.addAmount = 0; // Reset form
+        this.notification.success('Currency added successfully!');
+      } catch (error) {
+        console.error('Error adding currency:', error);
+        this.notification.error('Error adding currency. Please try again.');
       }
     }
   }

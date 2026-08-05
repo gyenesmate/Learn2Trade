@@ -1,55 +1,61 @@
-import { Timestamp } from 'firebase/firestore';
-
 export interface User {
-    uid: string;
-    userName: string;
-    email: string;
-    avatarUrl?: string | null;
-    preferences: {
-        watchlistSubscriptions?: WatchlistSubscription[] | null;
-        investments?: Investment[] | null;
-        websiteCurrencyBalance: number;
-        profitIndex: number;
-        theme: string;
-    };
-    isAdmin: boolean;
-    isBanned: boolean;
-    createdAt: Timestamp;
-    updatedAt?: Timestamp;
+  id: string;
+  username: string;
+  email: string;
+  avatar_url: string | null;
+  is_admin: boolean;
+  is_banned: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserMe extends User {
+  theme: 'light' | 'dark' | 'system';
+  balance: number;
+  currency_code: string;
+  profit_index: number;
+}
+
+export interface TokenResponse {
+  access_token: string;
+  token_type: string;
+  user: UserMe;
 }
 
 export interface CryptoCurrency {
-    id: string;
-    name: string;
-    symbol: string;
-    exchangeCurrency: string;
-}
-
-export interface WatchlistSubscription {
-    id: string;
-    cryptoCurrencyId: string;
+  id: string;
+  name: string;
+  symbol: string;
+  exchange_currency: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Investment {
-    id: string;
-    cryptoCurrencyId: string;
-    userId: string;
-    amount: number;
-    buyingPrice: number;
-    sellingPrice: number | null;
-    isSold: boolean | null;
-    description: string;
-    soldAt: Timestamp | null;
-    createdAt: Timestamp;
+  id: string;
+  user_id: string;
+  crypto_currency_id: string;
+  amount: number;
+  buying_price: number;
+  selling_price: number | null;
+  description: string | null;
+  sold_at: string | null;
+  created_at: string;
+}
+
+export interface WatchlistSubscription {
+  user_id: string;
+  crypto_currency_id: string;
+  created_at: string;
 }
 
 export interface PriceAlert {
-    id: string;
-    cryptoCurrencyId: string;
-    userId: string;
-    alertPrice: number;
-    description: string;
-    type: 'above' | 'below';
-    isActive: boolean;
-    createdAt: Timestamp;
+  id: string;
+  user_id: string;
+  crypto_currency_id: string;
+  alert_price: number;
+  description: string | null;
+  alert_type: 'above' | 'below';
+  is_active: boolean;
+  created_at: string;
 }

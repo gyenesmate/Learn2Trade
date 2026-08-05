@@ -7,6 +7,7 @@ import { AuthService } from '../../../services/auth.service';
 import { InvestmentsService } from '../../../services/investments.service';
 import { CryptoCurrenciesService } from '../../../services/crypto-currencies.service';
 import { NotificationService } from '../../../services/notification.service';
+import { isInvestmentSold } from '../../../core/investment.util';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -69,14 +70,13 @@ export class DashboardComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     try {
       const user = await firstValueFrom(this.auth.currentUserData$);
-      const uid = user?.uid;
-      if (!uid) {
+      if (!user?.id) {
         this.isLoading = false;
         return;
       }
 
       const [investments, cryptos] = await Promise.all([
-        this.investmentsService.getByUserId(uid),
+        this.investmentsService.getByUserId(),
         this.cryptosService.getAll()
       ]);
 
@@ -100,14 +100,14 @@ export class DashboardComponent implements OnInit {
     pricesByCryptoId: Map<string, number>
   ) {
     const cryptoById = new Map(cryptos.map(c => [c.id, c] as const));
-    const active = investments.filter(i => !i.isSold);
+    const active = investments.filter(i => !isInvestmentSold(i));
     const grouped = new Map<string, { amount: number; invested: number }>();
 
     for (const inv of active) {
-      const prev = grouped.get(inv.cryptoCurrencyId) ?? { amount: 0, invested: 0 };
+      const prev = grouped.get(inv.crypto_currency_id) ?? { amount: 0, invested: 0 };
       const amount = Number(inv.amount || 0);
-      const invested = amount * Number(inv.buyingPrice || 0);
-      grouped.set(inv.cryptoCurrencyId, {
+      const invested = amount * Number(inv.buying_price || 0);
+      grouped.set(inv.crypto_currency_id, {
         amount: prev.amount + amount,
         invested: prev.invested + invested
       });
@@ -157,8 +157,8 @@ export class DashboardComponent implements OnInit {
     const prices = new Map<string, number>();
     const cryptoById = new Map(cryptos.map(c => [c.id, c] as const));
 
-    const active = investments.filter(i => !i.isSold);
-    const ids = Array.from(new Set(active.map(i => i.cryptoCurrencyId)));
+    const active = investments.filter(i => !isInvestmentSold(i));
+    const ids = Array.from(new Set(active.map(i => i.crypto_currency_id)));
     if (!ids.length) return prices;
 
     await Promise.all(ids.map(async (id) => {
@@ -177,7 +177,7 @@ export class DashboardComponent implements OnInit {
     const base = String(coin.symbol).trim().toLowerCase();
     if (!base) return null;
 
-    const quoteRaw = String(coin.exchangeCurrency ?? '').trim().toLowerCase();
+    const quoteRaw = String(coin.exchange_currency ?? '').trim().toLowerCase();
     const quote = quoteRaw === 'usd' ? 'usdt' : (quoteRaw || 'usdt');
 
     const safeBase = base.replace(/[^a-z0-9]/g, '');
@@ -198,10 +198,10 @@ export class DashboardComponent implements OnInit {
   }
 
   private buildMetrics(investments: Investment[]) {
-    const sold = investments.filter(i => i.isSold);
+    const sold = investments.filter(i => isInvestmentSold(i));
     const returns = sold.map(i => {
-      const buy = Number(i.buyingPrice || 0);
-      const sell = Number(i.sellingPrice || 0);
+      const buy = Number(i.buying_price || 0);
+      const sell = Number(i.selling_price || 0);
       if (buy <= 0 || !sell) return 0;
       return ((sell - buy) / buy) * 100;
     }).filter(r => Number.isFinite(r));

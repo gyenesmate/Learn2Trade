@@ -1,36 +1,82 @@
-import { Injectable } from '@angular/core';
-import { FirestoreService } from './firestore.service';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 import { Investment } from '../const/models';
+import { ApiService } from '../core/api.service';
+import { toNumber, toNumberOrNull } from '../core/number.util';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class InvestmentsService {
-  private readonly collectionName = 'investments';
+  private readonly http = inject(HttpClient);
+  private readonly api = inject(ApiService);
+  private readonly auth = inject(AuthService);
 
-  constructor(private fs: FirestoreService) {}
-
-  getAll(): Promise<Investment[]> {
-    return this.fs.getAll<Investment>(this.collectionName);
+  private normalize(investment: Investment): Investment {
+    return {
+      ...investment,
+      amount: toNumber(investment.amount),
+      buying_price: toNumber(investment.buying_price),
+      selling_price: toNumberOrNull(investment.selling_price),
+    };
   }
 
-  getById(id: string): Promise<Investment | null> {
-    return this.fs.getById<Investment>(this.collectionName, id);
+  private normalizeList(items: Investment[]): Investment[] {
+    return items.map((item) => this.normalize(item));
   }
 
-  create(item: Omit<Investment, 'id' | 'createdAt'>): Promise<string> {
-    const toSave = { ...item, createdAt: new Date() } as any;
-    return this.fs.add<Investment>(this.collectionName, toSave);
+  async getAll(): Promise<Investment[]> {
+    return this.getByUserId();
   }
 
-  getByUserId(userId: string): Promise<Investment[]> {
-    return this.fs.getWhere<Investment>(this.collectionName, 'userId', '==', userId);
+  async getById(id: string): Promise<Investment | null> {
+    const list = await this.getByUserId();
+    return list.find((item) => item.id === id) ?? null;
   }
 
-  async getActiveByUserAndCrypto(userId: string, cryptoCurrencyId: string): Promise<Investment[]> {
-    const list = await this.fs.getWhere<Investment>(this.collectionName, 'userId', '==', userId);
-    return list.filter(i => i.cryptoCurrencyId === cryptoCurrencyId && !i.isSold);
+  async getByUserId(_userId?: string): Promise<Investment[]> {
+    const items = await firstValueFrom(
+      this.http.get<Investment[]>(this.api.url('/investments/me'))
+    );
+    return this.normalizeList(items);
   }
 
-  updateById(id: string, updates: Partial<Investment>): Promise<void> {
-    return this.fs.updateById<Investment>(this.collectionName, id, updates);
+  async getActiveByUserAndCrypto(
+    _userId: string,
+    cryptoCurrencyId: string
+  ): Promise<Investment[]> {
+    const params = new HttpParams().set('crypto_currency_id', cryptoCurrencyId);
+    const items = await firstValueFrom(
+      this.http.get<Investment[]>(this.api.url('/investments/me/active'), { params })
+    );
+    return this.normalizeList(items);
+  }
+
+  async create(item: {
+    crypto_currency_id: string;
+    amount: number;
+    buying_price: number;
+    description?: string | null;
+  }): Promise<Investment> {
+    const created = await firstValueFrom(
+      this.http.post<Investment>(this.api.url('/investments'), {
+        crypto_currency_id: item.crypto_currency_id,
+        amount: Number(item.amount),
+        buying_price: Number(item.buying_price),
+        description: item.description ?? null,
+      })
+    );
+    await this.auth.refreshUserData();
+    return this.normalize(created);
+  }
+
+  async sell(id: string, sellingPrice: number): Promise<Investment> {
+    const sold = await firstValueFrom(
+      this.http.post<Investment>(this.api.url(`/investments/${id}/sell`), {
+        selling_price: Number(sellingPrice),
+      })
+    );
+    await this.auth.refreshUserData();
+    return this.normalize(sold);
   }
 }

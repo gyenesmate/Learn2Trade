@@ -9,9 +9,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { CommonModule } from '@angular/common';
 import { filter, map } from 'rxjs/operators';
-import { of } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
-import { User } from '../../../const/models';
+import { UserMe } from '../../../const/models';
 import { Subscription, Observable } from 'rxjs';
 
 @Component({
@@ -31,9 +30,7 @@ import { Subscription, Observable } from 'rxjs';
   styleUrls: ['./navigation.component.scss']
 })
 export class NavigationComponent implements OnInit, OnDestroy {
-  // Observable-ök a template-ben az async pipe-pal való használathoz
-  currentUser$!: Observable<any | null>;
-  user$!: Observable<User | null>;
+  user$!: Observable<UserMe | null | undefined>;
   isLoggedIn$!: Observable<boolean>;
 
   isMobile = false;
@@ -45,18 +42,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     @Inject(DOCUMENT) private document: Document
   ) {
-    console.log('[Navigation] constructor start');
-    // Inicializálásuk
-    this.currentUser$ = this.authService.getCurrentUserObservable();
     this.user$ = this.authService.currentUserData$;
-    this.user$.subscribe(u => console.log('[Navigation] user$ emitted', u));
-    console.log('[Navigation] currentUser$ and user$ initialized', { currentUser$: this.currentUser$, user$: this.user$ });
-
-    // isLoggedIn$ - csupán egy szűrés az currentUser$-ból
-    this.isLoggedIn$ = this.currentUser$.pipe(
-      map(firebaseUser => firebaseUser !== null)
-    );
-    console.log('[Navigation] constructor end');
+    this.isLoggedIn$ = this.user$.pipe(map((user) => !!user));
   }
 
   ngOnInit() {
@@ -73,7 +60,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
     this.subscriptions.push(
       this.user$.subscribe(user => {
-        const theme = user?.preferences?.theme || 'light';
+        const theme = user?.theme || 'light';
         this.applyTheme(theme);
       })
     );

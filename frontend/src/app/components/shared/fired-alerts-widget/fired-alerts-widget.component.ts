@@ -54,15 +54,15 @@ export class FiredAlertsWidgetComponent implements OnInit, OnChanges {
   }
 
   label(alert: PriceAlert): string {
-    const c = this.cryptoById.get(alert.cryptoCurrencyId);
-    if (!c) return alert.cryptoCurrencyId;
+    const c = this.cryptoById.get(alert.crypto_currency_id);
+    if (!c) return alert.crypto_currency_id;
     const symbol = c.symbol ? ` (${c.symbol})` : '';
-    const quote = c.exchangeCurrency ? ` / ${c.exchangeCurrency}` : '';
+    const quote = c.exchange_currency ? ` / ${c.exchange_currency}` : '';
     return `${c.name}${symbol}${quote}`;
   }
 
   view(alert: PriceAlert): void {
-    void this.router.navigate(['/crypto', alert.cryptoCurrencyId]);
+    void this.router.navigate(['/crypto', alert.crypto_currency_id]);
   }
 
   stop(alert: PriceAlert): void {
