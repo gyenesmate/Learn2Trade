@@ -1,25 +1,31 @@
-<ng-container *ngIf="source$ | async as fired">
-  <div class="fired-widget" [class.embedded]="embedded" *ngIf="fired.length">
-    <div class="header">{{ title }}</div>
-
-    <div class="items">
-      <div class="item" *ngFor="let a of fired">
-        <div class="meta">
-          <div class="title">
-            {{ label(a) }}
-            <span class="type">({{ a.alert_type }})</span>
+@if (displayedAlerts(); as fired) {
+  @if (fired.length) {
+    <div class="fired-widget" [class.embedded]="embedded()">
+      <div class="header">{{ title() }}</div>
+      <div class="items">
+        @for (a of fired; track a.id) {
+          <div class="item">
+            <div class="meta">
+              <div class="title">
+                {{ label(a) }}
+                <span class="type">({{ a.alert_type }})</span>
+              </div>
+              <div class="sub">
+                Target: {{ a.alert_price }}
+                @if (a.description) {
+                  <span> — {{ a.description }}</span>
+                }
+              </div>
+            </div>
+            <div class="actions">
+              @if (!embedded()) {
+                <button class="btn btn-secondary btn-sm" type="button" (click)="view(a)">View</button>
+              }
+              <button class="btn btn-error btn-sm" type="button" (click)="stop(a)">Stop</button>
+            </div>
           </div>
-          <div class="sub">
-            Target: {{ a.alert_price }}
-            <span *ngIf="a.description"> — {{ a.description }}</span>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button *ngIf="!embedded" class="btn btn-secondary btn-sm" type="button" (click)="view(a)">View</button>
-          <button class="btn btn-error btn-sm" type="button" (click)="stop(a)">Stop</button>
-        </div>
+        }
       </div>
     </div>
-  </div>
-</ng-container>
+  }
+}

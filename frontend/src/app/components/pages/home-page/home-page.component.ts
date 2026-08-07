@@ -1,22 +1,30 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  inject,
+  effect,
+  signal,
+  untracked,
+} from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { CryptoCurrency, UserMe } from '../../../const/models';
 import { CryptoCardComponent } from '../../shared/crypto-card/crypto-card.component';
 import { AuthService } from '../../../services/auth.service';
 import { CryptoCurrenciesService } from '../../../services/crypto-currencies.service';
 import { WatchlistSubscriptionsService } from '../../../services/watchlist-subscriptions.service';
-import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-home-page',
-  standalone: true,
-  imports: [CommonModule, RouterModule, CryptoCardComponent],
+  imports: [RouterModule, CryptoCardComponent],
   templateUrl: './home-page.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./home-page.component.scss']
 })
 export class HomePageComponent implements OnInit {
-  user$: Observable<UserMe | null | undefined>;
+  private readonly auth = inject(AuthService);
+  private readonly cryptoService = inject(CryptoCurrenciesService);
+  private readonly watchlistSubscriptions = inject(WatchlistSubscriptionsService);
 
   private readonly fallbackCryptocurrencies: CryptoCurrency[] = [
     { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', exchange_currency: 'USD', created_at: '', updated_at: '' },
@@ -26,44 +34,47 @@ export class HomePageComponent implements OnInit {
     { id: 'ripple', name: 'Ripple', symbol: 'XRP', exchange_currency: 'USD', created_at: '', updated_at: '' }
   ];
 
-  cryptocurrencies: CryptoCurrency[] = [...this.fallbackCryptocurrencies];
-  watchlistCryptos: CryptoCurrency[] = [];
-  watchlistCryptoIds = new Set<string>();
+  readonly cryptocurrencies = signal<CryptoCurrency[]>([...this.fallbackCryptocurrencies]);
+  readonly watchlistCryptos = signal<CryptoCurrency[]>([]);
+  readonly watchlistCryptoIds = signal(new Set<string>());
 
-  constructor(
-    private auth: AuthService,
-    private cryptoService: CryptoCurrenciesService,
-    private watchlistSubscriptions: WatchlistSubscriptionsService
-  ) {
-    this.user$ = this.auth.currentUserData$;
+  constructor() {
+    effect(() => {
+      const user = this.auth.currentUser();
+      const cryptos = this.cryptocurrencies();
+      untracked(() => void this.refreshWatchlist(user, cryptos));
+    });
   }
 
   async ngOnInit(): Promise<void> {
     try {
       const fromDb = await this.cryptoService.getAll();
       if (Array.isArray(fromDb) && fromDb.length) {
-        this.cryptocurrencies = fromDb;
+        this.cryptocurrencies.set(fromDb);
       }
     } catch {
       // fallback stays
     }
+  }
 
-    this.user$.subscribe(async user => {
-      if (!user) {
-        this.watchlistCryptos = [];
-        this.watchlistCryptoIds = new Set();
-        return;
-      }
+  private async refreshWatchlist(
+    user: UserMe | null | undefined,
+    cryptos: CryptoCurrency[]
+  ): Promise<void> {
+    if (!user) {
+      this.watchlistCryptos.set([]);
+      this.watchlistCryptoIds.set(new Set());
+      return;
+    }
 
-      try {
-        const subs = await this.watchlistSubscriptions.getMe();
-        const ids = new Set(subs.map(s => s.crypto_currency_id));
-        this.watchlistCryptoIds = ids;
-        this.watchlistCryptos = this.cryptocurrencies.filter(c => ids.has(c.id));
-      } catch {
-        this.watchlistCryptos = [];
-        this.watchlistCryptoIds = new Set();
-      }
-    });
+    try {
+      const subs = await this.watchlistSubscriptions.getMe();
+      const ids = new Set(subs.map((s) => s.crypto_currency_id));
+      this.watchlistCryptoIds.set(ids);
+      this.watchlistCryptos.set(cryptos.filter((c) => ids.has(c.id)));
+    } catch {
+      this.watchlistCryptos.set([]);
+      this.watchlistCryptoIds.set(new Set());
+    }
   }
 }

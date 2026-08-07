@@ -22,7 +22,7 @@ Confirm the container is healthy before starting the API.
 
 ```powershell
 cd backend
-.\.venv\Scripts\Activate.ps1
+.\venv\Scripts\Activate.ps1
 ```
 
 If your environment folder is still named `venv`:

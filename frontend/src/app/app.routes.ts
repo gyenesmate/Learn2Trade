@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './guards/auth.guard';
-import { AdminGuard } from './guards/admin.guard';
+import { authGuard } from './guards/auth.guard';
+import { adminGuard } from './guards/admin.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/home', pathMatch: 'full' },
   {
     path: 'dashboard',
     loadComponent: () => import('./components/pages/dashboard/dashboard.component').then(m => m.DashboardComponent),
-    canActivate: [AuthGuard]
+    canActivate: [authGuard]
   },
   {
     path: 'home',
@@ -17,17 +17,17 @@ export const routes: Routes = [
   {
     path: 'profile',
     loadComponent: () => import('./components/pages/profile-page/profile-page.component').then(m => m.ProfilePageComponent),
-    canActivate: [AuthGuard]
+    canActivate: [authGuard]
   },
   {
     path: 'edit-profile',
     loadComponent: () => import('./components/pages/edit-profile-page/edit-profile-page.component').then(m => m.EditProfilePageComponent),
-    canActivate: [AuthGuard]
+    canActivate: [authGuard]
   },
   {
     path: 'login',
     loadComponent: () => import('./components/pages/login-page/login-page.component').then(m => m.LoginPageComponent),
-    canActivate: [AuthGuard]
+    canActivate: [authGuard]
   },
   {
     path: 'banned',
@@ -36,22 +36,22 @@ export const routes: Routes = [
   {
     path: 'register',
     loadComponent: () => import('./components/pages/register-page/register-page.component').then(m => m.RegisterPageComponent),
-    canActivate: [AuthGuard]
+    canActivate: [authGuard]
   },
   {
     path: 'crypto/:id',
     loadComponent: () => import('./components/pages/crypto-detail-page/crypto-detail-page.component').then(m => m.CryptoDetailPageComponent),
-    canActivate: [AuthGuard]
+    canActivate: [authGuard]
   },
   {
     path: 'admin/crypto-currencies/new',
     loadComponent: () => import('./components/pages/crypto-currency-edit-page/crypto-currency-edit-page.component').then(m => m.CryptoCurrencyEditPageComponent),
-    canActivate: [AuthGuard, AdminGuard]
+    canActivate: [authGuard, adminGuard]
   },
   {
     path: 'admin/crypto-currencies/:id/edit',
     loadComponent: () => import('./components/pages/crypto-currency-edit-page/crypto-currency-edit-page.component').then(m => m.CryptoCurrencyEditPageComponent),
-    canActivate: [AuthGuard, AdminGuard]
+    canActivate: [authGuard, adminGuard]
   },
   {
     path: 'testing-ground',

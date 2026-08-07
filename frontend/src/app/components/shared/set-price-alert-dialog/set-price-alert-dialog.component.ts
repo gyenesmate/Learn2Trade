@@ -1,5 +1,5 @@
-import { Component, Inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CryptoCurrency } from '../../../const/models';
@@ -16,19 +16,17 @@ export interface SetPriceAlertDialogResult {
 
 @Component({
   selector: 'app-set-price-alert-dialog',
-  standalone: true,
-  imports: [CommonModule, FormsModule, MatDialogModule],
+  imports: [FormsModule, MatDialogModule, DecimalPipe],
   templateUrl: './set-price-alert-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./set-price-alert-dialog.component.scss']
 })
 export class SetPriceAlertDialogComponent {
+  private readonly dialogRef = inject<MatDialogRef<SetPriceAlertDialogComponent, SetPriceAlertDialogResult | null>>(MatDialogRef);
+  readonly data = inject<SetPriceAlertDialogData>(MAT_DIALOG_DATA);
+
   alertPrice: number | null = null;
   description = '';
-
-  constructor(
-    private dialogRef: MatDialogRef<SetPriceAlertDialogComponent, SetPriceAlertDialogResult | null>,
-    @Inject(MAT_DIALOG_DATA) public data: SetPriceAlertDialogData
-  ) {}
 
   cancel(): void {
     this.dialogRef.close(null);

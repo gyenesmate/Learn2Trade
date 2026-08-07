@@ -4,29 +4,30 @@
     <a class="btn btn-secondary" routerLink="/profile">Back</a>
   </header>
 
-  <div *ngIf="loading" class="loading">Loading...</div>
+  @if (loading()) {
+    <div class="loading">Loading...</div>
+  }
 
-  <form *ngIf="!loading" class="edit-form" (ngSubmit)="save()">
-    <div class="form-group">
-      <label class="form-label">Name</label>
-      <input class="input" name="name" [(ngModel)]="form.name" placeholder="Bitcoin" required />
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Symbol</label>
-      <input class="input" name="symbol" [(ngModel)]="form.symbol" placeholder="BTC" required />
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Quote currency</label>
-      <input class="input" name="exchangeCurrency" [(ngModel)]="form.exchange_currency" placeholder="USD" required />
-    </div>
-
-    <div class="actions">
-      <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
-      <button type="submit" class="btn btn-primary" [disabled]="saving">
-        {{ saving ? 'Saving...' : 'Save' }}
-      </button>
-    </div>
-  </form>
+  @if (!loading()) {
+    <form class="edit-form" (ngSubmit)="save()">
+      <div class="form-group">
+        <label class="form-label">Name</label>
+        <input class="input" name="name" [(ngModel)]="form.name" placeholder="Bitcoin" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Symbol</label>
+        <input class="input" name="symbol" [(ngModel)]="form.symbol" placeholder="BTC" required />
+      </div>
+      <div class="form-group">
+        <label class="form-label">Quote currency</label>
+        <input class="input" name="exchangeCurrency" [(ngModel)]="form.exchange_currency" placeholder="USD" required />
+      </div>
+      <div class="actions">
+        <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">
+          {{ saving() ? 'Saving...' : 'Save' }}
+        </button>
+      </div>
+    </form>
+  }
 </div>

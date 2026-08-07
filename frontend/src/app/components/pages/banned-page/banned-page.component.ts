@@ -1,18 +1,18 @@
-import { Component } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-banned-page',
-  standalone: true,
   templateUrl: './banned-page.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./banned-page.component.scss']
 })
 export class BannedPageComponent {
+  private readonly router = inject(Router);
+
   supportEmail = 'support@example.com';
 
-  constructor(private router: Router) {}
-
-  goHome() {
-    this.router.navigate(['/home']);
+  goHome(): void {
+    void this.router.navigate(['/home']);
   }
 }

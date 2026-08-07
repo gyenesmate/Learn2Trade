@@ -7,32 +7,38 @@
   <div class="profile-content">
     <section class="personal-info card">
       <h2>Personal Information</h2>
-      <div class="info-grid" *ngIf="user$ | async as user">
-        <div class="avatar-section">
-          <div class="avatar-container">
-            <img *ngIf="user.avatar_url" [src]="user.avatar_url" alt="Avatar" class="avatar-image">
-            <div *ngIf="!user.avatar_url" class="avatar-placeholder">
-              {{ user.username.charAt(0).toUpperCase() }}
+      @if (user(); as user) {
+        <div class="info-grid">
+          <div class="avatar-section">
+            <div class="avatar-container">
+              @if (user.avatar_url) {
+                <img [src]="user.avatar_url" alt="Avatar" class="avatar-image">
+              }
+              @if (!user.avatar_url) {
+                <div class="avatar-placeholder">
+                  {{ user.username.charAt(0).toUpperCase() }}
+                </div>
+              }
             </div>
           </div>
+          <div class="info-item">
+            <label>Name:</label>
+            <span>{{ user.username }}</span>
+          </div>
+          <div class="info-item">
+            <label>Email:</label>
+            <span>{{ user.email }}</span>
+          </div>
+          <div class="info-item">
+            <label>Theme:</label>
+            <span>{{ user.theme }}</span>
+          </div>
+          <div class="info-item">
+            <label>Account Balance:</label>
+            <span class="balance">${{ user.balance }}</span>
+          </div>
         </div>
-        <div class="info-item">
-          <label>Name:</label>
-          <span>{{ user.username }}</span>
-        </div>
-        <div class="info-item">
-          <label>Email:</label>
-          <span>{{ user.email }}</span>
-        </div>
-        <div class="info-item">
-          <label>Theme:</label>
-          <span>{{ user.theme }}</span>
-        </div>
-        <div class="info-item">
-          <label>Account Balance:</label>
-          <span class="balance">${{ user.balance }}</span>
-        </div>
-      </div>
+      }
     </section>
 
     <section class="add-currency card">
@@ -50,64 +56,71 @@
             [(ngModel)]="addAmount"
             name="amount"
             required
-          >
-        </div>
-        <button type="submit" class="btn btn-primary" [disabled]="addAmount <= 0">Add Funds</button>
-      </form>
-    </section>
+            >
+          </div>
+          <button type="submit" class="btn btn-primary" [disabled]="addAmount <= 0">Add Funds</button>
+        </form>
+      </section>
 
-    <section class="watchlist-management card" id="watchlist">
-      <app-data-table
-        [title]="'My watchlist'"
-        [columns]="watchlistColumns"
-        [data]="watchlistRows"
-        [actionBar]="[]"
-        [rowActions]="watchlistRowActions">
-      </app-data-table>
-    </section>
-    
+      <section class="watchlist-management card" id="watchlist">
+        <app-data-table
+          [title]="'My watchlist'"
+          [columns]="watchlistColumns"
+          [data]="watchlistRows()"
+          [actionBar]="[]"
+          [rowActions]="watchlistRowActions">
+        </app-data-table>
+      </section>
+
       <section class="watchlist-management card" id="investments">
         <app-data-table
           [title]="'My investments'"
           [columns]="investmentsColumns"
-          [data]="investmentsRows"
+          [data]="investmentsRows()"
           [actionBar]="[]"
           [rowActions]="investmentsRowActions">
         </app-data-table>
       </section>
 
-    <section class="alerts-management card">
-      <app-data-table
-        [title]="'My alerts'"
-        [columns]="alertsColumns"
-        [data]="alertsRows"
-        [actionBar]="[]"
-        [rowActions]="alertsRowActions">
-      </app-data-table>
-    </section>
-
-    <ng-container *ngIf="isAdmin">
-      <section class="admin-management card">
-          <div *ngIf="adminLoading" class="admin-loading">Loading...</div>
-          <app-data-table *ngIf="!adminLoading"
-            [title]="'Crypto currencies'"
-            [columns]="cryptoColumns"
-            [data]="cryptoCurrencies"
-            [actionBar]="cryptoActionBar"
-            [rowActions]="cryptoRowActions">
-          </app-data-table>
-      </section>
-
-      <section class="admin-management card">
-        <div *ngIf="adminLoading" class="admin-loading">Loading...</div>
-        <app-data-table *ngIf="!adminLoading"
-          [title]="'Users'"
-          [columns]="userColumns"
-          [data]="users"
+      <section class="alerts-management card">
+        <app-data-table
+          [title]="'My alerts'"
+          [columns]="alertsColumns"
+          [data]="alertsRows()"
           [actionBar]="[]"
-          [rowActions]="userRowActions">
+          [rowActions]="alertsRowActions">
         </app-data-table>
       </section>
-    </ng-container>
+
+      @if (isAdmin()) {
+        <section class="admin-management card">
+          @if (adminLoading()) {
+            <div class="admin-loading">Loading...</div>
+          }
+          @if (!adminLoading()) {
+            <app-data-table
+              [title]="'Crypto currencies'"
+              [columns]="cryptoColumns"
+              [data]="cryptoCurrencies()"
+              [actionBar]="cryptoActionBar"
+              [rowActions]="cryptoRowActions">
+            </app-data-table>
+          }
+        </section>
+        <section class="admin-management card">
+          @if (adminLoading()) {
+            <div class="admin-loading">Loading...</div>
+          }
+          @if (!adminLoading()) {
+            <app-data-table
+              [title]="'Users'"
+              [columns]="userColumns"
+              [data]="users()"
+              [actionBar]="[]"
+              [rowActions]="userRowActions">
+            </app-data-table>
+          }
+        </section>
+      }
+    </div>
   </div>
-</div>

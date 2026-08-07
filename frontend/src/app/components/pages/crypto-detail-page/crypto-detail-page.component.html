@@ -1,48 +1,47 @@
 <div class="crypto-detail-page">
   <header class="crypto-detail-header">
     <a class="btn btn-secondary" routerLink="/home">← Back</a>
-    <div class="crypto-detail-title" *ngIf="selectedCrypto">
-      <h1>{{ selectedCrypto.name }}</h1>
-      <div class="crypto-detail-sub">{{ selectedCrypto.symbol }} / {{ selectedCrypto.exchange_currency }}</div>
-    </div>
+    @if (selectedCrypto(); as selectedCrypto) {
+      <div class="crypto-detail-title">
+        <h1>{{ selectedCrypto.name }}</h1>
+        <div class="crypto-detail-sub">{{ selectedCrypto.symbol }} / {{ selectedCrypto.exchange_currency }}</div>
+      </div>
+    }
   </header>
 
-  <ng-container *ngIf="selectedCrypto; else notFound">
+  @if (selectedCrypto(); as selectedCrypto) {
     <div class="crypto-detail-actions">
-      <button class="btn btn-primary" (click)="openInvest()" [disabled]="investing">Invest</button>
+      <button class="btn btn-primary" (click)="openInvest()" [disabled]="investing()">Invest</button>
       <button class="btn btn-secondary" (click)="openSetAlert()">Set alert</button>
     </div>
-
     <app-crypto-card #card [state]="'detailed'" [data]="selectedCrypto"></app-crypto-card>
-
     <div class="crypto-detail-bottom">
       <div class="crypto-detail-column">
-        <ng-container *ngIf="activeInvestments?.length">
-          <app-active-investment
-            *ngFor="let inv of activeInvestments"
-            [investment]="inv"
-            [crypto]="selectedCrypto"
-            [currentPrice]="card?.livePrice || 0"
-            (sell)="sellActiveInvestment(inv.id)">
-          </app-active-investment>
-        </ng-container>
+        @if (activeInvestments().length) {
+          @for (inv of activeInvestments(); track inv) {
+            <app-active-investment
+              [investment]="inv"
+              [crypto]="selectedCrypto"
+              [currentPrice]="card?.livePrice || 0"
+              (sell)="sellActiveInvestment(inv.id)">
+            </app-active-investment>
+          }
+        }
       </div>
-
       <div class="crypto-detail-column">
         <app-fired-alerts-widget
           [embedded]="true"
           [title]="'Alerts'"
-          [alerts$]="alertsForSelected$">
+          [alerts]="alertsForSelected()">
         </app-fired-alerts-widget>
       </div>
     </div>
-  </ng-container>
-
-  <ng-template #notFound>
+  } @else {
     <div class="crypto-not-found card">
       <h2>Crypto not found</h2>
-      <p>No crypto with id: <strong>{{ selectedId }}</strong></p>
+      <p>No crypto with id: <strong>{{ selectedId() }}</strong></p>
       <a class="btn btn-primary" routerLink="/home">Go back</a>
     </div>
-  </ng-template>
+  }
+
 </div>

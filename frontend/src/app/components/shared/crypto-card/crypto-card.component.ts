@@ -1,10 +1,9 @@
 
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnDestroy, OnInit, Renderer2, SimpleChanges, ViewChild, NgZone, DestroyRef } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Renderer2, NgZone, DestroyRef, ChangeDetectionStrategy, inject, input, viewChild, effect } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CryptoCurrency } from '../../../const/models';
-import { firstValueFrom } from 'rxjs';
 import { AuthService } from '../../../services/auth.service';
 import { WatchlistSubscriptionsService } from '../../../services/watchlist-subscriptions.service';
 import { NotificationService } from '../../../services/notification.service';
@@ -16,26 +15,32 @@ import { ColorType } from 'lightweight-charts';
 
 @Component({
   selector: 'app-crypto-card',
-  standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule],
+  imports: [MatButtonModule, MatIconModule, DecimalPipe],
   providers: [DecimalPipe],
   templateUrl: './crypto-card.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./crypto-card.component.scss']
 })
-export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+export class CryptoCardComponent implements OnInit, AfterViewInit, OnDestroy {
+  private renderer = inject(Renderer2);
+  private ngZone = inject(NgZone);
+  private decimalPipe = inject(DecimalPipe);
+  private destroyRef = inject(DestroyRef);
+  private auth = inject(AuthService);
+  private watchlistSubscriptions = inject(WatchlistSubscriptionsService);
+  private notification = inject(NotificationService);
+
   /**
    * State of the card: 'detailed' (with chart) or 'compact' (basic info)
    */
-  @Input() state: 'detailed' | 'compact' = 'compact';
-  /**
-   * Crypto data to display
-   */
-  @Input() data!: CryptoCurrency;
+  readonly state = input<'detailed' | 'compact'>('compact');
+  /** Crypto data to display */
+  readonly data = input.required<CryptoCurrency>();
   /**
    * Ids of cryptos the current user is watching. When provided by the parent,
    * avoids each card needing to independently fetch the watchlist.
    */
-  @Input() watchlistCryptoIds?: Set<string>;
+  readonly watchlistCryptoIds = input<Set<string>>();
 
   // Live fields (derived from Binance klines + websocket)
   exchangeLabel = 'Binance';
@@ -43,7 +48,7 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
   change24h?: number;
   lastUpdated?: number;
 
-  @ViewChild('chart', { static: false }) chartEl?: ElementRef<HTMLDivElement>;
+  readonly chartEl = viewChild<ElementRef<HTMLDivElement>>('chart');
 
   private chart: any = null;
   private lineSeries: any = null;
@@ -65,7 +70,8 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
   private getCssVar(name: string, fallback: string): string {
     try {
       // Theme variables are applied on body (e.g. body.theme-dark), not just :root
-      const fromHost = this.chartEl?.nativeElement ? getComputedStyle(this.chartEl.nativeElement).getPropertyValue(name)?.trim() : '';
+      const chartEl = this.chartEl();
+      const fromHost = chartEl?.nativeElement ? getComputedStyle(chartEl.nativeElement).getPropertyValue(name)?.trim() : '';
       if (fromHost) return fromHost;
 
       const fromBody = getComputedStyle(document.body).getPropertyValue(name)?.trim();
@@ -79,7 +85,7 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
   }
 
   // Tooltip state (always show focused candle info)
-  @ViewChild('chartTooltip', { static: false }) tooltipEl?: ElementRef<HTMLDivElement>;
+  readonly tooltipEl = viewChild<ElementRef<HTMLDivElement>>('chartTooltip');
   tooltipVisible = false;
   tooltipHtml = '';
   tooltipX = 0;
@@ -87,48 +93,72 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
 
   watchlistSaving = false;
   isInWatchlist = false;
-  private userSub: any = null;
+  private chartReady = false;
 
-  constructor(
-    private renderer: Renderer2,
-    private ngZone: NgZone,
-    private decimalPipe: DecimalPipe,
-    private destroyRef: DestroyRef,
-    private auth: AuthService,
-    private watchlistSubscriptions: WatchlistSubscriptionsService,
-    private notification: NotificationService
-  ) {
-    // Ensure websockets / intervals are cleaned up when Angular destroys this view
+  constructor() {
+    effect(() => {
+      const watchlistCryptoIds = this.watchlistCryptoIds();
+      const data = this.data();
+      const user = this.auth.currentUser();
+
+      if (watchlistCryptoIds) {
+        this.isInWatchlist = !!data?.id && watchlistCryptoIds.has(data.id);
+        return;
+      }
+      if (!user?.id || !data?.id) {
+        this.isInWatchlist = false;
+        return;
+      }
+      void this.refreshWatchlistMembership(data.id);
+    });
+
+    effect(() => {
+      const state = this.state();
+      const data = this.data();
+      void data;
+      this.currentType = state === 'detailed' ? 'candlestick' : 'line';
+      this.selectedDays = state === 'compact' ? 1 : this.selectedDays;
+      if (state === 'compact') {
+        this.isDrawing = false;
+        this.tooltipVisible = false;
+      }
+      if (!this.chartReady || !this.chartEl()) return;
+      try { this.stopBinance(); } catch { /* ignore */ }
+      try { this.initChart(); } catch { /* ignore */ }
+      try { this.ensureOverlayForState(); } catch { /* ignore */ }
+      void this.loadAndRender(this.selectedDays);
+    });
+  }
+
+  private async refreshWatchlistMembership(cryptoId: string): Promise<void> {
     try {
-      this.destroyRef.onDestroy(() => {
-        try { this.stopBinance(); } catch {}
-        try { this.stopLiveUpdates(); } catch {}
-      });
+      const subs = await this.watchlistSubscriptions.getMe();
+      this.isInWatchlist = !!subs.find((s) => s.crypto_currency_id === cryptoId);
     } catch {
-      console.warn('CryptoCardComponent: DestroyRef not available, live updates may not be cleaned up properly on destroy.');
+      this.isInWatchlist = false;
     }
   }
 
   async saveToWatchlist(): Promise<void> {
-    if (!this.data?.id) return;
+    if (!this.data()?.id) return;
     if (this.watchlistSaving) return;
     this.watchlistSaving = true;
 
     try {
-      const user = await firstValueFrom(this.auth.currentUserData$);
+      const user = this.auth.currentUser();
       if (!user?.id) {
         this.notification.warning('Please log in to save to watchlist');
         return;
       }
 
       if (this.isInWatchlist) {
-        await this.watchlistSubscriptions.deleteByCryptoCurrencyId(this.data.id);
+        await this.watchlistSubscriptions.deleteByCryptoCurrencyId(this.data().id);
         this.isInWatchlist = false;
         this.notification.info('Removed from watchlist');
         return;
       }
 
-      await this.watchlistSubscriptions.create(this.data.id);
+      await this.watchlistSubscriptions.create(this.data().id);
       this.isInWatchlist = true;
       this.notification.success('Saved to watchlist');
     } catch (err) {
@@ -140,61 +170,18 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
   }
 
   ngOnInit(): void {
-    // Set defaults early (ngAfterViewInit is too late and can trigger NG0100)
-    this.currentType = this.state === 'detailed' ? 'candlestick' : 'line';
-    this.selectedDays = this.state === 'compact' ? 1 : 7;
-    if (this.state === 'compact') this.isDrawing = false;
+    this.currentType = this.state() === 'detailed' ? 'candlestick' : 'line';
+    this.selectedDays = this.state() === 'compact' ? 1 : 7;
+    if (this.state() === 'compact') this.isDrawing = false;
 
-        // watch for current user changes to determine if this crypto is in their watchlist
-    try {
-      this.userSub = this.auth.currentUserData$.subscribe(async user => {
-        if (this.watchlistCryptoIds) {
-          this.isInWatchlist = !!this.data?.id && this.watchlistCryptoIds.has(this.data.id);
-          return;
-        }
-        if (!user?.id || !this.data?.id) {
-          this.isInWatchlist = false;
-          return;
-        }
-        try {
-          const subs = await this.watchlistSubscriptions.getMe();
-          this.isInWatchlist = !!subs.find(s => s.crypto_currency_id === this.data?.id);
-        } catch {
-          this.isInWatchlist = false;
-        }
-      });
-    } catch {}
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    // If inputs change after init, reconnect and rerender.
-    const stateChanged = !!changes['state'];
-    const dataChanged = !!changes['data'];
-
-    if (changes['watchlistCryptoIds'] && this.watchlistCryptoIds) {
-      this.isInWatchlist = !!this.data?.id && this.watchlistCryptoIds.has(this.data.id);
-    }
-
-    if (stateChanged) {
-      this.currentType = this.state === 'detailed' ? 'candlestick' : 'line';
-      this.selectedDays = this.state === 'compact' ? 1 : this.selectedDays;
-      if (this.state === 'compact') {
-        this.isDrawing = false;
-        this.tooltipVisible = false;
-      }
-    }
-
-    if ((stateChanged || dataChanged) && this.chartEl) {
-      try { this.stopBinance(); } catch {}
-      try { this.initChart(); } catch {}
-      try { this.ensureOverlayForState(); } catch {}
-      // fire and forget
-      void this.loadAndRender(this.selectedDays);
-    }
+    this.destroyRef.onDestroy(() => {
+      try { this.stopBinance(); } catch { /* ignore */ }
+      try { this.stopLiveUpdates(); } catch { /* ignore */ }
+    });
   }
 
   async ngAfterViewInit(): Promise<void> {
-    if (!this.chartEl) return;
+    if (!this.chartEl()) return;
     // Wait a tick so layout has settled (prevents 0x0 container -> no canvases rendered)
     await new Promise<void>(resolve => requestAnimationFrame(() => resolve()));
     this.initChart();
@@ -204,10 +191,10 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
     window.addEventListener('resize', this.windowResizeHandler);
 
     // tooltip: only for detailed candlestick view
-    if (this.state === 'detailed' && this.chart && typeof this.chart.subscribeCrosshairMove === 'function') {
+    if (this.state() === 'detailed' && this.chart && typeof this.chart.subscribeCrosshairMove === 'function') {
       this.chart.subscribeCrosshairMove((param: any) => {
         try {
-          const priceEl = this.chartEl?.nativeElement.querySelector('.price-detail');
+          const priceEl = this.chartEl()?.nativeElement.querySelector('.price-detail');
           // determine OHLC to show: prefer crosshair seriesPrices, fallback to data cache (latest)
           let ohlc: any = null;
           if (param && param.time) {
@@ -264,10 +251,10 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
     }
 
     await this.loadAndRender(this.selectedDays);
+    this.chartReady = true;
   }
 
   ngOnDestroy(): void {
-    try { this.userSub?.unsubscribe?.(); } catch {}
     try { this.chart?.remove(); } catch {}
     this.stopLiveUpdates();
     this.stopBinance();
@@ -276,19 +263,20 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
   }
 
   private initChart(): void {
-    if (!this.chartEl) return;
-    const host = this.chartEl.nativeElement;
+    const chartEl = this.chartEl();
+    if (!chartEl) return;
+    const host = chartEl.nativeElement;
 
     const rect = host.getBoundingClientRect();
     const width = Math.max(10, Math.floor(rect.width || host.clientWidth || 0));
     const heightFromCss = Math.floor(rect.height || host.clientHeight || 0);
-    const height = Math.max(10, heightFromCss || (this.state === 'compact' ? 80 : 140));
+    const height = Math.max(10, heightFromCss || (this.state() === 'compact' ? 80 : 140));
 
     try {
       this.chart?.remove?.();
     } catch {}
 
-    const isCompact = this.state === 'compact';
+    const isCompact = this.state() === 'compact';
 
     // Theme colors from existing design tokens (no new hard-coded palette)
     const surface = this.getCssVar('--color-surface', '#111827');
@@ -333,7 +321,7 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
     // lightweight-charts v5 uses `addSeries(SeriesDefinition, options)`
     if (this.chart) {
       try {
-        const isCompact = this.state === 'compact';
+        const isCompact = this.state() === 'compact';
         this.lineSeries = this.chart.addSeries(LineSeries, {
           color: '#2979ff',
           lineWidth: 2,
@@ -352,8 +340,9 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
     try {
       this.resizeObserver?.disconnect();
       this.resizeObserver = new ResizeObserver(() => {
-        if (!this.chartEl) return;
-        const r = this.chartEl.nativeElement.getBoundingClientRect();
+        const chartElValue = this.chartEl();
+        if (!chartElValue) return;
+        const r = chartElValue.nativeElement.getBoundingClientRect();
         const w = Math.max(10, Math.floor(r.width));
         const h = Math.max(10, Math.floor(r.height));
         try { this.chart?.applyOptions?.({ width: w, height: h }); } catch {}
@@ -366,8 +355,9 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
   }
 
   private ensureOverlayForState(): void {
-    if (!this.chartEl) return;
-    if (this.state !== 'detailed') {
+    const chartEl = this.chartEl();
+    if (!chartEl) return;
+    if (this.state() !== 'detailed') {
       // compact view: no drawing overlay
       try {
         if (this.overlayCanvas && this.overlayCanvas.parentElement) {
@@ -387,16 +377,17 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
       this.overlayCanvas.style.width = '100%';
       this.overlayCanvas.style.height = '100%';
       this.overlayCanvas.style.pointerEvents = 'none';
-      this.chartEl.nativeElement.style.position = 'relative';
-      this.chartEl.nativeElement.appendChild(this.overlayCanvas);
+      chartEl.nativeElement.style.position = 'relative';
+      chartEl.nativeElement.appendChild(this.overlayCanvas);
     }
     this.resizeOverlay();
   }
 
   private resizeOverlay(): void {
-    if (!this.overlayCanvas || !this.chartEl) return;
-    if (this.state !== 'detailed') return;
-    const rect = this.chartEl.nativeElement.getBoundingClientRect();
+    const chartEl = this.chartEl();
+    if (!this.overlayCanvas || !chartEl) return;
+    if (this.state() !== 'detailed') return;
+    const rect = chartEl.nativeElement.getBoundingClientRect();
     this.overlayCanvas.width = Math.round(rect.width * devicePixelRatio);
     this.overlayCanvas.height = Math.round(rect.height * devicePixelRatio);
     this.overlayCanvas.style.width = rect.width + 'px';
@@ -425,7 +416,7 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
 
   toggleType(): void {
     // In compact view, we always keep line visible
-    if (this.state === 'compact') {
+    if (this.state() === 'compact') {
       this.currentType = 'line';
       this.refreshSeriesVisibility();
       return;
@@ -461,7 +452,7 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
 
   private async loadAndRender(days: number): Promise<void> {
     // If caller provided historical data, use it. Otherwise fetch Binance klines for the current range.
-    const pair = this.mapSymbolToBinancePair(this.data);
+    const pair = this.mapSymbolToBinancePair(this.data());
     let raw: number[][] | null = null;
 
     if (pair) {
@@ -544,7 +535,7 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
   private startLiveUpdates(): void {
     // Only support Binance WebSocket live updates now
     if (this.liveIntervalId) { clearInterval(this.liveIntervalId); this.liveIntervalId = null; }
-    const pair = this.mapSymbolToBinancePair(this.data);
+    const pair = this.mapSymbolToBinancePair(this.data());
     if (pair) {
       const interval = this.getBinanceIntervalForDays(this.selectedDays);
       this.startBinanceKline(pair, interval);
@@ -670,7 +661,7 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
 
   toggleDrawing(): void {
     // no drawing in compact mode
-    if (this.state !== 'detailed') return;
+    if (this.state() !== 'detailed') return;
     this.isDrawing = !this.isDrawing;
     if (this.isDrawing) {
       if (this.overlayCanvas) this.overlayCanvas.style.pointerEvents = 'auto';
@@ -686,7 +677,7 @@ export class CryptoCardComponent implements OnInit, OnChanges, AfterViewInit, On
 
   private enableDrawingListeners(): void {
     if (!this.overlayCanvas) return;
-    if (this.state !== 'detailed') return;
+    if (this.state() !== 'detailed') return;
     const el = this.overlayCanvas;
     this.mouseDownListener = (e: MouseEvent) => {
       this.drawing = true;

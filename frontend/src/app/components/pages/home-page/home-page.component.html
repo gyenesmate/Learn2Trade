@@ -11,10 +11,12 @@
     <section class="crypto-browser">
       <h2>Browse Cryptocurrencies</h2>
       <div class="crypto-grid">
-        <div class="crypto-card card" *ngFor="let crypto of cryptocurrencies">
-          <app-crypto-card [state]="'compact'" [data]="crypto" [watchlistCryptoIds]="watchlistCryptoIds"></app-crypto-card>
-          <a class="btn btn-primary crypto-card__action" [routerLink]="['/crypto', crypto.id]">View Chart</a>
-        </div>
+        @for (crypto of cryptocurrencies(); track crypto) {
+          <div class="crypto-card card">
+            <app-crypto-card [state]="'compact'" [data]="crypto" [watchlistCryptoIds]="watchlistCryptoIds()"></app-crypto-card>
+            <a class="btn btn-primary crypto-card__action" [routerLink]="['/crypto', crypto.id]">View Chart</a>
+          </div>
+        }
       </div>
     </section>
 
@@ -31,11 +33,13 @@
               </tr>
             </thead>
             <tbody>
-              <tr *ngFor="let crypto of watchlistCryptos">
-                <td>{{ crypto.name }} ({{ crypto.symbol }})</td>
-                <td>{{ crypto.exchange_currency }}</td>
-                <td><a class="btn btn-primary" [routerLink]="['/crypto', crypto.id]">View</a></td>
-              </tr>
+              @for (crypto of watchlistCryptos(); track crypto) {
+                <tr>
+                  <td>{{ crypto.name }} ({{ crypto.symbol }})</td>
+                  <td>{{ crypto.exchange_currency }}</td>
+                  <td><a class="btn btn-primary" [routerLink]="['/crypto', crypto.id]">View</a></td>
+                </tr>
+              }
             </tbody>
           </table>
         </div>

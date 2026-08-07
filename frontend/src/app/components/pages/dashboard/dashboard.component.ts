@@ -1,5 +1,4 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { TableColumn } from '../../shared/data-table/data-table-utilities';
 import { AnalyticsCardComponent } from '../../shared/analytics-card/analytics-card.component';
 import { CryptoCurrency, Investment } from '../../../const/models';
@@ -8,23 +7,27 @@ import { InvestmentsService } from '../../../services/investments.service';
 import { CryptoCurrenciesService } from '../../../services/crypto-currencies.service';
 import { NotificationService } from '../../../services/notification.service';
 import { isInvestmentSold } from '../../../core/investment.util';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-dashboard',
-  standalone: true,
-  imports: [CommonModule, AnalyticsCardComponent],
+  imports: [AnalyticsCardComponent],
   templateUrl: './dashboard.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit {
-  portfolio: {
+  private readonly auth = inject(AuthService);
+  private readonly investmentsService = inject(InvestmentsService);
+  private readonly cryptosService = inject(CryptoCurrenciesService);
+  private readonly notification = inject(NotificationService);
+
+  readonly portfolio = signal<{
     totalValue: number;
     totalChange: number;
     totalInvested: number;
     totalPnL: number;
     bestPerformer: { name: string; change: number };
-  } | null = null;
+  } | null>(null);
 
   holdings: Array<{
     name: string;
@@ -57,21 +60,14 @@ export class DashboardComponent implements OnInit {
     riskReward: number;
   } | null = null;
 
-  investments: Investment[] = [];
-  isLoading = true;
-
-  constructor(
-    private auth: AuthService,
-    private investmentsService: InvestmentsService,
-    private cryptosService: CryptoCurrenciesService,
-    private notification: NotificationService
-  ) {}
+  readonly investments = signal<Investment[]>([]);
+  readonly isLoading = signal(true);
 
   async ngOnInit(): Promise<void> {
     try {
-      const user = await firstValueFrom(this.auth.currentUserData$);
+      const user = this.auth.currentUser();
       if (!user?.id) {
-        this.isLoading = false;
+        this.isLoading.set(false);
         return;
       }
 
@@ -80,17 +76,17 @@ export class DashboardComponent implements OnInit {
         this.cryptosService.getAll()
       ]);
 
-      this.investments = investments ?? [];
+      this.investments.set(investments ?? []);
 
-      const pricesByCryptoId = await this.fetchPricesByCryptoId(this.investments, cryptos ?? []);
-      this.holdings = this.buildHoldings(this.investments, cryptos ?? [], pricesByCryptoId);
-      this.portfolio = this.buildPortfolio(this.holdings);
-      this.metrics = this.buildMetrics(this.investments);
+      const pricesByCryptoId = await this.fetchPricesByCryptoId(this.investments(), cryptos ?? []);
+      this.holdings = this.buildHoldings(this.investments(), cryptos ?? [], pricesByCryptoId);
+      this.portfolio.set(this.buildPortfolio(this.holdings));
+      this.metrics = this.buildMetrics(this.investments());
     } catch (error) {
       console.error('Failed to load dashboard data', error);
       this.notification.error('Failed to load dashboard data');
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 

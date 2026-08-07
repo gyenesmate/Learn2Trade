@@ -15,11 +15,6 @@ export class WatchlistSubscriptionsService {
     );
   }
 
-  /** @deprecated Prefer getMe(); kept for call-site compatibility during migration. */
-  getAll(): Promise<WatchlistSubscription[]> {
-    return this.getMe();
-  }
-
   create(cryptoCurrencyId: string): Promise<WatchlistSubscription> {
     return firstValueFrom(
       this.http.post<WatchlistSubscription>(this.api.url('/watchlist'), {

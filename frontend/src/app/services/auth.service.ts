@@ -1,6 +1,6 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Observable, firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { TokenResponse, UserMe } from '../const/models';
 import { ApiService } from '../core/api.service';
 import { TokenStorageService } from '../core/token.storage';
@@ -15,30 +15,22 @@ export class AuthService {
   private readonly tokenStorage = inject(TokenStorageService);
 
   /** undefined = auth bootstrapping; null = logged out; UserMe = logged in */
-  private readonly currentUserDataSubject = new BehaviorSubject<UserMe | null | undefined>(undefined);
-  readonly currentUserData$ = this.currentUserDataSubject.asObservable();
+  readonly currentUser = signal<UserMe | null | undefined>(undefined);
+  readonly isLoggedIn = computed(() => this.currentUser() != null);
 
-  private readonly authReadySubject = new BehaviorSubject<boolean>(false);
-  readonly authReady$ = this.authReadySubject.asObservable();
-
+  /** Monitoring session timeout. (Update plan: might be better to use setTimeout with calculated expiration time) */
   private sessionCheckInterval: ReturnType<typeof setInterval> | null = null;
 
-  constructor() {
-    void this.bootstrap();
-  }
-
-  private async bootstrap(): Promise<void> {
+  async bootstrap(): Promise<void> {
     const token = this.tokenStorage.getAccessToken();
     if (!token) {
-      this.currentUserDataSubject.next(null);
-      this.authReadySubject.next(true);
+      this.currentUser.set(null);
       return;
     }
 
     if (this.isSessionExpired()) {
       this.clearSession();
-      this.currentUserDataSubject.next(null);
-      this.authReadySubject.next(true);
+      this.currentUser.set(null);
       return;
     }
 
@@ -47,9 +39,7 @@ export class AuthService {
       this.startSessionTimer();
     } catch {
       this.clearSession();
-      this.currentUserDataSubject.next(null);
-    } finally {
-      this.authReadySubject.next(true);
+      this.currentUser.set(null);
     }
   }
 
@@ -64,7 +54,7 @@ export class AuthService {
   private applyAuthSuccess(response: TokenResponse): UserMe {
     this.tokenStorage.setAccessToken(response.access_token);
     const user = this.normalizeUser(response.user);
-    this.currentUserDataSubject.next(user);
+    this.currentUser.set(user);
     this.startSessionTimer();
     return user;
   }
@@ -75,11 +65,12 @@ export class AuthService {
         this.http.post<TokenResponse>(this.api.url('/auth/login'), { email, password })
       );
       return this.applyAuthSuccess(response);
-    } catch (err: any) {
-      const detail = String(err?.error?.detail ?? '');
-      if (err?.status === 403 && detail.toLowerCase().includes('banned')) {
+    } catch (err: unknown) {
+      const httpErr = err as { status?: number; error?: { detail?: string } };
+      const detail = String(httpErr?.error?.detail ?? '');
+      if (httpErr?.status === 403 && detail.toLowerCase().includes('banned')) {
         this.clearSession();
-        this.currentUserDataSubject.next(null);
+        this.currentUser.set(null);
         throw { code: 'auth/banned', message: 'User is banned' };
       }
       throw err;
@@ -99,13 +90,13 @@ export class AuthService {
 
   async refreshUserData(): Promise<void> {
     if (!this.tokenStorage.getAccessToken()) {
-      this.currentUserDataSubject.next(null);
+      this.currentUser.set(null);
       return;
     }
     const user = await firstValueFrom(
       this.http.get<UserMe>(this.api.url('/auth/me'))
     );
-    this.currentUserDataSubject.next(this.normalizeUser(user));
+    this.currentUser.set(this.normalizeUser(user));
   }
 
   async logout(): Promise<void> {
@@ -115,7 +106,7 @@ export class AuthService {
       // Stateless JWT logout; ignore network errors when clearing client session.
     }
     this.clearSession();
-    this.currentUserDataSubject.next(null);
+    this.currentUser.set(null);
   }
 
   private clearSession(): void {
@@ -155,15 +146,7 @@ export class AuthService {
     return expired;
   }
 
-  isLoggedIn(): boolean {
-    return !!this.tokenStorage.getAccessToken() && !!this.currentUserDataSubject.value;
-  }
-
   getCurrentUserData(): UserMe | null | undefined {
-    return this.currentUserDataSubject.value;
-  }
-
-  getCurrentUserObservable(): Observable<UserMe | null | undefined> {
-    return this.currentUserData$;
+    return this.currentUser();
   }
 }

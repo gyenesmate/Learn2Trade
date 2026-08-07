@@ -1,7 +1,17 @@
-import { Component, OnInit, ViewChild, signal, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {
+  Component,
+  OnInit,
+  ChangeDetectionStrategy,
+  DestroyRef,
+  computed,
+  inject,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { CryptoCurrency, Investment, UserMe } from '../../../const/models';
+import { map } from 'rxjs';
+import { CryptoCurrency, Investment, PriceAlert } from '../../../const/models';
 import { CryptoCurrenciesService } from '../../../services/crypto-currencies.service';
 import { CryptoCardComponent } from '../../shared/crypto-card/crypto-card.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -9,7 +19,6 @@ import { InvestDialogComponent, InvestDialogResult } from '../../shared/invest-d
 import { AuthService } from '../../../services/auth.service';
 import { InvestmentsService } from '../../../services/investments.service';
 import { NotificationService } from '../../../services/notification.service';
-import { firstValueFrom, Observable, combineLatest, map } from 'rxjs';
 import { ActiveInvestmentComponent } from '../../shared/active-investment/active-investment.component';
 import { SetPriceAlertDialogComponent, SetPriceAlertDialogResult } from '../../shared/set-price-alert-dialog/set-price-alert-dialog.component';
 import { PriceAlertsService } from '../../../services/price-alerts.service';
@@ -17,13 +26,22 @@ import { FiredAlertsWidgetComponent } from '../../shared/fired-alerts-widget/fir
 
 @Component({
   selector: 'app-crypto-detail-page',
-  standalone: true,
-  imports: [CommonModule, RouterModule, CryptoCardComponent, MatDialogModule, ActiveInvestmentComponent, FiredAlertsWidgetComponent],
+  imports: [RouterModule, CryptoCardComponent, MatDialogModule, ActiveInvestmentComponent, FiredAlertsWidgetComponent],
   templateUrl: './crypto-detail-page.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./crypto-detail-page.component.scss']
 })
 export class CryptoDetailPageComponent implements OnInit {
-  cryptocurrencies: CryptoCurrency[] = [
+  private readonly route = inject(ActivatedRoute);
+  private readonly cryptoService = inject(CryptoCurrenciesService);
+  private readonly dialog = inject(MatDialog);
+  private readonly auth = inject(AuthService);
+  private readonly investments = inject(InvestmentsService);
+  private readonly priceAlerts = inject(PriceAlertsService);
+  private readonly notification = inject(NotificationService);
+  private readonly destroyRef = inject(DestroyRef);
+
+  private readonly fallbackCryptocurrencies: CryptoCurrency[] = [
     { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', exchange_currency: 'USD', created_at: '', updated_at: '' },
     { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', exchange_currency: 'USD', created_at: '', updated_at: '' },
     { id: 'cardano', name: 'Cardano', symbol: 'ADA', exchange_currency: 'USD', created_at: '', updated_at: '' },
@@ -31,99 +49,77 @@ export class CryptoDetailPageComponent implements OnInit {
     { id: 'ripple', name: 'Ripple', symbol: 'XRP', exchange_currency: 'USD', created_at: '', updated_at: '' }
   ];
 
-  selectedId: string | null = null;
-  selectedCrypto: CryptoCurrency | null = null;
-  user$: Observable<UserMe | null | undefined>;
-  activeInvestments: Investment[] = [];
-  investing = false;
-  selling = false;
+  private readonly routeId = toSignal(
+    this.route.paramMap.pipe(map((params) => params.get('id'))),
+    { initialValue: this.route.snapshot.paramMap.get('id') }
+  );
 
-  private readonly selectedCryptoId = signal<string | null>(null);
-  readonly alertsForSelected$: Observable<import('../../../const/models').PriceAlert[]>;
+  readonly selectedId = computed(() => this.routeId());
+  readonly selectedCrypto = signal<CryptoCurrency | null>(null);
+  readonly activeInvestments = signal<Investment[]>([]);
+  readonly investing = signal(false);
+  readonly selling = signal(false);
 
-  @ViewChild('card') card?: CryptoCardComponent;
-
-  constructor(
-    private route: ActivatedRoute,
-    private cryptoService: CryptoCurrenciesService,
-    private dialog: MatDialog,
-    private auth: AuthService,
-    private investments: InvestmentsService,
-    private priceAlerts: PriceAlertsService,
-    private notification: NotificationService
-  ) {
-    this.user$ = this.auth.currentUserData$;
-
-    this.alertsForSelected$ = combineLatest([
-      this.priceAlerts.alerts$,
-      // convert signal to observable by mapping to a simple subject via map in combineLatest
-      new Observable<string | null>((sub) => {
-        // emit current
-        sub.next(this.selectedCryptoId());
-        const eff = effect(() => sub.next(this.selectedCryptoId()));
-        return () => eff && (eff as any)();
-      })
-    ]).pipe(
-      map(([alerts, selectedId]) => {
-        if (!selectedId) return [];
-        return (alerts || []).filter(a => a.crypto_currency_id === selectedId && !!a.is_active);
-      })
+  readonly alertsForSelected = computed(() => {
+    const id = this.selectedId();
+    if (!id) return [] as PriceAlert[];
+    return this.priceAlerts.alerts().filter(
+      (a) => a.crypto_currency_id === id && !!a.is_active
     );
+  });
 
-    // Effect: when selectedCryptoId changes, run the page load logic
-    effect(() => {
-      const id = this.selectedCryptoId();
-      // run async logic in microtask
-      (async () => {
-        this.selectedId = id;
-        if (!id) {
-          this.selectedCrypto = null;
-          this.activeInvestments = [];
-          return;
-        }
+  readonly card = viewChild<CryptoCardComponent>('card');
 
-        try {
-          const fromDb = await this.cryptoService.getById(id);
-          if (fromDb) {
-            this.selectedCrypto = fromDb;
-            await this.loadActiveInvestments();
-            return;
-          }
-        } catch (err) {
-          // ignore and fall back
-        }
-
-        this.selectedCrypto = this.cryptocurrencies.find(c => c.id === id) ?? null;
-        await this.loadActiveInvestments();
-      })();
+  ngOnInit(): void {
+    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      void this.loadSelectedCrypto(params.get('id'));
     });
   }
 
-  ngOnInit(): void {
-    // wire route changes into the signal; the effect in constructor handles loading
-    this.route.paramMap.subscribe(params => {
-      this.selectedCryptoId.set(params.get('id'));
-    });
+  private async loadSelectedCrypto(id: string | null): Promise<void> {
+    if (!id) {
+      this.selectedCrypto.set(null);
+      this.activeInvestments.set([]);
+      return;
+    }
+
+    try {
+      const fromDb = await this.cryptoService.getById(id);
+      if (fromDb) {
+        this.selectedCrypto.set(fromDb);
+        await this.loadActiveInvestments();
+        return;
+      }
+    } catch {
+      // ignore and fall back
+    }
+
+    this.selectedCrypto.set(this.fallbackCryptocurrencies.find((c) => c.id === id) ?? null);
+    await this.loadActiveInvestments();
   }
 
   private async loadActiveInvestments(): Promise<void> {
     try {
-      const user = await firstValueFrom(this.user$);
-      if (!user?.id || !this.selectedCrypto?.id) {
-        this.activeInvestments = [];
+      const user = this.auth.currentUser();
+      const crypto = this.selectedCrypto();
+      if (!user?.id || !crypto?.id) {
+        this.activeInvestments.set([]);
         return;
       }
-      this.activeInvestments = await this.investments.getActiveByUserAndCrypto(user.id, this.selectedCrypto.id);
+      this.activeInvestments.set(
+        await this.investments.getActiveByUserAndCrypto(user.id, crypto.id)
+      );
     } catch {
-      this.activeInvestments = [];
+      this.activeInvestments.set([]);
     }
   }
 
   openInvest(): void {
-    if (!this.selectedCrypto) return;
-    const currentPrice = Number(this.card?.livePrice || 0);
+    const crypto = this.selectedCrypto();
+    if (!crypto) return;
+    const currentPrice = Number(this.card()?.livePrice || 0);
     const ref = this.dialog.open(InvestDialogComponent, {
-      data: { crypto: this.selectedCrypto, currentPrice }
+      data: { crypto, currentPrice }
     });
 
     ref.afterClosed().subscribe((result: InvestDialogResult | null) => {
@@ -133,11 +129,12 @@ export class CryptoDetailPageComponent implements OnInit {
   }
 
   openSetAlert(): void {
-    if (!this.selectedCrypto) return;
-    const currentPrice = Number(this.card?.livePrice || 0);
+    const crypto = this.selectedCrypto();
+    if (!crypto) return;
+    const currentPrice = Number(this.card()?.livePrice || 0);
 
     const ref = this.dialog.open(SetPriceAlertDialogComponent, {
-      data: { crypto: this.selectedCrypto, currentPrice }
+      data: { crypto, currentPrice }
     });
 
     ref.afterClosed().subscribe((result: SetPriceAlertDialogResult | null) => {
@@ -147,10 +144,11 @@ export class CryptoDetailPageComponent implements OnInit {
   }
 
   private async confirmSetAlert(result: SetPriceAlertDialogResult): Promise<void> {
-    if (!this.selectedCrypto) return;
+    const crypto = this.selectedCrypto();
+    if (!crypto) return;
 
     try {
-      const user = await firstValueFrom(this.user$);
+      const user = this.auth.currentUser();
       if (!user?.id) {
         this.notification.warning('Please log in to set alerts');
         return;
@@ -162,11 +160,11 @@ export class CryptoDetailPageComponent implements OnInit {
         return;
       }
 
-      const currentPrice = Number(this.card?.livePrice || 0);
+      const currentPrice = Number(this.card()?.livePrice || 0);
       const alertType: 'above' | 'below' = alertPrice < currentPrice ? 'below' : 'above';
 
       await this.priceAlerts.create({
-        crypto_currency_id: this.selectedCrypto.id,
+        crypto_currency_id: crypto.id,
         alert_price: alertPrice,
         description: String(result.description || ''),
         alert_type: alertType,
@@ -181,12 +179,13 @@ export class CryptoDetailPageComponent implements OnInit {
   }
 
   private async confirmInvest(result: InvestDialogResult): Promise<void> {
-    if (!this.selectedCrypto) return;
-    if (this.investing) return;
-    this.investing = true;
+    const crypto = this.selectedCrypto();
+    if (!crypto) return;
+    if (this.investing()) return;
+    this.investing.set(true);
 
     try {
-      const user = await firstValueFrom(this.user$);
+      const user = this.auth.currentUser();
       if (!user?.id) {
         this.notification.warning('Please log in to invest');
         return;
@@ -204,43 +203,43 @@ export class CryptoDetailPageComponent implements OnInit {
         return;
       }
 
-      const currentPrice = Number(this.card?.livePrice || 0);
+      const currentPrice = Number(this.card()?.livePrice || 0);
       if (!Number.isFinite(currentPrice) || currentPrice <= 0) {
         this.notification.error('Current price unavailable');
         return;
       }
 
       const newInv = await this.investments.create({
-        crypto_currency_id: this.selectedCrypto.id,
+        crypto_currency_id: crypto.id,
         amount,
         buying_price: currentPrice,
         description: result.description
       });
 
-      this.activeInvestments.push(newInv);
-
+      this.activeInvestments.update((list) => [...list, newInv]);
       this.notification.success('Investment created');
     } catch (err: any) {
       console.error('confirmInvest failed', err);
       this.notification.error(err?.message || 'Failed to invest');
     } finally {
-      this.investing = false;
+      this.investing.set(false);
     }
   }
 
   async sellActiveInvestment(investmentId?: string): Promise<void> {
-    if (this.selling) return;
-    this.selling = true;
+    if (this.selling()) return;
+    this.selling.set(true);
 
     try {
-      const currentPrice = Number(this.card?.livePrice || 0);
+      const currentPrice = Number(this.card()?.livePrice || 0);
       if (!Number.isFinite(currentPrice) || currentPrice <= 0) throw new Error('Current price unavailable');
 
+      const list = this.activeInvestments();
       let inv: Investment | undefined;
       if (investmentId) {
-        inv = this.activeInvestments.find(i => i.id === investmentId);
-      } else if (this.activeInvestments.length === 1) {
-        inv = this.activeInvestments[0];
+        inv = list.find((i) => i.id === investmentId);
+      } else if (list.length === 1) {
+        inv = list[0];
       } else {
         throw new Error('Select an investment to sell');
       }
@@ -249,14 +248,12 @@ export class CryptoDetailPageComponent implements OnInit {
 
       await this.investments.sell(inv.id, currentPrice);
       this.notification.success('Investment sold');
-
-      // remove from local list
-      this.activeInvestments = this.activeInvestments.filter(i => i.id !== inv!.id);
+      this.activeInvestments.update((items) => items.filter((i) => i.id !== inv!.id));
     } catch (err: any) {
       console.error('sellActiveInvestment failed', err);
       this.notification.error(err?.message || 'Failed to sell');
     } finally {
-      this.selling = false;
+      this.selling.set(false);
     }
   }
 }

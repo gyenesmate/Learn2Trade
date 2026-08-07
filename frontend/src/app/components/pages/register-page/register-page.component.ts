@@ -1,34 +1,38 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import {
+  AbstractControl,
+  FormBuilder,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-register-page',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink],
+  imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './register-page.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./register-page.component.scss']
 })
 export class RegisterPageComponent {
-  form: FormGroup;
-  submitted = false;
+  private readonly authService = inject(AuthService);
+  private readonly notifications = inject(NotificationService);
+  private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
 
-  constructor(
-    private authService: AuthService,
-    private notifications: NotificationService,
-    private fb: FormBuilder,
-    private router: Router
-  ) {
-    this.form = this.fb.group({
+  readonly form = this.fb.group(
+    {
       userName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.pattern(/^(?=.*[A-Z])(?=.*\d).{8,}$/)]],
       confirmPassword: ['', Validators.required]
-    }, { validators: [this.matchPasswords] });
-  }
+    },
+    { validators: [this.matchPasswords] }
+  );
+  submitted = false;
 
   private matchPasswords(control: AbstractControl): ValidationErrors | null {
     const password = control.get('password')?.value;
@@ -40,7 +44,7 @@ export class RegisterPageComponent {
     return password === confirmPassword ? null : { passwordMismatch: true };
   }
 
-  async onSubmit() {
+  async onSubmit(): Promise<void> {
     this.submitted = true;
     if (this.form.invalid) {
       return;
@@ -49,7 +53,7 @@ export class RegisterPageComponent {
     try {
       const { userName, email, password } = this.form.getRawValue();
       await this.authService.register(userName ?? '', email ?? '', password ?? '');
-      this.router.navigate(['/dashboard']);
+      void this.router.navigate(['/dashboard']);
     } catch (error) {
       console.error('Registration error:', error);
       this.notifications.error('Registration failed. Please try again.', 'Registration failed');

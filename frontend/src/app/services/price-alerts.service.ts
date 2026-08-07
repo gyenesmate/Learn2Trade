@@ -1,6 +1,6 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, effect, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, Subscription, firstValueFrom, timer } from 'rxjs';
+import { Subscription, firstValueFrom, timer } from 'rxjs';
 import { CryptoCurrency, PriceAlert } from '../const/models';
 import { ApiService } from '../core/api.service';
 import { toNumber } from '../core/number.util';
@@ -16,17 +16,35 @@ export class PriceAlertsService {
   private readonly cryptos = inject(CryptoCurrenciesService);
   private readonly notification = inject(NotificationService);
 
-  private readonly alertsSubject = new BehaviorSubject<PriceAlert[]>([]);
-  readonly alerts$ = this.alertsSubject.asObservable();
-
-  private readonly firedAlertsSubject = new BehaviorSubject<PriceAlert[]>([]);
-  readonly firedAlerts$ = this.firedAlertsSubject.asObservable();
+  readonly alerts = signal<PriceAlert[]>([]);
+  readonly firedAlerts = signal<PriceAlert[]>([]);
 
   private started = false;
-  private authSub?: Subscription;
   private pollSub?: Subscription;
   private currentUserId: string | null = null;
   private readonly cryptoCache = new Map<string, CryptoCurrency>();
+
+  constructor() {
+    effect(() => {
+      if (!this.started) return;
+      const user = this.auth.currentUser();
+      if (user === undefined) return;
+
+      const uid = user?.id ?? null;
+      if (uid === this.currentUserId) return;
+      this.currentUserId = uid;
+
+      this.alerts.set([]);
+      this.firedAlerts.set([]);
+
+      if (!uid) {
+        this.stopPollingOnly();
+        return;
+      }
+
+      void this.reloadUserAlerts();
+    });
+  }
 
   private normalize(alert: PriceAlert): PriceAlert {
     return {
@@ -39,35 +57,28 @@ export class PriceAlertsService {
     if (this.started) return;
     this.started = true;
 
-    this.authSub = this.auth.currentUserData$.subscribe((user) => {
-      const uid = user?.id ?? null;
-      if (uid === this.currentUserId) return;
-      this.currentUserId = uid;
+    const user = this.auth.currentUser();
+    if (user === undefined) return;
 
-      this.alertsSubject.next([]);
-      this.firedAlertsSubject.next([]);
+    const uid = user?.id ?? null;
+    this.currentUserId = uid;
+    this.alerts.set([]);
+    this.firedAlerts.set([]);
 
-      if (!uid) {
-        this.stopPollingOnly();
-        return;
-      }
+    if (!uid) {
+      this.stopPollingOnly();
+      return;
+    }
 
-      void this.reloadUserAlerts();
-    });
+    void this.reloadUserAlerts();
   }
 
   stop(): void {
     this.started = false;
-    try {
-      this.authSub?.unsubscribe();
-    } catch {
-      /* ignore */
-    }
-    this.authSub = undefined;
     this.stopPollingOnly();
     this.currentUserId = null;
-    this.alertsSubject.next([]);
-    this.firedAlertsSubject.next([]);
+    this.alerts.set([]);
+    this.firedAlerts.set([]);
   }
 
   private stopPollingOnly(): void {
@@ -92,7 +103,7 @@ export class PriceAlertsService {
       return;
     }
 
-    const hasActive = this.alertsSubject.value.some((a) => !!a.is_active);
+    const hasActive = this.alerts().some((a) => !!a.is_active);
     if (!hasActive) {
       this.stopPollingOnly();
       return;
@@ -128,7 +139,7 @@ export class PriceAlertsService {
     );
     const normalized = this.normalize(created);
     if (this.currentUserId && normalized.user_id === this.currentUserId) {
-      this.alertsSubject.next([normalized, ...this.alertsSubject.value]);
+      this.alerts.update((list) => [normalized, ...list]);
       this.ensurePollingState();
     }
     return normalized;
@@ -156,26 +167,22 @@ export class PriceAlertsService {
 
   async deleteById(id: string): Promise<void> {
     await firstValueFrom(this.http.delete(this.api.url(`/price-alerts/${id}`)));
-    this.alertsSubject.next(this.alertsSubject.value.filter((a) => a.id !== id));
-    this.firedAlertsSubject.next(
-      this.firedAlertsSubject.value.filter((a) => a.id !== id)
-    );
+    this.alerts.update((list) => list.filter((a) => a.id !== id));
+    this.firedAlerts.update((list) => list.filter((a) => a.id !== id));
     this.ensurePollingState();
   }
 
   async deactivate(id: string): Promise<void> {
     await this.updateById(id, { is_active: false });
-    this.firedAlertsSubject.next(
-      this.firedAlertsSubject.value.filter((a) => a.id !== id)
-    );
+    this.firedAlerts.update((list) => list.filter((a) => a.id !== id));
     this.ensurePollingState();
   }
 
   async reloadUserAlerts(): Promise<void> {
     const uid = this.currentUserId;
     if (!uid) {
-      this.alertsSubject.next([]);
-      this.firedAlertsSubject.next([]);
+      this.alerts.set([]);
+      this.firedAlerts.set([]);
       return;
     }
     try {
@@ -185,16 +192,14 @@ export class PriceAlertsService {
         const tb = Date.parse(b.created_at) || 0;
         return tb - ta;
       });
-      this.alertsSubject.next(sorted);
+      this.alerts.set(sorted);
       const activeIds = new Set(sorted.filter((a) => a.is_active).map((a) => a.id));
-      this.firedAlertsSubject.next(
-        this.firedAlertsSubject.value.filter((a) => activeIds.has(a.id))
-      );
+      this.firedAlerts.update((list) => list.filter((a) => activeIds.has(a.id)));
       this.ensurePollingState();
     } catch (err) {
       console.error('PriceAlertsService.reloadUserAlerts failed', err);
-      this.alertsSubject.next([]);
-      this.firedAlertsSubject.next([]);
+      this.alerts.set([]);
+      this.firedAlerts.set([]);
       this.ensurePollingState();
     }
   }
@@ -204,7 +209,7 @@ export class PriceAlertsService {
 
     await this.reloadUserAlerts();
 
-    const activeAlerts = this.alertsSubject.value.filter((a) => a.is_active);
+    const activeAlerts = this.alerts().filter((a) => a.is_active);
     if (!activeAlerts.length) {
       this.ensurePollingState();
       return;
@@ -228,7 +233,7 @@ export class PriceAlertsService {
 
     if (!pricesByCryptoId.size) return;
 
-    const firedIds = new Set(this.firedAlertsSubject.value.map((a) => a.id));
+    const firedIds = new Set(this.firedAlerts().map((a) => a.id));
     const newlyFired: PriceAlert[] = [];
 
     for (const alert of activeAlerts) {
@@ -248,10 +253,7 @@ export class PriceAlertsService {
     }
 
     if (newlyFired.length) {
-      this.firedAlertsSubject.next([
-        ...newlyFired,
-        ...this.firedAlertsSubject.value,
-      ]);
+      this.firedAlerts.update((list) => [...newlyFired, ...list]);
       for (const a of newlyFired) {
         const crypto = await this.getCryptoCached(a.crypto_currency_id);
         const name = crypto?.symbol || a.crypto_currency_id;

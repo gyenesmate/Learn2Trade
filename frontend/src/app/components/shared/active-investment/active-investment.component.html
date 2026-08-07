@@ -1,19 +1,22 @@
-<div class="active-investment card" *ngIf="investment && crypto">
-  <div class="header">
-    <h3>Active Investment</h3>
-    <div class="sub">{{ crypto.name }} ({{ crypto.symbol }})</div>
-  </div>
-
-  <div class="grid">
-    <div><span class="k">Amount:</span> <span class="v">${{ investment.amount | number:'1.2-2' }}</span></div>
-    <div><span class="k">Buying price:</span> <span class="v">{{ investment.buying_price | number:'1.2-6' }}</span></div>
-    <div><span class="k">Current price:</span> <span class="v">{{ currentPrice | number:'1.2-6' }}</span></div>
-    <div><span class="k">Est. payout:</span> <span class="v">${{ estimatedPayout | number:'1.2-2' }}</span></div>
-  </div>
-
-  <div class="desc" *ngIf="investment.description">{{ investment.description }}</div>
-
-  <div class="actions">
-    <button class="btn btn-primary" (click)="onSell()">Sell</button>
-  </div>
-</div>
+@if (investment(); as inv) {
+  @if (crypto(); as c) {
+    <div class="active-investment card">
+      <div class="header">
+        <h3>Active Investment</h3>
+        <div class="sub">{{ c.name }} ({{ c.symbol }})</div>
+      </div>
+      <div class="grid">
+        <div><span class="k">Amount:</span> <span class="v">${{ inv.amount | number:'1.2-2' }}</span></div>
+        <div><span class="k">Buying price:</span> <span class="v">{{ inv.buying_price | number:'1.2-6' }}</span></div>
+        <div><span class="k">Current price:</span> <span class="v">{{ currentPrice() | number:'1.2-6' }}</span></div>
+        <div><span class="k">Est. payout:</span> <span class="v">${{ estimatedPayout() | number:'1.2-2' }}</span></div>
+      </div>
+      @if (inv.description) {
+        <div class="desc">{{ inv.description }}</div>
+      }
+      <div class="actions">
+        <button class="btn btn-primary" (click)="onSell()">Sell</button>
+      </div>
+    </div>
+  }
+}

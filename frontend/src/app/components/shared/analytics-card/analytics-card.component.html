@@ -1,36 +1,55 @@
-<div class="analytics-card" [class.best]="state === 'best'" [class.average]="state === 'average'" [class.timeline]="state === 'timeline'">
-	<ng-container [ngSwitch]="state">
-		<div *ngSwitchCase="'best'">
-			<h3>Best Investment</h3>
-			<div *ngIf="bestInvestment; else noData">
-				<div><b>Crypto:</b> {{ bestInvestment.crypto_currency_id }}</div>
-				<div><b>Profit:</b> ${{ profit(bestInvestment) | number:'1.2-2' }}</div>
-				<div><b>ROI:</b> {{ roiPercent(bestInvestment) | number:'1.2-2' }}%</div>
-				<div><b>Amount:</b> {{ bestInvestment.amount | number:'1.2-8' }}</div>
-				<div><b>Bought at:</b> ${{ bestInvestment.buying_price | number:'1.2-2' }}</div>
-				<div><b>Sold at:</b> ${{ bestInvestment.selling_price | number:'1.2-2' }}</div>
-				<div><b>Date:</b> {{ soldDate(bestInvestment) | date:'mediumDate' }}</div>
-			</div>
-			<ng-template #noData>No sold investments.</ng-template>
-		</div>
-		<div *ngSwitchCase="'average'">
-			<h3>Average Profit</h3>
-			<div *ngIf="averageProfit !== null; else noAvg">${{ averageProfit | number:'1.2-2' }}</div>
-			<ng-template #noAvg>No sold investments.</ng-template>
-		</div>
-		<div *ngSwitchCase="'timeline'">
-			<h3>Investment Timeline</h3>
-			<div *ngIf="timeline.length; else noTimeline">
-				<div class="chart-placeholder" *ngFor="let inv of timeline">
-					<div><b>{{ soldDate(inv) | date:'mediumDate' }}</b></div>
-					<div>{{ inv.crypto_currency_id }} — ${{ profit(inv) | number:'1.2-2' }} ({{ roiPercent(inv) | number:'1.2-2' }}%)</div>
-				</div>
-			</div>
-			<ng-template #noTimeline>No sold investments.</ng-template>
-		</div>
-		<div *ngSwitchDefault>
-			<h3>{{ label || 'Analytics' }}</h3>
-			<div class="chart-placeholder">[Custom chart/data will appear here]</div>
-		</div>
-	</ng-container>
+<div class="analytics-card" [class.best]="state() === 'best'" [class.average]="state() === 'average'" [class.timeline]="state() === 'timeline'">
+  @switch (state()) {
+    @case ('best') {
+      <div>
+        <h3>Best Investment</h3>
+        @if (bestInvestment(); as best) {
+          <div>
+            <div><b>Crypto:</b> {{ best.crypto_currency_id }}</div>
+            <div><b>Profit:</b> ${{ profit(best) | number:'1.2-2' }}</div>
+            <div><b>ROI:</b> {{ roiPercent(best) | number:'1.2-2' }}%</div>
+            <div><b>Amount:</b> {{ best.amount | number:'1.2-8' }}</div>
+            <div><b>Bought at:</b> ${{ best.buying_price | number:'1.2-2' }}</div>
+            <div><b>Sold at:</b> ${{ best.selling_price | number:'1.2-2' }}</div>
+            <div><b>Date:</b> {{ soldDate(best) | date:'mediumDate' }}</div>
+          </div>
+        } @else {
+          No sold investments.
+        }
+      </div>
+    }
+    @case ('average') {
+      <div>
+        <h3>Average Profit</h3>
+        @if (averageProfit(); as avg) {
+          <div>${{ avg | number:'1.2-2' }}</div>
+        } @else {
+          No sold investments.
+        }
+      </div>
+    }
+    @case ('timeline') {
+      <div>
+        <h3>Investment Timeline</h3>
+        @if (timeline().length) {
+          <div>
+            @for (inv of timeline(); track inv.id) {
+              <div class="chart-placeholder">
+                <div><b>{{ soldDate(inv) | date:'mediumDate' }}</b></div>
+                <div>{{ inv.crypto_currency_id }} — ${{ profit(inv) | number:'1.2-2' }} ({{ roiPercent(inv) | number:'1.2-2' }}%)</div>
+              </div>
+            }
+          </div>
+        } @else {
+          No sold investments.
+        }
+      </div>
+    }
+    @default {
+      <div>
+        <h3>{{ label() || 'Analytics' }}</h3>
+        <div class="chart-placeholder">[Custom chart/data will appear here]</div>
+      </div>
+    }
+  }
 </div>

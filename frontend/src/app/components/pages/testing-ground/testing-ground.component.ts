@@ -1,16 +1,15 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 import { CryptoCardComponent } from '../../shared/crypto-card/crypto-card.component';
 import { CryptoCurrency } from '../../../const/models';
 
 @Component({
   selector: 'app-testing-ground',
-  standalone: true,
-  imports: [CommonModule, CryptoCardComponent],
+  imports: [CryptoCardComponent],
   templateUrl: './testing-ground.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./testing-ground.component.scss'],
 })
-export class TestingGroundComponent implements OnInit {
+export class TestingGroundComponent {
   ethData: CryptoCurrency = {
     id: 'ethereum',
     name: 'Ethereum',
@@ -19,6 +18,4 @@ export class TestingGroundComponent implements OnInit {
     created_at: '',
     updated_at: '',
   };
-
-  ngOnInit(): void {}
 }

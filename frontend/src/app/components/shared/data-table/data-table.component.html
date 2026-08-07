@@ -30,7 +30,7 @@
   @if (data() && data().length !== 0) {
 
     <table mat-table [dataSource]="dataSource" matSort class="mdc-data-table--modern" multiTemplateDataRows>
-  
+
       @for (column of columns(); track column.key) {
         <ng-container [matColumnDef]="column.key">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>
@@ -58,7 +58,7 @@
           </td>
         </ng-container>
       }
-  
+
       <!-- Row Actions Column -->
       @if (rowActions() && rowActions().length) {
         <ng-container matColumnDef="actions">
@@ -84,7 +84,7 @@
       }
 
       @if (innerWidth() < 600) {
-          <!-- Expandable Detail Column for Mobile -->
+        <!-- Expandable Detail Column for Mobile -->
 
         <ng-container matColumnDef="expand">
           <th mat-header-cell *matHeaderCellDef></th>
@@ -99,20 +99,22 @@
         </ng-container>
 
         <ng-container matColumnDef="expandedDetail">
-          <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns.length">
-            <div class="mobile-detail" *ngIf="isExpanded(row)">
-              @for (column of columns(); track column.key) {
-                <div class="mobile-detail__row">
-                  <span class="mobile-detail__label">{{ column.label }}</span>
-                  <span class="mobile-detail__value">{{ formatCell(row, column) }}</span>
-                </div>
-              }
-            </div>
+          <td mat-cell *matCellDef="let row" [attr.colspan]="displayedColumns().length">
+            @if (isExpanded(row)) {
+              <div class="mobile-detail">
+                @for (column of columns(); track column.key) {
+                  <div class="mobile-detail__row">
+                    <span class="mobile-detail__label">{{ column.label }}</span>
+                    <span class="mobile-detail__value">{{ formatCell(row, column) }}</span>
+                  </div>
+                }
+              </div>
+            }
           </td>
         </ng-container>
       }
-      <tr mat-header-row *matHeaderRowDef="displayedColumns" class="table-row"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="table-row"
+      <tr mat-header-row *matHeaderRowDef="displayedColumns()" class="table-row"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns();" class="table-row"
         [matTooltip]="formatRowTooltip(row)"
         [matTooltipDisabled]="isMobile()"
         [matTooltipShowDelay]="1000"
@@ -123,7 +125,7 @@
         <tr mat-row *matRowDef="let row; columns: ['expandedDetail'];" [style.display]="isExpanded(row) ? 'table-row' : 'none'" class="table-row table-row--detail"></tr>
       }
     </table>
-  
+
     <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select"></mat-paginator>
   } @else {
     <div class="no-data">

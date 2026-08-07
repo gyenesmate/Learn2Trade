@@ -1,35 +1,30 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { A11yModule } from "@angular/cdk/a11y";
+import { A11yModule } from '@angular/cdk/a11y';
 import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-login-page',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, A11yModule, RouterLink],
+  imports: [ReactiveFormsModule, A11yModule, RouterLink],
   templateUrl: './login-page.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./login-page.component.scss']
 })
 export class LoginPageComponent {
-  form: FormGroup;
+  private readonly authService = inject(AuthService);
+  private readonly notifications = inject(NotificationService);
+  private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
+
+  readonly form = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', Validators.required]
+  });
   submitted = false;
 
-  constructor(
-    private authService: AuthService,
-    private notifications: NotificationService,
-    private fb: FormBuilder,
-    private router: Router
-  ) {
-    this.form = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', Validators.required]
-    });
-  }
-
-  async onSubmit() {
+  async onSubmit(): Promise<void> {
     this.submitted = true;
     if (this.form.invalid) {
       return;
@@ -40,13 +35,11 @@ export class LoginPageComponent {
     try {
       await this.authService.login(email ?? '', password ?? '');
       console.log('[LoginPage] login succeeded, navigating to dashboard');
-      this.router.navigate(['/dashboard']);
+      void this.router.navigate(['/dashboard']);
     } catch (error) {
       console.error('[LoginPage] Login error:', error);
-      // if user is banned, navigate to the banned page
-      if ((error as any)?.code === 'auth/banned') {
-        // already signed out in AuthService; navigate to banned info page
-        this.router.navigate(['/banned']);
+      if ((error as { code?: string })?.code === 'auth/banned') {
+        void this.router.navigate(['/banned']);
         return;
       }
 

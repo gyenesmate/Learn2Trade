@@ -618,9 +618,9 @@ textarea,
 
 // Angular Material paginator/select styling
 .mat-mdc-paginator .mat-mdc-form-field {
-    --mdc-outlined-text-field-outline-color: var(--color-border);
-    --mdc-outlined-text-field-hover-outline-color: var(--color-border);
-    --mdc-outlined-text-field-focus-outline-color: var(--color-primary);
+    --mat-form-field-outlined-outline-color: var(--color-border);
+    --mat-form-field-outlined-hover-outline-color: var(--color-border);
+    --mat-form-field-outlined-focus-outline-color: var(--color-primary);
 }
 
 .mat-mdc-paginator .mdc-notched-outline__leading,

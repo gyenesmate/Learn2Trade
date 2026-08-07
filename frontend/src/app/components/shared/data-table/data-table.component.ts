@@ -1,5 +1,15 @@
-import { Component, input, effect, OnInit, ViewChild, AfterViewInit, HostListener, signal } from '@angular/core';
-import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
+import {
+  Component,
+  input,
+  effect,
+  HostListener,
+  signal,
+  ChangeDetectionStrategy,
+  inject,
+  viewChild,
+  computed,
+} from '@angular/core';
+import { DatePipe, CurrencyPipe } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -10,9 +20,7 @@ import { TableColumn, TableAction, RowAction } from './data-table-utilities';
 
 @Component({
   selector: 'app-data-table',
-  standalone: true,
   imports: [
-    CommonModule,
     MatTableModule,
     MatPaginatorModule,
     MatSortModule,
@@ -20,130 +28,98 @@ import { TableColumn, TableAction, RowAction } from './data-table-utilities';
     MatIconModule,
     MatTooltipModule,
     DatePipe,
-    CurrencyPipe
+    CurrencyPipe,
   ],
   providers: [DatePipe, CurrencyPipe],
   templateUrl: './data-table.component.html',
-  styleUrl: './data-table.component.scss'
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrl: './data-table.component.scss',
 })
-export class DataTableComponent<T> implements OnInit, AfterViewInit {
-  // Inputs as signals
+export class DataTableComponent<T> {
+  private readonly datePipe = inject(DatePipe);
+  private readonly currencyPipe = inject(CurrencyPipe);
+
   readonly columns = input<TableColumn<T>[]>([]);
   readonly title = input<string | undefined>(undefined);
   readonly data = input<T[]>([]);
   readonly actionBar = input<TableAction[]>([]);
   readonly rowActions = input<RowAction<T>[]>([]);
 
-  public innerWidth = signal<number>(window.innerWidth);
-  @HostListener('window:resize', ['$event'])
-  onResize(event: any) {
-    this.innerWidth.set(event.target.innerWidth);
-  }
+  readonly innerWidth = signal<number>(window.innerWidth);
+  readonly expandedRow = signal<T | null>(null);
+
+  private readonly paginator = viewChild(MatPaginator);
+  private readonly sort = viewChild(MatSort);
 
   dataSource = new MatTableDataSource<T>([]);
-  displayedColumns: string[] = [];
-  expandedRow = signal<T | null>(null);
 
-  @ViewChild(MatPaginator)
-  set paginator(value: MatPaginator) {
-    if (value) {
-      this.dataSource.paginator = value;
+  readonly displayedColumns = computed(() => {
+    const cols = this.columns();
+    const actions = this.rowActions();
+    if (this.innerWidth() < 600) {
+      const result: string[] = cols[0] ? [String(cols[0].key)] : [];
+      if (!result.includes('expand')) result.push('expand');
+      if (actions?.length && !result.includes('actions')) result.push('actions');
+      return result;
     }
+    const result = cols.map((col) => String(col.key)).filter((c) => c !== 'expand');
+    if (actions?.length) {
+      if (!result.includes('actions')) result.push('actions');
+    }
+    return result.filter((c) => c !== 'actions' || !!actions?.length);
+  });
+
+  @HostListener('window:resize', ['$event'])
+  onResize(event: UIEvent): void {
+    const target = event.target as Window;
+    this.innerWidth.set(target.innerWidth);
   }
 
-  @ViewChild(MatSort)
-  set sort(value: MatSort) {
-    if (value) {
-      this.dataSource.sort = value;
-    }
-  }
-
-  constructor(private datePipe: DatePipe, private currencyPipe: CurrencyPipe) {
-    // React to columns or rowActions changes
-    effect(() => {
-      const cols = this.columns();
-      const innerWidth = this.innerWidth();
-
-      if (innerWidth < 600) {
-        this.displayedColumns = this.columns()[0] ? [String(this.columns()[0].key)] : [];
-        if (!this.displayedColumns.includes('expand')) {
-          this.displayedColumns.push('expand');
-        }
-        if (this.rowActions() && this.rowActions().length > 0) {
-          if (!this.displayedColumns.includes('actions')) {
-            this.displayedColumns.push('actions');
-          }
-        }
-      } else {
-        this.displayedColumns = cols.map(col => String(col.key));
-        this.displayedColumns = this.displayedColumns.filter(c => c !== 'expand');
-        if (this.rowActions() && this.rowActions().length > 0) {
-          if (!this.displayedColumns.includes('actions')) {
-            this.displayedColumns.push('actions');
-          }
-        } else {
-          this.displayedColumns = this.displayedColumns.filter(c => c !== 'actions');
-        }
-      }
-    });
-
-    // React to data changes and update dataSource
+  constructor() {
     effect(() => {
       this.dataSource.data = this.data();
     });
 
-    // When paginator becomes available, attach paginator and sort to dataSource
     effect(() => {
-      const p = this.paginator;
-      if (p) {
-        this.dataSource.paginator = p;
-        // assign sort if available (may be undefined)
-        if (this.sort) {
-          this.dataSource.sort = this.sort;
-        }
-      }
+      const p = this.paginator();
+      const s = this.sort();
+      if (p) this.dataSource.paginator = p;
+      if (s) this.dataSource.sort = s;
     });
   }
-
-  ngOnInit() {
-
-  }
-
-  ngAfterViewInit() {}
 
   isMobile(): boolean {
     return this.innerWidth() < 600;
   }
 
-  onRowContext(event: MouseEvent, tooltip: { show: () => void; hide: () => void; }) {
+  onRowContext(event: MouseEvent, tooltip: { show: () => void; hide: () => void }): void {
     event.preventDefault();
     if (this.isMobile()) return;
     try {
       tooltip.show();
       setTimeout(() => tooltip.hide(), 3500);
-    } catch (e) {
+    } catch {
       // ignore
     }
   }
 
-  formatRowTooltip(row: any) {
+  formatRowTooltip(row: Record<string, unknown>): string {
     if (!row || this.innerWidth() > 600) return '';
-    // display a compact summary: first two keys
     try {
       const keys = Object.keys(row);
-      const parts = keys.slice(0, 2).map(k => `${k}: ${row[k]}`);
+      const parts = keys.slice(0, 2).map((k) => `${k}: ${row[k]}`);
       return parts.join(' — ');
     } catch {
       return String(row);
     }
   }
 
-  applyFilter(event: Event) {
+  applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
-  toggleRow(row: T) {
+  toggleRow(row: T): void {
     const current = this.expandedRow();
     this.expandedRow.set(current === row ? null : row);
   }
@@ -154,14 +130,14 @@ export class DataTableComponent<T> implements OnInit, AfterViewInit {
 
   isExpandedRow = (_index: number, row: T): boolean => this.isExpanded(row);
 
-  formatCell(row: any, column: TableColumn<T>): string {
+  formatCell(row: Record<string, unknown>, column: TableColumn<T>): string {
     if (!row || !column) return '';
-    const value = row[column.key as keyof typeof row];
+    const value = row[column.key as string];
     switch (column.type) {
       case 'date':
-        return this.datePipe.transform(value, 'short') ?? '';
+        return this.datePipe.transform(value as string | number | Date, 'short') ?? '';
       case 'currency':
-        return this.currencyPipe.transform(value) ?? '';
+        return this.currencyPipe.transform(value as number) ?? '';
       case 'boolean':
         return value ? 'Yes' : 'No';
       default:

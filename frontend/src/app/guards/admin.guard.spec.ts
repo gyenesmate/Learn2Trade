@@ -1,45 +1,44 @@
 import { TestBed } from '@angular/core/testing';
-import { firstValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
+import { Mock } from 'vitest';
 
-import { AdminGuard } from './admin.guard';
+import { adminGuard } from './admin.guard';
 import { UsersService } from '../services/users.service';
 
-describe('AdminGuard', () => {
-  let guard: AdminGuard;
-  let usersSpy: jasmine.SpyObj<UsersService>;
-  let routerSpy: jasmine.SpyObj<Router>;
+describe('adminGuard', () => {
+  let isCurrentUserAdmin: Mock;
+  let navigate: Mock;
 
   beforeEach(() => {
-    usersSpy = jasmine.createSpyObj<UsersService>('UsersService', ['isCurrentUserAdmin']);
-    routerSpy = jasmine.createSpyObj<Router>('Router', ['navigate']);
+    isCurrentUserAdmin = vi.fn();
+    navigate = vi.fn();
 
     TestBed.configureTestingModule({
       providers: [
-        AdminGuard,
-        { provide: UsersService, useValue: usersSpy },
-        { provide: Router, useValue: routerSpy }
-      ]
+        { provide: UsersService, useValue: { isCurrentUserAdmin } },
+        { provide: Router, useValue: { navigate } },
+      ],
     });
-
-    guard = TestBed.inject(AdminGuard);
   });
 
+  const runGuard = () =>
+    TestBed.runInInjectionContext(() => adminGuard({} as never, {} as never));
+
   it('navigates to /home when not admin', async () => {
-    usersSpy.isCurrentUserAdmin.and.resolveTo(false);
+    isCurrentUserAdmin.mockResolvedValue(false);
 
-    const allowed = await firstValueFrom(guard.canActivate());
+    const allowed = await runGuard();
 
-    expect(allowed).toBeFalse();
-    expect(routerSpy.navigate).toHaveBeenCalledWith(['/home']);
+    expect(allowed).toBe(false);
+    expect(navigate).toHaveBeenCalledWith(['/home']);
   });
 
   it('allows navigation when admin', async () => {
-    usersSpy.isCurrentUserAdmin.and.resolveTo(true);
+    isCurrentUserAdmin.mockResolvedValue(true);
 
-    const allowed = await firstValueFrom(guard.canActivate());
+    const allowed = await runGuard();
 
-    expect(allowed).toBeTrue();
-    expect(routerSpy.navigate).not.toHaveBeenCalled();
+    expect(allowed).toBe(true);
+    expect(navigate).not.toHaveBeenCalled();
   });
 });

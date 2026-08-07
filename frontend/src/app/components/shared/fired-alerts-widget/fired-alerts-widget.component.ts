@@ -1,60 +1,48 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { Observable } from 'rxjs';
 import { CryptoCurrency, PriceAlert } from '../../../const/models';
 import { PriceAlertsService } from '../../../services/price-alerts.service';
 import { CryptoCurrenciesService } from '../../../services/crypto-currencies.service';
 
 @Component({
   selector: 'app-fired-alerts-widget',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [RouterModule],
   templateUrl: './fired-alerts-widget.component.html',
-  styleUrls: ['./fired-alerts-widget.component.scss']
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls: ['./fired-alerts-widget.component.scss'],
 })
-export class FiredAlertsWidgetComponent implements OnInit, OnChanges {
+export class FiredAlertsWidgetComponent implements OnInit {
+  private readonly alertsService = inject(PriceAlertsService);
+  private readonly cryptos = inject(CryptoCurrenciesService);
+  private readonly router = inject(Router);
+
   /**
-   * Optional source stream. If omitted, defaults to fired alerts.
-   * This enables reusing this component as an embedded alerts list.
+   * Optional alerts list. If omitted, defaults to fired alerts from the service.
    */
-  @Input() alerts$?: Observable<PriceAlert[]>;
-  @Input() title = 'Alerts';
+  readonly alerts = input<PriceAlert[] | undefined>(undefined);
+  readonly title = input('Alerts');
   /** When true, renders as an inline/embedded panel instead of fixed pinned widget. */
-  @Input() embedded = false;
+  readonly embedded = input(false);
 
-  source$!: Observable<PriceAlert[]>;
-  private cryptoById = new Map<string, CryptoCurrency>();
+  readonly displayedAlerts = computed(() => this.alerts() ?? this.alertsService.firedAlerts());
 
-  constructor(
-    private alerts: PriceAlertsService,
-    private cryptos: CryptoCurrenciesService,
-    private router: Router
-  ) {
-    void this.loadCryptos();
-  }
+  private readonly cryptoById = signal(new Map<string, CryptoCurrency>());
 
   ngOnInit(): void {
-    this.source$ = this.alerts$ ?? this.alerts.firedAlerts$;
-  }
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['alerts$']) {
-      this.source$ = this.alerts$ ?? this.alerts.firedAlerts$;
-    }
+    void this.loadCryptos();
   }
 
   private async loadCryptos(): Promise<void> {
     try {
       const all = await this.cryptos.getAll();
-      this.cryptoById = new Map(all.map(c => [c.id, c] as const));
+      this.cryptoById.set(new Map(all.map((c) => [c.id, c] as const)));
     } catch {
       // ignore
     }
   }
 
   label(alert: PriceAlert): string {
-    const c = this.cryptoById.get(alert.crypto_currency_id);
+    const c = this.cryptoById().get(alert.crypto_currency_id);
     if (!c) return alert.crypto_currency_id;
     const symbol = c.symbol ? ` (${c.symbol})` : '';
     const quote = c.exchange_currency ? ` / ${c.exchange_currency}` : '';
@@ -66,6 +54,6 @@ export class FiredAlertsWidgetComponent implements OnInit, OnChanges {
   }
 
   stop(alert: PriceAlert): void {
-    void this.alerts.deactivate(alert.id);
+    void this.alertsService.deactivate(alert.id);
   }
 }

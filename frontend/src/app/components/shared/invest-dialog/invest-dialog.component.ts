@@ -1,5 +1,5 @@
-import { Component, Inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { CryptoCurrency } from '../../../const/models';
@@ -16,19 +16,17 @@ export interface InvestDialogResult {
 
 @Component({
   selector: 'app-invest-dialog',
-  standalone: true,
-  imports: [CommonModule, FormsModule, MatDialogModule],
+  imports: [FormsModule, MatDialogModule, DecimalPipe],
   templateUrl: './invest-dialog.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./invest-dialog.component.scss']
 })
 export class InvestDialogComponent {
+  private readonly dialogRef = inject<MatDialogRef<InvestDialogComponent, InvestDialogResult | null>>(MatDialogRef);
+  readonly data = inject<InvestDialogData>(MAT_DIALOG_DATA);
+
   amount = 0;
   description = '';
-
-  constructor(
-    private dialogRef: MatDialogRef<InvestDialogComponent, InvestDialogResult | null>,
-    @Inject(MAT_DIALOG_DATA) public data: InvestDialogData
-  ) {}
 
   cancel(): void {
     this.dialogRef.close(null);

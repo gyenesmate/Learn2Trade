@@ -1,24 +1,26 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, inject, provideAppInitializer, provideZoneChangeDetection } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { provideToastr } from 'ngx-toastr';
+import { provideNgxMatToast } from 'ngx-mat-toast';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './core/auth.interceptor';
+import { AuthService } from './services/auth.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withXhr(), withInterceptors([authInterceptor])),
     provideAnimationsAsync(),
-    provideToastr({
-      timeOut: 3500,
-      positionClass: 'toast-bottom-right',
+    provideNgxMatToast({
+      duration: 3500,
+      position: { horizontal: 'end', vertical: 'bottom' },
       preventDuplicates: true,
       progressBar: true,
-      closeButton: true
-    })
+      closeable: true
+    }),
+    provideAppInitializer(() => inject(AuthService).bootstrap()),
   ]
 };
