@@ -1,0 +1,10 @@
+1. File structures and component name convetions update
+2. Implementing global design
+    2.1 Materail overrides
+    2.2 Color Palletes
+    2.3 Font
+    2.4 Tailwind overrides
+3. Intruducing base components
+4. Crypto card optimization (Websocket handeling)
+5. Changing to angular snackbar instead of ngx toast
+6. Datatable optimization
