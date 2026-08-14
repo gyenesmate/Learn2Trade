@@ -1,0 +1,74 @@
+// Color tokens — TradeLab palette
+@use 'sass:map';
+
+$primary: (
+  main: #00d084,
+  medium: #00b572,
+  dark: #009e68,
+);
+
+$secondary: (
+  main: #6366f1,
+  medium: #818cf8,
+  light: #a5b4fc,
+);
+
+$semantic: (
+  success: #22c55e,
+  warning: #f59e0b,
+  error: #ef4444,
+  info: #3b82f6,
+);
+
+$neutral: (
+  0: #0d1117,
+  10: #161b22,
+  20: #21262d,
+  30: #30363d,
+  50: #8b949e,
+  70: #c9d1d9,
+  80: #e6edf3,
+  90: #f3f6f9,
+);
+
+$category: (
+  stock: #3b82f6,
+  crypto: #6366f1,
+  forex: #f59e0b,
+  etf: #22c55e,
+  watchlist: #8b949e,
+);
+
+$gradients: (
+  primary: linear-gradient(135deg, #{map.get($primary, main)} 0%, #{map.get($primary, dark)} 100%),
+  secondary: linear-gradient(135deg, #{map.get($secondary, main)} 0%, #8b5cf6 100%),
+  dark: linear-gradient(180deg, #{map.get($neutral, 20)} 0%, #{map.get($neutral, 0)} 100%),
+);
+
+$dark: (
+  bg: map.get($neutral, 0),
+  surface: map.get($neutral, 10),
+  surface-raised: map.get($neutral, 20),
+  border: map.get($neutral, 30),
+  text: map.get($neutral, 80),
+  muted: map.get($neutral, 50),
+  on-primary: map.get($neutral, 0),
+  shadow: rgba(0, 0, 0, 0.45),
+  bg-gradient: linear-gradient(180deg, #0d1117 0%, #0b1016 55%, #0a0e14 100%),
+  surface-gradient: linear-gradient(180deg, rgba(22, 27, 34, 0.98), rgba(13, 17, 23, 0.92)),
+  accent-gradient: map.get($gradients, primary),
+);
+
+$light: (
+  bg: map.get($neutral, 90),
+  surface: #ffffff,
+  surface-raised: map.get($neutral, 80),
+  border: #d0d7de,
+  text: map.get($neutral, 0),
+  muted: #57606a,
+  on-primary: map.get($neutral, 0),
+  shadow: rgba(13, 17, 23, 0.12),
+  bg-gradient: linear-gradient(180deg, #f3f6f9 0%, #e6edf3 55%, #f3f6f9 100%),
+  surface-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(243, 246, 249, 0.9)),
+  accent-gradient: map.get($gradients, primary),
+);

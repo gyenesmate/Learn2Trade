@@ -1,0 +1,25 @@
+// Spacing tokens — 8pt grid
+$scale: (
+  4: 4px,
+  8: 8px,
+  16: 16px,
+  24: 24px,
+  32: 32px,
+  40: 40px,
+  48: 48px,
+  64: 64px,
+  80: 80px,
+  96: 96px,
+  128: 128px,
+);
+
+// Legacy aliases used by existing component styles
+$aliases: (
+  xxs: 4px,
+  xs: 8px,
+  sm: 12px,
+  md: 16px,
+  lg: 24px,
+  xl: 32px,
+  xxl: 48px,
+);

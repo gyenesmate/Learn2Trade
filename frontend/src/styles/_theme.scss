@@ -1,0 +1,105 @@
+// Angular Material theme — TradeLab colors + Space Mono
+@use 'sass:list';
+@use '@angular/material' as mat;
+@use 'sass:map';
+@use 'colors';
+@use 'typography';
+@use 'radius';
+
+@mixin apply {
+  html {
+    color-scheme: dark;
+
+    @include mat.theme(
+      (
+        color: (
+          primary: mat.$spring-green-palette,
+          tertiary: mat.$violet-palette,
+          theme-type: dark,
+        ),
+        typography: (
+          plain-family: list.nth(typography.$family-base, 1),
+          brand-family: list.nth(typography.$family-brand, 1),
+          bold-weight: typography.$weight-bold,
+          medium-weight: typography.$weight-semibold,
+          regular-weight: typography.$weight-regular,
+        ),
+        density: 0,
+      )
+    );
+
+    @include mat.theme-overrides((
+      primary: map.get(colors.$primary, main),
+      on-primary: map.get(colors.$dark, on-primary),
+      primary-container: map.get(colors.$primary, dark),
+      on-primary-container: map.get(colors.$neutral, 80),
+      secondary: map.get(colors.$secondary, main),
+      on-secondary: map.get(colors.$neutral, 90),
+      secondary-container: #312e81,
+      tertiary: map.get(colors.$secondary, main),
+      on-tertiary: map.get(colors.$neutral, 90),
+      error: map.get(colors.$semantic, error),
+      on-error: map.get(colors.$neutral, 90),
+      background: map.get(colors.$neutral, 0),
+      on-background: map.get(colors.$neutral, 80),
+      surface: map.get(colors.$neutral, 10),
+      on-surface: map.get(colors.$neutral, 80),
+      on-surface-variant: map.get(colors.$neutral, 50),
+      surface-container: map.get(colors.$neutral, 20),
+      surface-container-low: map.get(colors.$neutral, 10),
+      surface-container-high: map.get(colors.$neutral, 20),
+      surface-container-highest: map.get(colors.$neutral, 30),
+      outline: map.get(colors.$neutral, 30),
+      outline-variant: map.get(colors.$neutral, 30),
+      inverse-surface: map.get(colors.$neutral, 80),
+      inverse-on-surface: map.get(colors.$neutral, 0),
+      inverse-primary: map.get(colors.$primary, dark),
+      corner-extra-small: map.get(radius.$scale, xs),
+      corner-small: map.get(radius.$scale, md),
+      corner-medium: map.get(radius.$scale, lg),
+      corner-large: map.get(radius.$scale, xl),
+      corner-extra-large: map.get(radius.$scale, 2xl),
+      body-large-size: map.get(map.get(typography.$scale, body-lg), size),
+      body-large-line-height: 1.6,
+      body-medium-size: map.get(map.get(typography.$scale, body), size),
+      body-medium-line-height: 1.6,
+      body-small-size: map.get(map.get(typography.$scale, caption), size),
+      body-small-line-height: 1.5,
+      headline-large-size: map.get(map.get(typography.$scale, h1), size),
+      headline-large-line-height: 1.3,
+      headline-large-weight: typography.$weight-bold,
+      headline-medium-size: map.get(map.get(typography.$scale, h2), size),
+      headline-medium-line-height: 1.4,
+      headline-medium-weight: typography.$weight-semibold,
+      headline-small-size: map.get(map.get(typography.$scale, h3), size),
+      headline-small-line-height: 1.4,
+      headline-small-weight: typography.$weight-semibold,
+      display-small-size: map.get(map.get(typography.$scale, display), size),
+      display-small-line-height: 1.2,
+      display-small-weight: typography.$weight-bold,
+      label-small-size: map.get(map.get(typography.$scale, overline), size),
+      label-small-line-height: 1.5,
+    ));
+  }
+
+  body.theme-light {
+    color-scheme: light;
+
+    @include mat.theme-overrides((
+      primary: map.get(colors.$primary, dark),
+      on-primary: #ffffff,
+      background: map.get(colors.$light, bg),
+      on-background: map.get(colors.$light, text),
+      surface: map.get(colors.$light, surface),
+      on-surface: map.get(colors.$light, text),
+      on-surface-variant: map.get(colors.$light, muted),
+      surface-container: #ffffff,
+      outline: map.get(colors.$light, border),
+      outline-variant: map.get(colors.$light, border),
+    ));
+  }
+
+  body.theme-dark {
+    color-scheme: dark;
+  }
+}

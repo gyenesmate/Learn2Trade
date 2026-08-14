@@ -1,0 +1,194 @@
+// Angular Material component overrides via mat.*-overrides
+@use '@angular/material' as mat;
+@use 'sass:map';
+@use 'colors';
+@use 'radius';
+
+@mixin overrides {
+  html {
+    @include mat.button-overrides((
+      filled-container-color: map.get(colors.$primary, main),
+      filled-label-text-color: map.get(colors.$dark, on-primary),
+      filled-container-shape: map.get(radius.$scale, md),
+      filled-horizontal-padding: 16px,
+      outlined-container-shape: map.get(radius.$scale, md),
+      outlined-outline-color: map.get(colors.$secondary, main),
+      outlined-label-text-color: map.get(colors.$secondary, main),
+      outlined-horizontal-padding: 16px,
+      text-container-shape: map.get(radius.$scale, md),
+      text-label-text-color: map.get(colors.$neutral, 50),
+      protected-container-shape: map.get(radius.$scale, md),
+      tonal-container-shape: map.get(radius.$scale, md),
+    ));
+
+    @include mat.icon-button-overrides((
+      icon-color: map.get(colors.$neutral, 80),
+    ));
+
+    @include mat.form-field-overrides((
+      outlined-container-shape: map.get(radius.$scale, md),
+      filled-container-shape: map.get(radius.$scale, md),
+      filled-container-color: map.get(colors.$neutral, 0),
+      outlined-outline-color: map.get(colors.$neutral, 30),
+      outlined-focus-outline-color: map.get(colors.$primary, main),
+      outlined-hover-outline-color: map.get(colors.$primary, medium),
+      outlined-input-text-color: map.get(colors.$neutral, 80),
+      outlined-input-text-placeholder-color: map.get(colors.$neutral, 50),
+      outlined-label-text-color: map.get(colors.$neutral, 50),
+      filled-input-text-color: map.get(colors.$neutral, 80),
+      filled-input-text-placeholder-color: map.get(colors.$neutral, 50),
+      filled-label-text-color: map.get(colors.$neutral, 50),
+      filled-caret-color: map.get(colors.$primary, main),
+      outlined-caret-color: map.get(colors.$primary, main),
+    ));
+
+    @include mat.card-overrides((
+      elevated-container-color: map.get(colors.$neutral, 10),
+      elevated-container-shape: map.get(radius.$scale, lg),
+      outlined-container-color: map.get(colors.$neutral, 10),
+      outlined-container-shape: map.get(radius.$scale, lg),
+      outlined-outline-color: map.get(colors.$neutral, 30),
+    ));
+
+    @include mat.table-overrides((
+      background-color: map.get(colors.$neutral, 10),
+      header-headline-color: map.get(colors.$neutral, 50),
+      header-headline-size: 10px,
+      header-headline-weight: 400,
+      header-headline-tracking: 0.08em,
+      row-item-label-text-color: map.get(colors.$neutral, 80),
+      row-item-outline-color: map.get(colors.$neutral, 30),
+      row-item-outline-width: 1px,
+    ));
+
+    @include mat.paginator-overrides((
+      container-background-color: map.get(colors.$neutral, 10),
+      container-text-color: map.get(colors.$neutral, 50),
+      enabled-icon-color: map.get(colors.$neutral, 80),
+    ));
+
+    @include mat.tabs-overrides((
+      active-indicator-color: map.get(colors.$primary, main),
+      active-label-text-color: map.get(colors.$primary, main),
+      active-focus-label-text-color: map.get(colors.$primary, main),
+      active-hover-label-text-color: map.get(colors.$primary, main),
+      inactive-label-text-color: map.get(colors.$neutral, 50),
+      inactive-hover-label-text-color: map.get(colors.$neutral, 80),
+      divider-color: map.get(colors.$neutral, 30),
+      active-indicator-height: 2px,
+    ));
+
+    @include mat.chips-overrides((
+      container-shape-radius: map.get(radius.$scale, md),
+      outline-color: map.get(colors.$neutral, 30),
+      label-text-color: map.get(colors.$neutral, 80),
+      elevated-container-color: map.get(colors.$neutral, 20),
+    ));
+
+    @include mat.toolbar-overrides((
+      container-background-color: map.get(colors.$neutral, 10),
+      container-text-color: map.get(colors.$neutral, 80),
+    ));
+
+    @include mat.sidenav-overrides((
+      container-background-color: map.get(colors.$neutral, 10),
+      container-text-color: map.get(colors.$neutral, 80),
+      container-divider-color: map.get(colors.$neutral, 30),
+      container-shape: 0,
+      container-width: 280px,
+      content-background-color: transparent,
+      content-text-color: map.get(colors.$neutral, 80),
+    ));
+
+    @include mat.list-overrides((
+      list-item-label-text-color: map.get(colors.$neutral, 80),
+      list-item-leading-icon-color: map.get(colors.$neutral, 50),
+      active-indicator-color: rgba(0, 208, 132, 0.12),
+      active-indicator-shape: map.get(radius.$scale, md),
+    ));
+
+    @include mat.menu-overrides((
+      container-color: map.get(colors.$neutral, 10),
+      container-shape: map.get(radius.$scale, md),
+      item-label-text-color: map.get(colors.$neutral, 80),
+      item-icon-color: map.get(colors.$neutral, 50),
+      divider-color: map.get(colors.$neutral, 30),
+    ));
+
+    @include mat.dialog-overrides((
+      container-color: map.get(colors.$neutral, 10),
+      container-shape: map.get(radius.$scale, lg),
+      subhead-color: map.get(colors.$neutral, 80),
+      supporting-text-color: map.get(colors.$neutral, 50),
+    ));
+
+    @include mat.select-overrides((
+      panel-background-color: map.get(colors.$neutral, 10),
+      enabled-trigger-text-color: map.get(colors.$neutral, 80),
+    ));
+
+    @include mat.tooltip-overrides((
+      container-color: map.get(colors.$neutral, 20),
+      supporting-text-color: map.get(colors.$neutral, 80),
+      container-shape: map.get(radius.$scale, sm),
+    ));
+
+    @include mat.snack-bar-overrides((
+      container-color: map.get(colors.$neutral, 20),
+      supporting-text-color: map.get(colors.$neutral, 80),
+      button-color: map.get(colors.$primary, main),
+      container-shape: map.get(radius.$scale, md),
+    ));
+  }
+
+  body.theme-light {
+    @include mat.button-overrides((
+      filled-label-text-color: #ffffff,
+      text-label-text-color: map.get(colors.$light, muted),
+    ));
+
+    @include mat.form-field-overrides((
+      filled-container-color: map.get(colors.$light, bg),
+      outlined-outline-color: map.get(colors.$light, border),
+      outlined-input-text-color: map.get(colors.$light, text),
+      outlined-input-text-placeholder-color: map.get(colors.$light, muted),
+      filled-input-text-color: map.get(colors.$light, text),
+    ));
+
+    @include mat.card-overrides((
+      elevated-container-color: map.get(colors.$light, surface),
+      outlined-container-color: map.get(colors.$light, surface),
+      outlined-outline-color: map.get(colors.$light, border),
+    ));
+
+    @include mat.table-overrides((
+      background-color: map.get(colors.$light, surface),
+      header-headline-color: map.get(colors.$light, muted),
+      row-item-label-text-color: map.get(colors.$light, text),
+      row-item-outline-color: map.get(colors.$light, border),
+    ));
+
+    @include mat.toolbar-overrides((
+      container-background-color: map.get(colors.$light, surface),
+      container-text-color: map.get(colors.$light, text),
+    ));
+
+    @include mat.sidenav-overrides((
+      container-background-color: map.get(colors.$light, surface),
+      container-text-color: map.get(colors.$light, text),
+      container-divider-color: map.get(colors.$light, border),
+      content-text-color: map.get(colors.$light, text),
+    ));
+
+    @include mat.dialog-overrides((
+      container-color: map.get(colors.$light, surface),
+      subhead-color: map.get(colors.$light, text),
+      supporting-text-color: map.get(colors.$light, muted),
+    ));
+
+    @include mat.menu-overrides((
+      container-color: map.get(colors.$light, surface),
+      item-label-text-color: map.get(colors.$light, text),
+    ));
+  }
+}

@@ -1,0 +1,51 @@
+// Typography tokens — Space Mono scale from the TradeLab style guide
+$family-base: ('Space Mono', 'IBM Plex Mono', ui-monospace, monospace);
+$family-brand: $family-base;
+
+$weight-regular: 400;
+$weight-semibold: 700;
+$weight-bold: 700;
+
+// name: (size, line-height, weight)
+$scale: (
+  display: (
+    size: 36px,
+    line-height: 1.2,
+    weight: $weight-bold,
+  ),
+  h1: (
+    size: 28px,
+    line-height: 1.3,
+    weight: $weight-bold,
+  ),
+  h2: (
+    size: 22px,
+    line-height: 1.4,
+    weight: $weight-semibold,
+  ),
+  h3: (
+    size: 18px,
+    line-height: 1.4,
+    weight: $weight-semibold,
+  ),
+  body-lg: (
+    size: 16px,
+    line-height: 1.6,
+    weight: $weight-regular,
+  ),
+  body: (
+    size: 14px,
+    line-height: 1.6,
+    weight: $weight-regular,
+  ),
+  caption: (
+    size: 12px,
+    line-height: 1.5,
+    weight: $weight-regular,
+  ),
+  overline: (
+    size: 10px,
+    line-height: 1.5,
+    weight: $weight-regular,
+  ),
+);

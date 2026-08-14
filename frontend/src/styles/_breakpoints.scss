@@ -1,0 +1,16 @@
+// Breakpoint tokens
+@use 'sass:map';
+
+$scale: (
+  xs: 480px,
+  sm: 600px,
+  md: 900px,
+  lg: 1200px,
+  xl: 1600px,
+);
+
+@mixin up($name) {
+  @media (min-width: map.get($scale, $name)) {
+    @content;
+  }
+}

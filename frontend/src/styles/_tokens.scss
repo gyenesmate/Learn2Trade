@@ -1,0 +1,108 @@
+// Emits CSS custom properties from the distinct token maps
+@use 'sass:map';
+@use 'colors';
+@use 'typography';
+@use 'spacing';
+@use 'radius';
+@use 'elevation';
+@use 'motion';
+@use 'breakpoints';
+
+@mixin _color-scheme($palette) {
+  --color-bg: #{map.get($palette, bg)};
+  --color-surface: #{map.get($palette, surface)};
+  --color-surface-raised: #{map.get($palette, surface-raised)};
+  --color-border: #{map.get($palette, border)};
+  --color-text: #{map.get($palette, text)};
+  --color-muted: #{map.get($palette, muted)};
+  --color-on-primary: #{map.get($palette, on-primary)};
+  --color-shadow: #{map.get($palette, shadow)};
+  --gradient-bg: #{map.get($palette, bg-gradient)};
+  --gradient-secondary: #{map.get($palette, surface-gradient)};
+  --gradient-primary: #{map.get($palette, accent-gradient)};
+}
+
+@mixin _static-tokens {
+  --color-primary: #{map.get(colors.$primary, main)};
+  --color-primary-medium: #{map.get(colors.$primary, medium)};
+  --color-primary-dark: #{map.get(colors.$primary, dark)};
+  --color-secondary: #{map.get(colors.$secondary, main)};
+  --color-secondary-medium: #{map.get(colors.$secondary, medium)};
+  --color-secondary-light: #{map.get(colors.$secondary, light)};
+  --color-accent: #{map.get(colors.$primary, main)};
+  --color-success: #{map.get(colors.$semantic, success)};
+  --color-warning: #{map.get(colors.$semantic, warning)};
+  --color-error: #{map.get(colors.$semantic, error)};
+  --color-info: #{map.get(colors.$semantic, info)};
+  --color-crypto-up: #{map.get(colors.$semantic, success)};
+  --color-crypto-down: #{map.get(colors.$semantic, error)};
+  --color-crypto-neutral: #{map.get(colors.$semantic, warning)};
+  --color-category-stock: #{map.get(colors.$category, stock)};
+  --color-category-crypto: #{map.get(colors.$category, crypto)};
+  --color-category-forex: #{map.get(colors.$category, forex)};
+  --color-category-etf: #{map.get(colors.$category, etf)};
+  --color-category-watchlist: #{map.get(colors.$category, watchlist)};
+  --gradient-accent-purple: #{map.get(colors.$gradients, secondary)};
+  --gradient-accent-dark: #{map.get(colors.$gradients, dark)};
+
+  --font-family-base: #{typography.$family-base};
+  --font-family-accent: #{typography.$family-brand};
+  --font-weight-normal: #{typography.$weight-regular};
+  --font-weight-semibold: #{typography.$weight-semibold};
+  --font-weight-bold: #{typography.$weight-bold};
+  --font-size-display: #{map.get(map.get(typography.$scale, display), size)};
+  --font-size-xxl: #{map.get(map.get(typography.$scale, display), size)};
+  --font-size-xl: #{map.get(map.get(typography.$scale, h1), size)};
+  --font-size-lg: #{map.get(map.get(typography.$scale, h2), size)};
+  --font-size-h3: #{map.get(map.get(typography.$scale, h3), size)};
+  --font-size-md: #{map.get(map.get(typography.$scale, body-lg), size)};
+  --font-size-sm: #{map.get(map.get(typography.$scale, body), size)};
+  --font-size-xs: #{map.get(map.get(typography.$scale, caption), size)};
+  --font-size-overline: #{map.get(map.get(typography.$scale, overline), size)};
+  --line-height-display: #{map.get(map.get(typography.$scale, display), line-height)};
+  --line-height-heading: #{map.get(map.get(typography.$scale, h1), line-height)};
+  --line-height-body: #{map.get(map.get(typography.$scale, body), line-height)};
+
+  @each $name, $value in spacing.$scale {
+    --space-#{$name}: #{$value};
+  }
+
+  @each $name, $value in spacing.$aliases {
+    --space-#{$name}: #{$value};
+  }
+
+  @each $name, $value in radius.$scale {
+    --radius-#{$name}: #{$value};
+  }
+
+  @each $name, $value in elevation.$shadows {
+    --shadow-#{$name}: #{$value};
+  }
+
+  @each $name, $value in elevation.$z-index {
+    --z-index-#{$name}: #{$value};
+  }
+
+  @each $name, $value in motion.$transition {
+    --transition-#{$name}: #{$value};
+  }
+
+  @each $name, $value in breakpoints.$scale {
+    --breakpoint-#{$name}: #{$value};
+  }
+}
+
+@mixin properties {
+  :root {
+    @include _static-tokens;
+    @include _color-scheme(colors.$dark);
+  }
+
+  body.theme-dark {
+    @include _color-scheme(colors.$dark);
+  }
+
+  body.theme-light {
+    @include _color-scheme(colors.$light);
+  }
+}
