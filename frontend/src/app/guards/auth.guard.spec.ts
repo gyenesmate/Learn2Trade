@@ -1,26 +1,25 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { ActivatedRouteSnapshot, Router } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, UrlTree } from '@angular/router';
 import { firstValueFrom, Observable } from 'rxjs';
-import { Mock } from 'vitest';
 
 import { authGuard } from './auth.guard';
 import { AuthService } from '../services/auth.service';
 
 describe('authGuard', () => {
-  let navigate: Mock;
   let currentUser: ReturnType<typeof signal<unknown>>;
+  let createUrlTree: ReturnType<typeof vi.fn>;
 
   const routeWithPath = (path: string): ActivatedRouteSnapshot =>
     ({ routeConfig: { path } } as ActivatedRouteSnapshot);
 
   beforeEach(() => {
-    navigate = vi.fn();
+    createUrlTree = vi.fn((commands: unknown[]) => ({ commands }) as unknown as UrlTree);
     currentUser = signal<unknown>(undefined);
 
     TestBed.configureTestingModule({
       providers: [
-        { provide: Router, useValue: { navigate } },
+        { provide: Router, useValue: { createUrlTree } },
         {
           provide: AuthService,
           useValue: {
@@ -36,32 +35,32 @@ describe('authGuard', () => {
     TestBed.runInInjectionContext(() => authGuard(routeWithPath(path), {} as never));
 
   it('allows unauthenticated users on public routes (/login)', async () => {
-    const result = runGuard('login') as Observable<boolean>;
+    const result = runGuard('login') as Observable<boolean | UrlTree>;
     const resultPromise = firstValueFrom(result);
     currentUser.set(null);
 
     const allowed = await resultPromise;
     expect(allowed).toBe(true);
-    expect(navigate).not.toHaveBeenCalled();
+    expect(createUrlTree).not.toHaveBeenCalled();
   });
 
   it('redirects unauthenticated users from protected routes to /login', async () => {
-    const result = runGuard('dashboard') as Observable<boolean>;
+    const result = runGuard('dashboard') as Observable<boolean | UrlTree>;
     const resultPromise = firstValueFrom(result);
     currentUser.set(null);
 
-    const allowed = await resultPromise;
-    expect(allowed).toBe(false);
-    expect(navigate).toHaveBeenCalledWith(['/login']);
+    const redirected = await resultPromise;
+    expect(redirected).toEqual({ commands: ['/login'] });
+    expect(createUrlTree).toHaveBeenCalledWith(['/login']);
   });
 
   it('redirects authenticated users away from /login to /dashboard', async () => {
-    const result = runGuard('login') as Observable<boolean>;
+    const result = runGuard('login') as Observable<boolean | UrlTree>;
     const resultPromise = firstValueFrom(result);
     currentUser.set({ id: 'u1', username: 'tester' });
 
-    const allowed = await resultPromise;
-    expect(allowed).toBe(false);
-    expect(navigate).toHaveBeenCalledWith(['/dashboard']);
+    const redirected = await resultPromise;
+    expect(redirected).toEqual({ commands: ['/dashboard'] });
+    expect(createUrlTree).toHaveBeenCalledWith(['/dashboard']);
   });
 });
