@@ -1,8 +1,8 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { CryptoCurrenciesService } from '../../../services/crypto-currencies.service';
-import { NotificationService } from '../../../services/notification.service';
+import { CryptoCurrenciesService } from '@services/crypto-currencies.service';
+import { NotificationService } from '@services/notification.service';
 
 @Component({
   selector: 'app-crypto-currency-edit-page',

@@ -1,12 +1,12 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
-import { TableColumn } from '../../shared/data-table/data-table-utilities';
-import { AnalyticsCardComponent } from '../../shared/analytics-card/analytics-card.component';
-import { CryptoCurrency, Investment } from '../../../const/models';
-import { AuthService } from '../../../services/auth.service';
-import { InvestmentsService } from '../../../services/investments.service';
-import { CryptoCurrenciesService } from '../../../services/crypto-currencies.service';
-import { NotificationService } from '../../../services/notification.service';
-import { isInvestmentSold } from '../../../core/investment.util';
+import { TableColumn } from '@shared/data-table/data-table-utilities';
+import { AnalyticsCardComponent } from '@shared/analytics-card/analytics-card.component';
+import { CryptoCurrency, Investment } from '@const/models';
+import { AuthService } from '@services/auth.service';
+import { InvestmentsService } from '@services/investments.service';
+import { CryptoCurrenciesService } from '@services/crypto-currencies.service';
+import { NotificationService } from '@services/notification.service';
+import { isInvestmentSold } from '@core/investment.util';
 
 @Component({
   selector: 'app-dashboard',

@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { User, UserMe } from '../const/models';
-import { ApiService } from '../core/api.service';
-import { toNumber } from '../core/number.util';
+import { User, UserMe } from '@const/models';
+import { ApiService } from '@core/api.service';
+import { toNumber } from '@core/number.util';
 import { AuthService } from './auth.service';
 
 export interface UserProfileUpdate {

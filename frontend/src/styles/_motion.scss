@@ -1,8 +1,8 @@
-// Motion tokens
+// Motion — subtle trading UI transitions (120–200ms)
 $duration: (
   fast: 0.15s,
-  normal: 0.3s,
-  slow: 0.5s,
+  normal: 0.18s,
+  slow: 0.28s,
 );
 
 $easing: (
@@ -13,6 +13,6 @@ $easing: (
 
 $transition: (
   fast: 0.15s cubic-bezier(0.2, 0, 0, 1),
-  normal: 0.3s cubic-bezier(0.2, 0, 0, 1),
-  slow: 0.5s cubic-bezier(0.2, 0, 0, 1),
+  normal: 0.18s cubic-bezier(0.2, 0, 0, 1),
+  slow: 0.28s cubic-bezier(0.2, 0, 0, 1),
 );

@@ -1,4 +1,4 @@
-// App-level primitives (non-Material)
+// App-level primitives (non-Material) — trading density
 @use 'breakpoints';
 
 @mixin primitives {
@@ -7,8 +7,8 @@
   [type='button'],
   [type='submit'],
   [type='reset'] {
-    min-width: 44px;
-    min-height: 44px;
+    min-width: 36px;
+    min-height: 36px;
     touch-action: manipulation;
   }
 
@@ -17,25 +17,33 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-xs);
-    padding: var(--space-xs) var(--space-md);
+    height: 36px;
+    padding: 0 var(--space-md);
     font-family: var(--font-family-base);
     font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-medium);
     text-decoration: none;
-    border: 1px solid var(--color-primary);
+    border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
     cursor: pointer;
-    transition: background var(--transition-fast), color var(--transition-fast),
+    transition:
+      background var(--transition-fast),
+      color var(--transition-fast),
       border-color var(--transition-fast);
     outline: none;
     background: transparent;
-    color: var(--color-primary);
+    color: var(--color-text-primary);
   }
 
   .btn:hover,
   .btn:focus-visible {
-    background: var(--color-primary);
-    color: var(--color-on-primary);
+    background: var(--color-surface-hover);
+    border-color: var(--color-border-strong);
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   .btn-primary {
@@ -46,72 +54,151 @@
 
   .btn-primary:hover,
   .btn-primary:focus-visible {
-    background: var(--color-primary-medium);
-    border-color: var(--color-primary-medium);
+    background: var(--color-primary-hover);
+    border-color: var(--color-primary-hover);
     color: var(--color-on-primary);
   }
 
   .btn-secondary {
     background: transparent;
-    color: var(--color-secondary);
-    border-color: var(--color-secondary);
+    color: var(--color-text-primary);
+    border-color: var(--color-border);
   }
 
   .btn-secondary:hover,
   .btn-secondary:focus-visible {
-    background: rgba(99, 102, 241, 0.12);
-    border-color: var(--color-secondary);
-    color: var(--color-secondary);
+    background: var(--color-surface-hover);
+    border-color: var(--color-border-strong);
   }
 
   .btn-tertiary {
     background: transparent;
     border-color: transparent;
-    color: var(--color-muted);
+    color: var(--color-text-muted);
   }
 
   .btn-tertiary:hover,
   .btn-tertiary:focus-visible {
-    background: transparent;
-    color: var(--color-text);
+    background: var(--color-surface-hover);
+    color: var(--color-text-primary);
   }
 
   .btn-sm {
-    min-height: 36px;
-    padding: var(--space-xxs) var(--space-sm);
+    height: 32px;
+    min-height: 32px;
+    padding: 0 var(--space-sm);
     font-size: var(--font-size-xs);
   }
 
-  .card {
+  .trade-buy-button,
+  .trade-sell-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+    height: 36px;
+    min-height: 36px;
+    padding: 0 var(--space-md);
+    font-family: var(--font-family-base);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    cursor: pointer;
+    color: #ffffff;
+    transition: filter var(--transition-fast), opacity var(--transition-fast);
+  }
+
+  .trade-buy-button {
+    background: var(--color-success);
+    border-color: var(--color-success);
+  }
+
+  .trade-sell-button {
+    background: var(--color-danger);
+    border-color: var(--color-danger);
+  }
+
+  .trade-buy-button:hover,
+  .trade-buy-button:focus-visible,
+  .trade-sell-button:hover,
+  .trade-sell-button:focus-visible {
+    filter: brightness(1.08);
+  }
+
+  .trade-buy-button:disabled,
+  .trade-sell-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .card,
+  .app-surface {
     background: var(--color-surface);
     border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    padding: var(--space-lg);
     border: 1px solid var(--color-border);
-    transition: box-shadow var(--transition-fast), border-color var(--transition-fast);
+  }
+
+  .card {
+    box-shadow: none;
+    padding: var(--space-md);
+  }
+
+  .app-panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+
+  .app-panel__header,
+  .app-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sm);
+    min-height: 44px;
+    padding: 0 var(--space-md);
+    border-bottom: 1px solid var(--color-border);
+    font-size: var(--font-size-h3);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+  }
+
+  .app-panel__body,
+  .app-panel-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding: var(--space-md);
+    overflow: auto;
   }
 
   .input {
     width: 100%;
-    padding: var(--space-xs) var(--space-md);
+    height: 36px;
+    padding: 0 var(--space-sm);
     font-family: var(--font-family-base);
-    font-size: var(--font-size-md);
+    font-size: var(--font-size-sm);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-md);
-    background-color: var(--color-bg);
-    color: var(--color-text);
+    background-color: var(--color-input-background);
+    color: var(--color-text-primary);
     transition: border-color var(--transition-fast);
   }
 
   .input:focus {
     outline: none;
     border-color: var(--color-primary);
-    box-shadow: 0 0 0 2px rgba(0, 208, 132, 0.2);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.25);
   }
 
   .container {
     width: 100%;
-    max-width: 1200px;
+    max-width: 1440px;
     margin: 0 auto;
     padding: 0 var(--space-md);
   }
@@ -122,46 +209,61 @@
     }
   }
 
-  @include breakpoints.up(md) {
-    .container {
-      padding: 0 var(--space-xl);
-    }
-  }
-
-  .tag {
+  .tag,
+  .status-chip {
     display: inline-flex;
     align-items: center;
-    padding: 2px var(--space-xs);
+    gap: 4px;
+    padding: 2px 8px;
     border-radius: var(--radius-sm);
     font-size: var(--font-size-overline);
-    line-height: var(--font-size-overline);
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    font-weight: var(--font-weight-semibold);
+    line-height: 1.4;
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.02em;
   }
 
-  .tag-stock {
-    color: var(--color-category-stock);
-    background: rgba(59, 130, 246, 0.16);
+  .tag-stock,
+  .status-chip--neutral {
+    color: var(--color-primary);
+    background: rgba(59, 130, 246, 0.12);
   }
 
   .tag-crypto {
-    color: var(--color-category-crypto);
-    background: rgba(99, 102, 241, 0.16);
+    color: var(--color-primary);
+    background: rgba(59, 130, 246, 0.12);
   }
 
   .tag-forex {
-    color: var(--color-category-forex);
-    background: rgba(245, 158, 11, 0.16);
+    color: var(--color-warning);
+    background: var(--color-warning-soft);
   }
 
   .tag-etf {
-    color: var(--color-category-etf);
-    background: rgba(34, 197, 94, 0.16);
+    color: var(--color-success);
+    background: var(--color-success-soft);
   }
 
   .tag-watchlist {
-    color: var(--color-category-watchlist);
-    background: rgba(139, 148, 158, 0.16);
+    color: var(--color-text-muted);
+    background: rgba(100, 116, 139, 0.16);
+  }
+
+  .status-long,
+  .status-chip--long,
+  .status-chip--success {
+    color: var(--color-success);
+    background: var(--color-success-soft);
+  }
+
+  .status-short,
+  .status-chip--short,
+  .status-chip--danger {
+    color: var(--color-danger);
+    background: var(--color-danger-soft);
+  }
+
+  .status-chip--warning {
+    color: var(--color-warning);
+    background: var(--color-warning-soft);
   }
 }

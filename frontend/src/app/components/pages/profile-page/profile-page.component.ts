@@ -10,18 +10,18 @@ import {
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { AuthService } from '../../../services/auth.service';
-import { UsersService } from '../../../services/users.service';
-import { NotificationService } from '../../../services/notification.service';
-import { CryptoCurrency, Investment, PriceAlert, User, UserMe } from '../../../const/models';
+import { AuthService } from '@services/auth.service';
+import { UsersService } from '@services/users.service';
+import { NotificationService } from '@services/notification.service';
+import { CryptoCurrency, Investment, PriceAlert, User, UserMe } from '@const/models';
 import { firstValueFrom } from 'rxjs';
-import { CryptoCurrenciesService } from '../../../services/crypto-currencies.service';
-import { ConfirmationDialogComponent } from '../../shared/confirmation-dialog/confirmation-dialog.component';
-import { DataTableComponent } from '../../shared/data-table/data-table.component';
-import { TableColumn, RowAction, TableAction } from '../../shared/data-table/data-table-utilities';
-import { WatchlistSubscriptionsService } from '../../../services/watchlist-subscriptions.service';
-import { InvestmentsService } from '../../../services/investments.service';
-import { PriceAlertsService } from '../../../services/price-alerts.service';
+import { CryptoCurrenciesService } from '@services/crypto-currencies.service';
+import { ConfirmationDialogComponent } from '@shared/confirmation-dialog/confirmation-dialog.component';
+import { DataTableComponent } from '@shared/data-table/data-table.component';
+import { TableColumn, RowAction, TableAction } from '@shared/data-table/data-table-utilities';
+import { WatchlistSubscriptionsService } from '@services/watchlist-subscriptions.service';
+import { InvestmentsService } from '@services/investments.service';
+import { PriceAlertsService } from '@services/price-alerts.service';
 
 @Component({
   selector: 'app-profile-page',

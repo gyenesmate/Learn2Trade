@@ -15,7 +15,7 @@
           <div class="overview-item">
             <label>Total Value</label>
             <span class="value">${{ portfolio.totalValue }}</span>
-            <span class="change" [class]="portfolio.totalChange > 0 ? 'price-up' : 'price-down'">
+            <span class="change tabular-nums" [class]="portfolio.totalChange > 0 ? 'price-up' : 'price-down'">
               {{ portfolio.totalChange }}%
             </span>
           </div>

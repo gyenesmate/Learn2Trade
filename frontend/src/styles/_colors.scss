@@ -1,47 +1,61 @@
-// Color tokens — TradeLab palette
+// Color tokens — trading terminal (dark-first)
 @use 'sass:map';
 
 $primary: (
-  main: #00d084,
-  medium: #00b572,
-  dark: #009e68,
+  main: #3b82f6,
+  hover: #2563eb,
+  active: #1d4ed8,
+  medium: #2563eb,
+  dark: #1d4ed8,
 );
 
 $secondary: (
-  main: #6366f1,
-  medium: #818cf8,
-  light: #a5b4fc,
+  main: #8b5cf6,
+  medium: #7c3aed,
+  light: #a78bfa,
 );
 
 $semantic: (
-  success: #22c55e,
+  success: #10b981,
+  success-soft: rgba(16, 185, 129, 0.12),
   warning: #f59e0b,
+  warning-soft: rgba(245, 158, 11, 0.12),
   error: #ef4444,
-  info: #3b82f6,
+  danger: #ef4444,
+  danger-soft: rgba(239, 68, 68, 0.12),
+  info: #38bdf8,
 );
 
 $neutral: (
-  0: #0d1117,
-  10: #161b22,
-  20: #21262d,
-  30: #30363d,
-  50: #8b949e,
-  70: #c9d1d9,
-  80: #e6edf3,
-  90: #f3f6f9,
+  0: #0b0f14,
+  10: #111827,
+  20: #151e2e,
+  30: #1f2937,
+  40: #334155,
+  50: #64748b,
+  70: #94a3b8,
+  80: #cbd5e1,
+  90: #f6f8fb,
+);
+
+$text: (
+  primary: #f9fafb,
+  secondary: #cbd5e1,
+  muted: #94a3b8,
+  disabled: #64748b,
 );
 
 $category: (
-  stock: #3b82f6,
-  crypto: #6366f1,
-  forex: #f59e0b,
-  etf: #22c55e,
-  watchlist: #8b949e,
+  stock: map.get($primary, main),
+  crypto: map.get($primary, main),
+  forex: map.get($semantic, warning),
+  etf: map.get($semantic, success),
+  watchlist: map.get($text, muted),
 );
 
 $gradients: (
   primary: linear-gradient(135deg, #{map.get($primary, main)} 0%, #{map.get($primary, dark)} 100%),
-  secondary: linear-gradient(135deg, #{map.get($secondary, main)} 0%, #8b5cf6 100%),
+  secondary: linear-gradient(180deg, #{map.get($neutral, 10)} 0%, #{map.get($neutral, 0)} 100%),
   dark: linear-gradient(180deg, #{map.get($neutral, 20)} 0%, #{map.get($neutral, 0)} 100%),
 );
 
@@ -49,26 +63,38 @@ $dark: (
   bg: map.get($neutral, 0),
   surface: map.get($neutral, 10),
   surface-raised: map.get($neutral, 20),
+  surface-hover: #1a2434,
   border: map.get($neutral, 30),
-  text: map.get($neutral, 80),
-  muted: map.get($neutral, 50),
-  on-primary: map.get($neutral, 0),
-  shadow: rgba(0, 0, 0, 0.45),
-  bg-gradient: linear-gradient(180deg, #0d1117 0%, #0b1016 55%, #0a0e14 100%),
-  surface-gradient: linear-gradient(180deg, rgba(22, 27, 34, 0.98), rgba(13, 17, 23, 0.92)),
+  border-strong: map.get($neutral, 40),
+  text: map.get($text, primary),
+  text-secondary: map.get($text, secondary),
+  muted: map.get($text, muted),
+  disabled: map.get($text, disabled),
+  on-primary: #ffffff,
+  input-background: #0f172a,
+  overlay: rgba(0, 0, 0, 0.65),
+  shadow: rgba(0, 0, 0, 0.35),
+  bg-gradient: linear-gradient(180deg, #0b0f14 0%, #0d1219 55%, #0b0f14 100%),
+  surface-gradient: linear-gradient(180deg, rgba(17, 24, 39, 0.98), rgba(11, 15, 20, 0.94)),
   accent-gradient: map.get($gradients, primary),
 );
 
 $light: (
-  bg: map.get($neutral, 90),
+  bg: #f6f8fb,
   surface: #ffffff,
-  surface-raised: map.get($neutral, 80),
-  border: #d0d7de,
-  text: map.get($neutral, 0),
-  muted: #57606a,
-  on-primary: map.get($neutral, 0),
-  shadow: rgba(13, 17, 23, 0.12),
-  bg-gradient: linear-gradient(180deg, #f3f6f9 0%, #e6edf3 55%, #f3f6f9 100%),
-  surface-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(243, 246, 249, 0.9)),
+  surface-raised: #ffffff,
+  surface-hover: #f1f5f9,
+  border: #e2e8f0,
+  border-strong: #cbd5e1,
+  text: #0f172a,
+  text-secondary: #334155,
+  muted: #64748b,
+  disabled: #94a3b8,
+  on-primary: #ffffff,
+  input-background: #ffffff,
+  overlay: rgba(15, 23, 42, 0.35),
+  shadow: rgba(15, 23, 42, 0.08),
+  bg-gradient: linear-gradient(180deg, #f6f8fb 0%, #eef2f6 55%, #f6f8fb 100%),
+  surface-gradient: linear-gradient(180deg, #ffffff, #f8fafc),
   accent-gradient: map.get($gradients, primary),
 );

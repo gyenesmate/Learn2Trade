@@ -1,49 +1,23 @@
-# CryptoWatcher — Client
+# Learn2Trade Frontend
 
-Ez a mappa tartalmazza a CryptoWatcher Angular kliensalkalmazását.
+Angular client for Learn2Trade.
 
-**Cél:** kriptovaluták böngészése és követése (figyelőlista), árfolyamriasztások kezelése, befektetések/portfólió megjelenítése, valamint admin funkciók.
+## Conventions & AI guidance
 
-**Technológiák:** Angular (standalone komponensek), Angular Material, Firebase Auth + Firestore.
+Project definitions and coding standards live in:
 
-## Előfeltételek
+- **`.cursor/rules/`** — always-on rules (Angular, Material, Learn2Trade project map)
+- **`.cursor/commands/`** — reusable AI commands (e.g. `/code-review`)
+- **`docs/`** — project and feature descriptions (start with `docs/TRADING_UI_CONTEXT.md` for UI)
+- **`agents.md`** — how AI agents should work in this frontend
 
-- Node.js (LTS ajánlott)
-- npm
+Read those before changing architecture, styling, or feature behavior.
 
-## Lokális futtatás
-
-1) Függőségek telepítése:
+## Quick start
 
 ```bash
 npm install
-```
-
-2) Dev szerver indítása:
-
-```bash
 npm start
 ```
 
-Az alkalmazás alapértelmezetten itt fut: `http://localhost:4200/`
-
-## Firebase konfiguráció
-
-A Firebase inicializálás itt található:
-
-- `src/app/services/db.ts`
-
-Ha saját Firebase projektet használsz, a `firebaseConfig` értékeit cseréld le a sajátodra.
-
-## Hasznos parancsok
-
-```bash
-# build
-npm run build
-
-# unit tesztek (ChromeHeadless)
-npm run test:unit
-
-# e2e tesztek (Playwright)
-npm run test:e2e
-```
+Useful scripts: `npm run build`, `npm run test:unit`, `npm run test:e2e`.

@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { Mock } from 'vitest';
 
 import { adminGuard } from './admin.guard';
-import { UsersService } from '../services/users.service';
+import { UsersService } from '@services/users.service';
 
 describe('adminGuard', () => {
   let isCurrentUserAdmin: Mock;

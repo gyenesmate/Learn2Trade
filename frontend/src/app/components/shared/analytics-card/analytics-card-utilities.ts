@@ -1,4 +1,4 @@
-import { Investment } from '../../../const/models';
+import { Investment } from '@const/models';
 
 export type AnalyticsCardState = 'best' | 'average' | 'timeline' | 'custom';
 

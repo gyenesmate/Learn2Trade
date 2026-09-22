@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { AnalyticsCardState } from './analytics-card-utilities';
-import { Investment } from '../../../const/models';
-import { isInvestmentSold } from '../../../core/investment.util';
+import { Investment } from '@const/models';
+import { isInvestmentSold } from '@core/investment.util';
 
 @Component({
   selector: 'app-analytics-card',

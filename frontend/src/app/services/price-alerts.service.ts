@@ -1,9 +1,9 @@
 import { Injectable, effect, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Subscription, firstValueFrom, timer } from 'rxjs';
-import { CryptoCurrency, PriceAlert } from '../const/models';
-import { ApiService } from '../core/api.service';
-import { toNumber } from '../core/number.util';
+import { CryptoCurrency, PriceAlert } from '@const/models';
+import { ApiService } from '@core/api.service';
+import { toNumber } from '@core/number.util';
 import { AuthService } from './auth.service';
 import { CryptoCurrenciesService } from './crypto-currencies.service';
 import { NotificationService } from './notification.service';

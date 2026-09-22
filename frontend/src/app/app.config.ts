@@ -5,8 +5,8 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideNgxMatToast } from 'ngx-mat-toast';
 
 import { routes } from './app.routes';
-import { authInterceptor } from './core/auth.interceptor';
-import { AuthService } from './services/auth.service';
+import { authInterceptor } from '@core/auth.interceptor';
+import { AuthService } from '@services/auth.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [

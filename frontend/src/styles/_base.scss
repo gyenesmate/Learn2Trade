@@ -21,10 +21,10 @@
     font-family: var(--font-family-base);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-normal);
-    color: var(--color-text);
-    background: var(--gradient-bg);
-    background-color: var(--color-bg);
-    background-attachment: fixed;
+    color: var(--color-text-primary);
+    background-color: var(--color-background);
+    background-image: none;
+    font-variant-numeric: tabular-nums;
   }
 
   h1,

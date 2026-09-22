@@ -2,7 +2,7 @@ import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
-import { CryptoCurrency } from '../../../const/models';
+import { CryptoCurrency } from '@const/models';
 
 export interface SetPriceAlertDialogData {
   crypto: CryptoCurrency;

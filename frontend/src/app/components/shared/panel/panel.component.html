@@ -1,0 +1,11 @@
+@if (title()) {
+  <header class="app-panel__header">
+    <span class="app-panel__title">{{ title() }}</span>
+    <div class="app-panel__actions">
+      <ng-content select="[panelActions]" />
+    </div>
+  </header>
+}
+<div class="app-panel__body">
+  <ng-content />
+</div>

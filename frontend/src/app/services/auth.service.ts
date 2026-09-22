@@ -1,10 +1,10 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { TokenResponse, UserMe } from '../const/models';
-import { ApiService } from '../core/api.service';
-import { TokenStorageService } from '../core/token.storage';
-import { toNumber } from '../core/number.util';
+import { TokenResponse, UserMe } from '@const/models';
+import { ApiService } from '@core/api.service';
+import { TokenStorageService } from '@core/token.storage';
+import { toNumber } from '@core/number.util';
 
 const SESSION_TIMEOUT_MS = 60 * 60 * 1000;
 

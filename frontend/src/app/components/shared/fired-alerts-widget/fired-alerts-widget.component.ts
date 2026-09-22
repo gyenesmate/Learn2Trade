@@ -1,8 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit, computed, inject, input, signal } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { CryptoCurrency, PriceAlert } from '../../../const/models';
-import { PriceAlertsService } from '../../../services/price-alerts.service';
-import { CryptoCurrenciesService } from '../../../services/crypto-currencies.service';
+import { CryptoCurrency, PriceAlert } from '@const/models';
+import { PriceAlertsService } from '@services/price-alerts.service';
+import { CryptoCurrenciesService } from '@services/crypto-currencies.service';
 
 @Component({
   selector: 'app-fired-alerts-widget',

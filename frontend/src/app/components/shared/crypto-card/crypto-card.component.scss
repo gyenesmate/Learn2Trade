@@ -19,12 +19,12 @@
 	width: 36px;
 	height: 36px;
 	border-radius: 50%;
-	background: rgba(0, 123, 255, 0.08);
+	background: rgba(59, 130, 246, 0.08);
 	color: var(--color-primary);
 	transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 
 	&:hover:not(:disabled) {
-		background: rgba(0, 123, 255, 0.16);
+		background: rgba(59, 130, 246, 0.16);
 		transform: translateY(-1px);
 	}
 

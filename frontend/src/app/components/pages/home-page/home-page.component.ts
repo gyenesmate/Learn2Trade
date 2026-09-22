@@ -8,11 +8,11 @@ import {
   untracked,
 } from '@angular/core';
 import { RouterModule } from '@angular/router';
-import { CryptoCurrency, UserMe } from '../../../const/models';
-import { CryptoCardComponent } from '../../shared/crypto-card/crypto-card.component';
-import { AuthService } from '../../../services/auth.service';
-import { CryptoCurrenciesService } from '../../../services/crypto-currencies.service';
-import { WatchlistSubscriptionsService } from '../../../services/watchlist-subscriptions.service';
+import { CryptoCurrency, UserMe } from '@const/models';
+import { CryptoCardComponent } from '@shared/crypto-card/crypto-card.component';
+import { AuthService } from '@services/auth.service';
+import { CryptoCurrenciesService } from '@services/crypto-currencies.service';
+import { WatchlistSubscriptionsService } from '@services/watchlist-subscriptions.service';
 
 @Component({
   selector: 'app-home-page',

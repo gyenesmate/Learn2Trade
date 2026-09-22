@@ -1,4 +1,4 @@
-// Global utility classes
+// Global utility classes — trading semantic helpers
 @mixin helpers {
   .flex {
     display: flex;
@@ -52,28 +52,44 @@
     padding: var(--space-md);
   }
 
+  .min-0 {
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .text-brand,
   .text-primary {
     color: var(--color-primary);
   }
 
-  .text-secondary {
-    color: var(--color-secondary);
+  .text-fg,
+  .app-text-primary {
+    color: var(--color-text-primary);
+  }
+
+  .text-secondary,
+  .app-text-secondary {
+    color: var(--color-text-secondary);
   }
 
   .text-accent {
     color: var(--color-accent);
   }
 
-  .text-error {
-    color: var(--color-error);
+  .text-error,
+  .text-loss,
+  .text-danger {
+    color: var(--color-danger);
   }
 
-  .text-success {
+  .text-success,
+  .text-profit {
     color: var(--color-success);
   }
 
-  .text-muted {
-    color: var(--color-muted);
+  .text-muted,
+  .app-text-muted {
+    color: var(--color-text-muted);
   }
 
   .bg-surface {
@@ -112,6 +128,15 @@
     box-shadow: var(--shadow-lg);
   }
 
+  .tabular-nums,
+  .numeric {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .text-right {
+    text-align: right;
+  }
+
   .price-up {
     color: var(--color-crypto-up);
   }
@@ -122,5 +147,28 @@
 
   .price-neutral {
     color: var(--color-crypto-neutral);
+  }
+
+  .trading-workspace {
+    display: grid;
+    gap: var(--space-md);
+    min-width: 0;
+    min-height: 0;
+  }
+
+  .trading-workspace--lg {
+    grid-template-columns: minmax(0, 1fr) 280px 280px;
+  }
+
+  @media (max-width: 1439px) {
+    .trading-workspace--lg {
+      grid-template-columns: minmax(0, 1fr) minmax(240px, 280px);
+    }
+  }
+
+  @media (max-width: 1023px) {
+    .trading-workspace--lg {
+      grid-template-columns: 1fr;
+    }
   }
 }

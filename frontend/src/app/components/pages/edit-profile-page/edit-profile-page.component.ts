@@ -1,9 +1,9 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../services/auth.service';
-import { UsersService } from '../../../services/users.service';
-import { NotificationService } from '../../../services/notification.service';
+import { AuthService } from '@services/auth.service';
+import { UsersService } from '@services/users.service';
+import { NotificationService } from '@services/notification.service';
 
 @Component({
   selector: 'app-edit-profile-page',

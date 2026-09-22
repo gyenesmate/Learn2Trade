@@ -1,200 +1,91 @@
-# Repository AI Agent Instructions
+# Frontend AI Agent Instructions
 
-These instructions apply to every AI agent working in this repository.
+These instructions apply to every AI agent working in the **Learn2Trade frontend**.
 
-For Angular, TypeScript, RxJS, Angular Material, templates, styles, routing, forms, or frontend architecture tasks, also read and follow [`angular_expert.md`](./angular_expert.md).
+## Where standards live
+
+| Location | Use for |
+| --- | --- |
+| [`.cursor/rules/learn2trade.mdc`](./.cursor/rules/learn2trade.mdc) | Project map, where code/docs live |
+| [`.cursor/rules/angular-expert.mdc`](./.cursor/rules/angular-expert.mdc) | Angular 22+ patterns (signals, inject, RxJS, templates) |
+| [`.cursor/rules/material-expert.mdc`](./.cursor/rules/material-expert.mdc) | Angular Material theming and components |
+| [`docs/`](./docs/) | Feature and architecture descriptions (prefer over legacy notes) |
+| [`.cursor/commands/code-review.md`](./.cursor/commands/code-review.md) | Branch review against the expert rules |
+
+Always-on Cursor rules under `.cursor/rules/` apply automatically. Prefer them over inventing new conventions.
 
 ## 1. Mission
 
-Produce the smallest correct change that solves the requested problem while preserving existing behavior, public APIs, project conventions, accessibility, and testability.
+Produce the smallest correct change that solves the request while preserving behavior, public APIs, project conventions, accessibility, and testability.
 
 A successful change must be:
 
-- compatible with the Angular version installed in this repository;
-- understandable without hidden assumptions;
-- strongly typed;
-- limited to the requested scope;
-- consistent with nearby code unless a migration is explicitly requested;
+- compatible with versions in `package.json` (Angular / Material ^22);
+- strongly typed and scoped to the request;
+- consistent with nearby code unless a migration is requested;
 - validated with the most relevant available checks.
 
 ## 2. Instruction priority
 
-When instructions conflict, use this order:
+When instructions conflict:
 
-1. The user's explicit request.
-2. Repository-specific instructions in this file.
-3. Domain instructions in `angular_expert.md`.
-4. Existing local architecture and conventions.
-5. Official framework documentation.
-6. General preferences or stylistic improvements.
+1. The user's explicit request
+2. This file
+3. `.cursor/rules/*.mdc` and `docs/` feature guides
+4. Existing local architecture and conventions
+5. Official Angular / Material docs for the installed version
+6. General stylistic preferences
 
-Never replace a working project convention merely because a newer alternative exists. Modernize only when the installed framework supports it and the change is in scope.
+Do not modernize working code merely because a newer API exists unless it is in scope and supported by the installed version.
 
-## 3. Required investigation before editing
-
-Before changing code:
+## 3. Before editing
 
 1. Read the task completely.
-2. Inspect `package.json` and determine the installed Angular, TypeScript, RxJS, Angular Material, and testing versions.
-3. Inspect `angular.json`, relevant `tsconfig` files, lint configuration, and the application bootstrap/configuration when they affect the task.
-4. Read the complete target file, not only the referenced method.
-5. Trace related templates, styles, services, models, routes, tests, interceptors, and call sites.
-6. Search for an existing implementation of the same pattern elsewhere in the repository.
-7. Identify the actual cause before editing. Do not patch only the visible symptom.
-8. Establish the expected behavior and invariants that must remain unchanged.
+2. Confirm Angular, Material, RxJS, and test tooling versions from `package.json`.
+3. Inspect `angular.json`, `tsconfig` path aliases, and bootstrap/config when relevant.
+4. Read the full target file and related templates, styles, services, guards, and tests.
+5. Use the project map in `learn2trade.mdc`; check `docs/` / future `docs/features/` for the feature.
+6. Prefer an existing pattern in the repo over a new one.
+7. Identify root cause before patching symptoms (especially races, auth, lifecycle).
 
-For race conditions or lifecycle problems, explicitly identify:
+## 4. Version compatibility
 
-- the producers of each value;
-- when each value becomes available;
-- what triggers rendering or side effects;
-- whether requests can overlap or complete out of order;
-- what cleanup occurs when the component, route, dialog, or selection changes.
-
-## 4. Version compatibility gate
-
-Do not assume the repository uses the newest Angular release.
-
-Before using a framework feature, verify that it exists and is stable in the installed version. In particular, check compatibility before introducing:
-
-- built-in control flow such as `@if`, `@for`, and `@switch`;
-- signal inputs, outputs, models, and queries;
-- `linkedSignal`, `resource`, `httpResource`, or asynchronous reactivity APIs;
-- Signal Forms;
-- zoneless-specific behavior;
-- Angular version-specific decorator defaults;
-- the Angular v22 `@Service` decorator.
-
-When a newer approach is unsupported, use the best supported equivalent. Do not upgrade dependencies unless the task explicitly requests an upgrade.
+Verify a feature is stable in the installed Angular version before using it (control flow, signal inputs/queries, `resource` / `httpResource`, Signal Forms, zoneless defaults, etc.). Use the best supported equivalent when unsupported. Do not upgrade dependencies unless asked.
 
 ## 5. Change discipline
 
-### Must
+**Must:** focused diffs; reuse shared components/services; keep loading/error/empty/success explicit; update tests when behavior changes; remove obsolete code from the change.
 
-- Make focused changes with a clear relationship to the task.
-- Preserve existing public interfaces unless changing them is necessary and requested.
-- Reuse project abstractions when they are appropriate.
-- Keep error, loading, empty, and success states explicit.
-- Update affected tests when behavior changes.
-- Remove imports, branches, and helpers made obsolete by the change.
-- Explain any assumption that could not be verified from the repository.
+**Must not:** unrelated cleanup or reformatting; new libraries when Angular/the repo already covers it; broad signal/architecture migrations as a side effect of a bug fix; weaken types with `any` / unsafe casts; swallow errors; claim validation passed when it was not run; alter auth, routing, interceptors, or global styles without tracing consumers.
 
-### Must not
+## 6. Preferences
 
-- Perform unrelated cleanup.
-- Reformat entire files for a small change.
-- introduce a new library when Angular or the repository already provides the needed capability;
-- convert an entire feature to signals, standalone APIs, Signal Forms, or another architecture as a side effect of a bug fix;
-- alter global interceptors, providers, shared styles, authentication, routing, or error handling without tracing all consumers;
-- weaken types with `any`, unsafe casts, or non-null assertions to silence errors;
-- use stringification or keyword searches as the primary way to understand typed error objects;
-- hide failures with empty `catch` blocks, swallowed Observable errors, or broad fallback behavior;
-- claim commands passed when they were not executed.
+Correctness → installed-version compatibility → preserve behavior → simplicity → strong typing → testability → evidence-based performance → modernization.
 
-## 6. Decision-making rules
+Fix leaks, races, unstable `@for` tracking, and duplicate work when they are part of the task. Do not chase speculative optimizations.
 
-Prefer, in order:
+## 7. Uncertain data
 
-1. Correctness.
-2. Compatibility with the installed project.
-3. Preservation of existing behavior.
-4. Simplicity and readability.
-5. Strong typing.
-6. Testability.
-7. Performance supported by evidence.
-8. Modernization.
-
-Do not optimize speculative bottlenecks. Do fix obvious repeated work, duplicate subscriptions, leaking listeners, unstable list tracking, and request races when they are directly related to the task.
-
-## 7. Working with uncertain data
-
-When an external value has an uncertain runtime shape:
-
-- type it as `unknown` at the boundary;
-- narrow it with small reusable type guards or normalization functions;
-- support only shapes justified by API contracts or existing repository evidence;
-- preserve the original error for diagnostics;
-- separate user-facing messages from technical logging;
-- avoid recursively traversing arbitrary objects unless the API genuinely returns nested heterogeneous error structures and recursion is bounded against cycles.
-
-Never use `JSON.stringify(error).includes(...)` as normal application control flow. It is fragile, loses semantic structure, can fail on circular values, and creates false matches.
+Type external payloads as `unknown` at the boundary; narrow with small guards; preserve original errors for diagnostics; separate user-facing messages from logs. Never use `JSON.stringify(error).includes(...)` for control flow.
 
 ## 8. Validation
 
-Run the narrowest meaningful checks first, then broader checks when practical.
-
-Typical order:
-
-1. Relevant unit tests.
-2. Type checking or Angular build.
-3. Linting for changed files or project.
-4. Broader test suite when the change affects shared infrastructure.
-
-Use repository scripts from `package.json`. Do not invent command names.
-
-If validation cannot run, state exactly what was not run and why. Still inspect the changed code for:
-
-- TypeScript errors;
-- missing imports;
-- template type errors;
-- incorrect signal invocation;
-- subscription cleanup;
-- unreachable branches;
-- accessibility regressions;
-- accidental API changes.
+Use scripts from `package.json` (`build`, `test:unit`, `test:e2e`). Narrowest useful check first. If you cannot run validation, say what was skipped and why.
 
 ## 9. Tests
 
-Tests should verify observable behavior, not private implementation details.
+Assert observable behavior, not private implementation. Cover the bug/request, edge cases, and loading/error/cancel paths when applicable.
 
-Add or update tests for:
+## 10. Security
 
-- the reported bug or requested behavior;
-- relevant edge cases;
-- loading, error, empty, and cancellation behavior when applicable;
-- input/output interactions;
-- route, dialog, or service integration boundaries affected by the change.
+Do not expose tokens or sensitive payloads; do not bypass Angular sanitization without a justified trust boundary; preserve auth checks; avoid logging full auth/HTTP objects.
 
-A regression test should fail before the fix and pass after it whenever practical.
+## 11. Git safety
 
-## 10. Security and privacy
+No reset/revert/force-push/discard of unrelated work. Do not touch lockfiles unless dependencies change. Keep patches reviewable.
 
-- Never expose tokens, secrets, personal data, or raw sensitive backend payloads.
-- Do not bypass Angular sanitization with `bypassSecurityTrust...` unless the trust boundary is explicitly justified.
-- Do not use `innerHTML` for ordinary rendering.
-- Validate and encode data at the correct boundary.
-- Preserve authorization checks and server-side enforcement; client-side visibility is not security.
-- Avoid logging full authentication, user, or HTTP objects in production code.
+## 12. Done when
 
-## 11. Git and repository safety
+Requested behavior works on the installed stack; related behavior intact; types sound; cleanup/cancellation correct; tests updated or justified; validation run where practical; no unrelated changes.
 
-- Do not reset, revert, force-push, delete branches, or discard unrelated changes.
-- Do not modify generated files unless the project expects them to be committed.
-- Do not edit lockfiles unless dependencies actually change.
-- Keep patches reviewable.
-- Mention any pre-existing issue that blocks validation, but do not silently fix unrelated failures.
-
-## 12. Completion report
-
-When finishing a task, report:
-
-- the root cause or implementation goal;
-- the files changed;
-- the behavior now implemented;
-- the validation performed and its result;
-- any remaining limitation or assumption.
-
-Do not provide a long walkthrough unless requested. Do not say a task is complete when a required part is still missing.
-
-## 13. Definition of done
-
-A task is done only when:
-
-- the requested behavior is implemented;
-- the implementation is compatible with the repository's actual versions;
-- related behavior remains intact;
-- types are sound;
-- cleanup and cancellation are correct;
-- relevant tests are updated or a reason is given;
-- validation is run where available;
-- no unrelated changes are included.
+Report briefly: goal/root cause, files touched, behavior, validation result, remaining assumptions.

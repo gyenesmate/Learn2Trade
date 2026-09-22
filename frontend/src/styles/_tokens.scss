@@ -9,13 +9,22 @@
 @use 'breakpoints';
 
 @mixin _color-scheme($palette) {
+  --color-background: #{map.get($palette, bg)};
   --color-bg: #{map.get($palette, bg)};
   --color-surface: #{map.get($palette, surface)};
   --color-surface-raised: #{map.get($palette, surface-raised)};
+  --color-surface-hover: #{map.get($palette, surface-hover)};
   --color-border: #{map.get($palette, border)};
+  --color-border-strong: #{map.get($palette, border-strong)};
   --color-text: #{map.get($palette, text)};
+  --color-text-primary: #{map.get($palette, text)};
+  --color-text-secondary: #{map.get($palette, text-secondary)};
   --color-muted: #{map.get($palette, muted)};
+  --color-text-muted: #{map.get($palette, muted)};
+  --color-text-disabled: #{map.get($palette, disabled)};
   --color-on-primary: #{map.get($palette, on-primary)};
+  --color-input-background: #{map.get($palette, input-background)};
+  --color-overlay: #{map.get($palette, overlay)};
   --color-shadow: #{map.get($palette, shadow)};
   --gradient-bg: #{map.get($palette, bg-gradient)};
   --gradient-secondary: #{map.get($palette, surface-gradient)};
@@ -24,6 +33,8 @@
 
 @mixin _static-tokens {
   --color-primary: #{map.get(colors.$primary, main)};
+  --color-primary-hover: #{map.get(colors.$primary, hover)};
+  --color-primary-active: #{map.get(colors.$primary, active)};
   --color-primary-medium: #{map.get(colors.$primary, medium)};
   --color-primary-dark: #{map.get(colors.$primary, dark)};
   --color-secondary: #{map.get(colors.$secondary, main)};
@@ -31,11 +42,15 @@
   --color-secondary-light: #{map.get(colors.$secondary, light)};
   --color-accent: #{map.get(colors.$primary, main)};
   --color-success: #{map.get(colors.$semantic, success)};
+  --color-success-soft: #{map.get(colors.$semantic, success-soft)};
   --color-warning: #{map.get(colors.$semantic, warning)};
+  --color-warning-soft: #{map.get(colors.$semantic, warning-soft)};
   --color-error: #{map.get(colors.$semantic, error)};
+  --color-danger: #{map.get(colors.$semantic, danger)};
+  --color-danger-soft: #{map.get(colors.$semantic, danger-soft)};
   --color-info: #{map.get(colors.$semantic, info)};
   --color-crypto-up: #{map.get(colors.$semantic, success)};
-  --color-crypto-down: #{map.get(colors.$semantic, error)};
+  --color-crypto-down: #{map.get(colors.$semantic, danger)};
   --color-crypto-neutral: #{map.get(colors.$semantic, warning)};
   --color-category-stock: #{map.get(colors.$category, stock)};
   --color-category-crypto: #{map.get(colors.$category, crypto)};
@@ -48,6 +63,7 @@
   --font-family-base: #{typography.$family-base};
   --font-family-accent: #{typography.$family-brand};
   --font-weight-normal: #{typography.$weight-regular};
+  --font-weight-medium: #{typography.$weight-medium};
   --font-weight-semibold: #{typography.$weight-semibold};
   --font-weight-bold: #{typography.$weight-bold};
   --font-size-display: #{map.get(map.get(typography.$scale, display), size)};
@@ -92,17 +108,23 @@
   }
 }
 
+@mixin _theme-roots {
+  @include _static-tokens;
+  @include _color-scheme(colors.$dark);
+}
+
 @mixin properties {
   :root {
-    @include _static-tokens;
+    @include _theme-roots;
+  }
+
+  body.theme-dark,
+  [data-theme='dark'] {
     @include _color-scheme(colors.$dark);
   }
 
-  body.theme-dark {
-    @include _color-scheme(colors.$dark);
-  }
-
-  body.theme-light {
+  body.theme-light,
+  [data-theme='light'] {
     @include _color-scheme(colors.$light);
   }
 }

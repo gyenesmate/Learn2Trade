@@ -1,0 +1,122 @@
+---
+description: Learn2Trade frontend project guide — where to look and global conventions
+alwaysApply: true
+---
+
+# Learn2Trade Frontend Guide
+
+Use this rule as the map of the frontend. Before implementing a feature or fix, locate the right code and docs paths below. Prefer the smallest change that matches existing patterns.
+
+## Stack (verify in `package.json`)
+
+- Angular + Material + CDK ^22
+- RxJS 7.8, Zone.js present
+- Vitest unit tests (`ng test`); Playwright e2e (`npm run test:e2e`)
+- Charts: `lightweight-charts`
+- Toasts: `ngx-mat-toast`
+
+Also follow always-on rules: `angular-expert.mdc`, `material-expert.mdc`, and `agents.md` at the frontend root.
+
+## Path aliases (`tsconfig.json`)
+
+Prefer these over deep relative imports:
+
+| Alias | Maps to |
+| --- | --- |
+| `@styles/*` | `./src/styles/*` |
+| `@components/*` | `./src/app/components/*` |
+| `@shared/*` | `./src/app/components/shared/*` |
+| `@const/*` | `./src/app/const/*` |
+| `@core/*` | `./src/app/core/*` |
+| `@env/*` | `./src/app/env/*` |
+| `@guards/*` | `./src/app/guards/*` |
+| `@services/*` | `./src/app/services/*` |
+
+Same-folder `./` imports may stay relative. For shared UI, prefer `@shared/...` over `@components/shared/...`.
+
+## Where to look
+
+### App shell & config
+
+| Path | Purpose |
+| --- | --- |
+| `src/app/app.config.ts` | Providers, router, HTTP, animations |
+| `src/app/app.routes.ts` | Route table |
+| `src/app/app.component.*` | Root shell |
+| `src/app/env/environment.ts` | Environment / API base |
+| `src/index.html`, `src/styles.scss` | Bootstrap HTML and global style entry |
+
+### Core & cross-cutting
+
+| Path | Purpose |
+| --- | --- |
+| `src/app/core/api.service.ts` | Shared HTTP / API access |
+| `src/app/core/token.storage.ts` | Auth token storage |
+| `src/app/core/*.util.ts` | Shared pure helpers |
+| `src/app/guards/` | Functional route guards (e.g. `auth.guard.ts`) |
+| `src/app/const/models.ts` | Shared models / types |
+
+### Services (feature APIs & state)
+
+| Path | Purpose |
+| --- | --- |
+| `src/app/services/auth.service.ts` | Auth session / user signals |
+| `src/app/services/users.service.ts` | User profile APIs |
+| `src/app/services/crypto-currencies.service.ts` | Crypto list/detail APIs |
+| `src/app/services/investments.service.ts` | Investments |
+| `src/app/services/price-alerts.service.ts` | Price alerts |
+| `src/app/services/watchlist-subscriptions.service.ts` | Watchlist |
+| `src/app/services/notification.service.ts` | Toasts / user feedback |
+| `src/app/services/index.ts` | Barrel exports |
+
+### UI
+
+| Path | Purpose |
+| --- | --- |
+| `src/app/components/pages/` | Routed pages (dashboard, login, crypto detail, profile, …) |
+| `src/app/components/shared/` | Reusable widgets/dialogs (crypto-card, data-table, navigation, …) |
+| `src/app/components/shared/index.ts` | Shared barrel |
+
+### Design system
+
+| Path | Purpose |
+| --- | --- |
+| `src/styles/_tokens.scss` | CSS variables / semantic tokens |
+| `src/styles/_theme.scss` | Material `mat.theme` + system overrides |
+| `src/styles/_material.scss` | Component `mat.*-overrides` |
+| `src/styles/_colors.scss` etc. | Primitives (color, type, radius, space, motion) |
+
+Visual direction: dark-first trading terminal (see `docs/TRADING_UI_CONTEXT.md`). Prefer semantic tokens (`--color-success` / `--color-danger`) over arbitrary hex. Do not introduce Tailwind unless requested.
+
+### Docs (feature guides — expand over time)
+
+Feature-specific AI guidance will live under `docs/`. When present, **read the matching doc before implementing**.
+
+| Path | Status / intent |
+| --- | --- |
+| `docs/TRADING_UI_CONTEXT.md` | **Primary** trading UI/UX design system |
+| `docs/features/` | **(planned)** One markdown guide per feature (auth, dashboard, alerts, investments, watchlist, profile, crypto detail, …) |
+| `docs/architecture.md` | **(planned)** Frontend architecture overview |
+| `docs/api-contracts.md` | **(planned)** Backend contract notes relevant to UI |
+| `docs/OLD_DESCRITIONS/` | Legacy specs — historical only; verify against current code |
+| `docs/PLANS/` | Working plans / notes — not source of truth |
+
+If a feature doc is missing, inspect the page + service + shared components for that feature and mirror local patterns. Prefer updating/creating the future `docs/features/<name>.md` only when asked.
+
+## Global implementation guidelines
+
+1. **Investigate first**: read target page/service/tests and one similar feature before editing.
+2. **Reuse**: shared components and services before adding new abstractions.
+3. **Auth & routing**: preserve guard behavior (bootstrap/session readiness, public routes, login redirect). Do not “simplify” auth without tracing all routes.
+4. **API errors**: keep user-facing messages separate from technical logging; narrow `unknown` at boundaries.
+5. **Styles**: tokens + Material overrides for shared look; component SCSS for local layout only.
+6. **Scope**: no drive-by refactors, lockfile churn, or unrelated formatting.
+7. **Validate**: use `npm run build`, `npm run test:unit`, or targeted tests from `package.json` when practical.
+
+## Decision order when stuck
+
+1. User request  
+2. This file + expert MDCs + `agents.md`  
+3. Existing feature code and shared components  
+4. Future `docs/features/*` (when added)  
+5. Official Angular / Material docs for the installed version  

@@ -3,10 +3,10 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Renderer2, NgZ
 import { DecimalPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { CryptoCurrency } from '../../../const/models';
-import { AuthService } from '../../../services/auth.service';
-import { WatchlistSubscriptionsService } from '../../../services/watchlist-subscriptions.service';
-import { NotificationService } from '../../../services/notification.service';
+import { CryptoCurrency } from '@const/models';
+import { AuthService } from '@services/auth.service';
+import { WatchlistSubscriptionsService } from '@services/watchlist-subscriptions.service';
+import { NotificationService } from '@services/notification.service';
 
 // Note: this implementation uses `lightweight-charts` at runtime. Install with:
 // npm install lightweight-charts

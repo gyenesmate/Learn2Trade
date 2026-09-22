@@ -10,34 +10,34 @@
       filled-container-color: map.get(colors.$primary, main),
       filled-label-text-color: map.get(colors.$dark, on-primary),
       filled-container-shape: map.get(radius.$scale, md),
-      filled-horizontal-padding: 16px,
+      filled-horizontal-padding: 14px,
       outlined-container-shape: map.get(radius.$scale, md),
-      outlined-outline-color: map.get(colors.$secondary, main),
-      outlined-label-text-color: map.get(colors.$secondary, main),
-      outlined-horizontal-padding: 16px,
+      outlined-outline-color: map.get(colors.$neutral, 40),
+      outlined-label-text-color: map.get(colors.$text, primary),
+      outlined-horizontal-padding: 14px,
       text-container-shape: map.get(radius.$scale, md),
-      text-label-text-color: map.get(colors.$neutral, 50),
+      text-label-text-color: map.get(colors.$text, muted),
       protected-container-shape: map.get(radius.$scale, md),
       tonal-container-shape: map.get(radius.$scale, md),
     ));
 
     @include mat.icon-button-overrides((
-      icon-color: map.get(colors.$neutral, 80),
+      icon-color: map.get(colors.$text, primary),
     ));
 
     @include mat.form-field-overrides((
       outlined-container-shape: map.get(radius.$scale, md),
       filled-container-shape: map.get(radius.$scale, md),
-      filled-container-color: map.get(colors.$neutral, 0),
+      filled-container-color: map.get(colors.$dark, input-background),
       outlined-outline-color: map.get(colors.$neutral, 30),
       outlined-focus-outline-color: map.get(colors.$primary, main),
       outlined-hover-outline-color: map.get(colors.$primary, medium),
-      outlined-input-text-color: map.get(colors.$neutral, 80),
-      outlined-input-text-placeholder-color: map.get(colors.$neutral, 50),
-      outlined-label-text-color: map.get(colors.$neutral, 50),
-      filled-input-text-color: map.get(colors.$neutral, 80),
-      filled-input-text-placeholder-color: map.get(colors.$neutral, 50),
-      filled-label-text-color: map.get(colors.$neutral, 50),
+      outlined-input-text-color: map.get(colors.$text, primary),
+      outlined-input-text-placeholder-color: map.get(colors.$text, muted),
+      outlined-label-text-color: map.get(colors.$text, secondary),
+      filled-input-text-color: map.get(colors.$text, primary),
+      filled-input-text-placeholder-color: map.get(colors.$text, muted),
+      filled-label-text-color: map.get(colors.$text, secondary),
       filled-caret-color: map.get(colors.$primary, main),
       outlined-caret-color: map.get(colors.$primary, main),
     ));
@@ -52,19 +52,19 @@
 
     @include mat.table-overrides((
       background-color: map.get(colors.$neutral, 10),
-      header-headline-color: map.get(colors.$neutral, 50),
-      header-headline-size: 10px,
-      header-headline-weight: 400,
-      header-headline-tracking: 0.08em,
-      row-item-label-text-color: map.get(colors.$neutral, 80),
+      header-headline-color: map.get(colors.$text, muted),
+      header-headline-size: 12px,
+      header-headline-weight: 500,
+      header-headline-tracking: 0.02em,
+      row-item-label-text-color: map.get(colors.$text, primary),
       row-item-outline-color: map.get(colors.$neutral, 30),
       row-item-outline-width: 1px,
     ));
 
     @include mat.paginator-overrides((
       container-background-color: map.get(colors.$neutral, 10),
-      container-text-color: map.get(colors.$neutral, 50),
-      enabled-icon-color: map.get(colors.$neutral, 80),
+      container-text-color: map.get(colors.$text, muted),
+      enabled-icon-color: map.get(colors.$text, primary),
     ));
 
     @include mat.tabs-overrides((
@@ -72,8 +72,8 @@
       active-label-text-color: map.get(colors.$primary, main),
       active-focus-label-text-color: map.get(colors.$primary, main),
       active-hover-label-text-color: map.get(colors.$primary, main),
-      inactive-label-text-color: map.get(colors.$neutral, 50),
-      inactive-hover-label-text-color: map.get(colors.$neutral, 80),
+      inactive-label-text-color: map.get(colors.$text, muted),
+      inactive-hover-label-text-color: map.get(colors.$text, primary),
       divider-color: map.get(colors.$neutral, 30),
       active-indicator-height: 2px,
     ));
@@ -81,74 +81,75 @@
     @include mat.chips-overrides((
       container-shape-radius: map.get(radius.$scale, md),
       outline-color: map.get(colors.$neutral, 30),
-      label-text-color: map.get(colors.$neutral, 80),
+      label-text-color: map.get(colors.$text, primary),
       elevated-container-color: map.get(colors.$neutral, 20),
     ));
 
     @include mat.toolbar-overrides((
       container-background-color: map.get(colors.$neutral, 10),
-      container-text-color: map.get(colors.$neutral, 80),
+      container-text-color: map.get(colors.$text, primary),
     ));
 
     @include mat.sidenav-overrides((
       container-background-color: map.get(colors.$neutral, 10),
-      container-text-color: map.get(colors.$neutral, 80),
+      container-text-color: map.get(colors.$text, primary),
       container-divider-color: map.get(colors.$neutral, 30),
       container-shape: 0,
-      container-width: 280px,
+      container-width: 220px,
       content-background-color: transparent,
-      content-text-color: map.get(colors.$neutral, 80),
+      content-text-color: map.get(colors.$text, primary),
     ));
 
     @include mat.list-overrides((
-      list-item-label-text-color: map.get(colors.$neutral, 80),
-      list-item-leading-icon-color: map.get(colors.$neutral, 50),
-      active-indicator-color: rgba(0, 208, 132, 0.12),
+      list-item-label-text-color: map.get(colors.$text, primary),
+      list-item-leading-icon-color: map.get(colors.$text, muted),
+      active-indicator-color: rgba(59, 130, 246, 0.14),
       active-indicator-shape: map.get(radius.$scale, md),
     ));
 
     @include mat.menu-overrides((
       container-color: map.get(colors.$neutral, 10),
       container-shape: map.get(radius.$scale, md),
-      item-label-text-color: map.get(colors.$neutral, 80),
-      item-icon-color: map.get(colors.$neutral, 50),
+      item-label-text-color: map.get(colors.$text, primary),
+      item-icon-color: map.get(colors.$text, muted),
       divider-color: map.get(colors.$neutral, 30),
     ));
 
     @include mat.dialog-overrides((
       container-color: map.get(colors.$neutral, 10),
       container-shape: map.get(radius.$scale, lg),
-      subhead-color: map.get(colors.$neutral, 80),
-      supporting-text-color: map.get(colors.$neutral, 50),
+      subhead-color: map.get(colors.$text, primary),
+      supporting-text-color: map.get(colors.$text, muted),
     ));
 
     @include mat.select-overrides((
       panel-background-color: map.get(colors.$neutral, 10),
-      enabled-trigger-text-color: map.get(colors.$neutral, 80),
+      enabled-trigger-text-color: map.get(colors.$text, primary),
     ));
 
     @include mat.tooltip-overrides((
       container-color: map.get(colors.$neutral, 20),
-      supporting-text-color: map.get(colors.$neutral, 80),
+      supporting-text-color: map.get(colors.$text, primary),
       container-shape: map.get(radius.$scale, sm),
     ));
 
     @include mat.snack-bar-overrides((
       container-color: map.get(colors.$neutral, 20),
-      supporting-text-color: map.get(colors.$neutral, 80),
+      supporting-text-color: map.get(colors.$text, primary),
       button-color: map.get(colors.$primary, main),
       container-shape: map.get(radius.$scale, md),
     ));
   }
 
-  body.theme-light {
+  body.theme-light,
+  [data-theme='light'] {
     @include mat.button-overrides((
       filled-label-text-color: #ffffff,
       text-label-text-color: map.get(colors.$light, muted),
     ));
 
     @include mat.form-field-overrides((
-      filled-container-color: map.get(colors.$light, bg),
+      filled-container-color: map.get(colors.$light, input-background),
       outlined-outline-color: map.get(colors.$light, border),
       outlined-input-text-color: map.get(colors.$light, text),
       outlined-input-text-placeholder-color: map.get(colors.$light, muted),

@@ -1,0 +1,76 @@
+---
+description: Angular Material 22+ theming, tokens, and component usage standards
+alwaysApply: true
+---
+
+# Material Expert (v22+)
+
+Target `@angular/material` / `@angular/cdk` versions in `frontend/package.json` (currently ^22). Follow Material 3 token APIs. Do not style via private DOM/CSS.
+
+## Theming source of truth
+
+Project theme lives under `src/styles/`:
+
+| File | Role |
+| --- | --- |
+| `_tokens.scss` | App design tokens / CSS variables |
+| `_colors.scss`, `_typography.scss`, `_radius.scss`, `_spacing.scss`, `_elevation.scss`, `_motion.scss`, `_fonts.scss` | Primitive scales |
+| `_theme.scss` | `mat.theme` + `mat.theme-overrides` |
+| `_material.scss` | `mat.*-overrides` for components |
+| `_components.scss`, `_base.scss`, `_utilities.scss` | App-level styles |
+
+When changing look-and-feel, prefer tokens and these files over one-off component hacks.
+
+## Official theming APIs (required)
+
+```scss
+@use '@angular/material' as mat;
+
+html {
+  color-scheme: dark; // match app (this project is dark)
+  @include mat.theme((
+    color: (primary: mat.$cyan-palette, theme-type: dark),
+    typography: (...),
+    density: 0,
+  ));
+  @include mat.theme-overrides(( primary: ..., on-primary: ... ));
+  @include mat.button-overrides(( filled-container-color: ... ));
+}
+```
+
+- Define the global theme with **`mat.theme`**.
+- Adjust system tokens with **`mat.theme-overrides`** (or `$overrides` on `mat.theme`).
+- Adjust a single component with its **`mat.<component>-overrides`** mixin (validated keys at build time).
+- In custom UI, consume **`var(--mat-sys-*)`** (and app tokens from `_tokens.scss`) so light/dark and theme updates stay coherent.
+
+## Do / Don't
+
+**Do**
+
+- Use Material components and CDK primitives (`Dialog`, `Overlay`, a11y, table, form-field) instead of reinventing behavior.
+- Prefer outlined/filled variants and density already configured in `_material.scss` (compact trading density `-1`).
+- Keep dialogs as focused Material dialogs; reuse existing shared dialogs when possible.
+- Preserve accessibility: labels, `aria-*`, focus management, contrast against dark/light trading themes.
+- Align custom surfaces with Material system roles and app tokens (`--color-surface`, `--color-primary`, etc.).
+- Follow `docs/TRADING_UI_CONTEXT.md` for density, panels, tables, and buy/sell semantic actions.
+
+**Don't**
+
+- Override with `.mat-mdc-*` selectors, `::ng-deep`, `!important`, or private `--mat-*` component vars outside overrides APIs.
+- Depend on Material internal DOM structure or class names — they are not a public API.
+- Introduce a second UI kit or ad-hoc button/input system alongside Material.
+- Add purple-on-white / generic “AI default” palettes; keep the trading blue + semantic green/red system from `docs/TRADING_UI_CONTEXT.md`.
+
+## Components & patterns in this app
+
+- Prefer existing shared building blocks under `src/app/components/shared/` before new Material composites.
+- Forms: `mat-form-field` + reactive forms; match existing appearance (outline/fill) from nearby screens.
+- Feedback: use the project notification/toast approach (`ngx-mat-toast` / `NotificationService`) instead of inventing another snackbar path.
+- Tables: prefer the shared `data-table` patterns and Material table/sort/paginator conventions already in use.
+- Icons: use Material icons consistently with existing navigation and actions.
+
+## Change discipline
+
+- Theme token changes belong in `src/styles`, not scattered component SCSS, unless the style is truly local layout.
+- Component SCSS should handle layout/spacing composition; color/shape should come from tokens / Material overrides when shared.
+- After Material or theme edits, sanity-check key surfaces: login, dashboard, dialogs, navigation, form fields, buttons.

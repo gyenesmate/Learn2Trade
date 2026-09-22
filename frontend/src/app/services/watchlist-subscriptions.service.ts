@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { WatchlistSubscription } from '../const/models';
-import { ApiService } from '../core/api.service';
+import { WatchlistSubscription } from '@const/models';
+import { ApiService } from '@core/api.service';
 
 @Injectable({ providedIn: 'root' })
 export class WatchlistSubscriptionsService {

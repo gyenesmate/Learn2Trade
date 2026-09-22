@@ -1,8 +1,8 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { CryptoCurrency } from '../const/models';
-import { ApiService } from '../core/api.service';
+import { CryptoCurrency } from '@const/models';
+import { ApiService } from '@core/api.service';
 
 @Injectable({ providedIn: 'root' })
 export class CryptoCurrenciesService {

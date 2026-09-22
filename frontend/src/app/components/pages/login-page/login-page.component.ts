@@ -1,9 +1,9 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../services/auth.service';
+import { AuthService } from '@services/auth.service';
 import { A11yModule } from '@angular/cdk/a11y';
-import { NotificationService } from '../../../services/notification.service';
+import { NotificationService } from '@services/notification.service';
 
 @Component({
   selector: 'app-login-page',

@@ -1,6 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { CryptoCardComponent } from '../../shared/crypto-card/crypto-card.component';
-import { CryptoCurrency } from '../../../const/models';
+import { CryptoCardComponent } from '@shared/crypto-card/crypto-card.component';
+import { CryptoCurrency } from '@const/models';
 
 @Component({
   selector: 'app-testing-ground',

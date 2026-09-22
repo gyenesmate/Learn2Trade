@@ -1,0 +1,76 @@
+---
+description: Angular 22+ expert standards — signals, inject, lifecycle, RxJS, templates
+alwaysApply: true
+---
+
+# Angular Expert (v22+)
+
+Target the Angular version in `frontend/package.json` (currently ^22). Prefer modern APIs that are stable in that version. Do not invent APIs or upgrade deps unless asked.
+
+## Components & DI
+
+- Prefer **standalone** components; keep `imports` minimal and explicit.
+- Use **`inject()`** for DI in components, services, guards, interceptors, and factories. Avoid constructor injection for new code.
+- Default change detection is **OnPush** in Angular 22. Prefer signals for state so views update correctly. Avoid `ChangeDetectionStrategy.Eager` unless genuinely required.
+- Prefer **signal inputs/outputs/queries**: `input()`, `output()`, `model()`, `viewChild()`, `viewChildren()`, `contentChild()`, `contentChildren()`.
+- Prefer **`computed()`** for derived state. Prefer **`linkedSignal()`** when derived state must stay writable and reset with a source.
+- Prefer **`effect()` / `afterRenderEffect()`** only for bridging non-reactive APIs (DOM, third-party widgets, logging). Never use effects to sync state that `computed` can express.
+- Prefer class field initializers over `ngOnInit` for simple setup. Use lifecycle hooks when timing depends on inputs, view readiness, or external subscriptions that cannot be field-initialized.
+
+## Signals vs RxJS
+
+| Use signals for | Keep RxJS for |
+| --- | --- |
+| Component/service view state | Debounce, throttle, retry, backoff |
+| Derived values (`computed`) | `switchMap` / `exhaustMap` / race cancellation |
+| Template reads (`value()`) | WebSockets, SSE, multi-source event streams |
+| Simple async UI state (`resource` / `httpResource` / `rxResource` when appropriate) | Complex orchestration pipelines |
+
+Interop (`@angular/core/rxjs-interop`):
+
+- `toSignal(obs$, { initialValue })` or `{ requireSync: true }` at construction / injection context.
+- `toObservable(sig)` when an Observable consumer is required.
+- `takeUntilDestroyed()` for any manual subscription you must keep.
+- Prefer `async` pipe only for Observables that remain streams; prefer signals in templates when state is signal-backed.
+
+Do **not** subscribe in components just to copy into fields. Prefer `toSignal`, `async` pipe, or resources.
+
+## Templates & control flow
+
+- Use built-in control flow: `@if`, `@for`, `@switch`, `@empty`. Avoid `*ngIf` / `*ngFor` / `*ngSwitch` in new code.
+- Always provide `track` in `@for` with a stable identity.
+- Prefer native bindings / class / style over `ngClass` / `ngStyle` unless dynamic maps are clearer.
+- Keep templates declarative; move logic into `computed` or small pure helpers.
+- Prefer `NgOptimizedImage` for static/content images when applicable.
+
+## Routing, guards, forms
+
+- Prefer **functional** guards, resolvers, and interceptors.
+- Prefer **reactive forms** (`FormBuilder` via `inject`) unless Signal Forms are intentionally adopted and supported by the installed version.
+- Keep route data loading cancellable (`switchMap` / resources); handle overlapping navigations.
+
+## Services & state
+
+- Expose **readonly signals** (`asReadonly()`) from services; mutate only inside the service.
+- Prefer feature-scoped services over god services. Put shared HTTP in existing `ApiService` / feature services.
+- Keep error, loading, empty, and success states explicit — do not hide failures in empty `catch` / swallowed streams.
+
+## Lifecycle & cleanup
+
+- Clean up subscriptions, listeners, intervals, and chart/widget instances with `DestroyRef` + `takeUntilDestroyed()` or explicit teardown in `ngOnDestroy` / destroy callbacks.
+- For dialogs and routed components, cancel in-flight HTTP when the view closes or inputs change (`switchMap`, resource reload, or abort).
+- Do not read signal-producing async work in ways that create request races; identify producers, readiness, and cancellation before editing race-prone code.
+
+## Testing
+
+- Use the repo test runner (Vitest via `ng test`). Prefer behavior tests over private implementation details.
+- After signal/OnPush updates in tests, call `fixture.detectChanges()` / `whenStable()` as needed.
+- Update tests when behavior changes; add regression coverage for bugs you fix.
+
+## Anti-patterns
+
+- `BehaviorSubject` for simple local UI state → use `signal`.
+- Manual `subscribe()` + mutable fields for template data → `toSignal` / resources.
+- Effects that set other signals to “keep them in sync” → `computed` / `linkedSignal`.
+- `any`, non-null assertions, or `JSON.stringify(error).includes(...)` for control flow.
+- Broad refactors (full signal migration, zoneless flip) unless the task asks for them.

@@ -4,7 +4,7 @@ import { ActivatedRouteSnapshot, Router, UrlTree } from '@angular/router';
 import { firstValueFrom, Observable } from 'rxjs';
 
 import { authGuard } from './auth.guard';
-import { AuthService } from '../services/auth.service';
+import { AuthService } from '@services/auth.service';
 
 describe('authGuard', () => {
   let currentUser: ReturnType<typeof signal<unknown>>;

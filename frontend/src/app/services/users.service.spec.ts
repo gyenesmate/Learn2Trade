@@ -4,7 +4,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Mock } from 'vitest';
 import { UsersService } from './users.service';
 import { AuthService } from './auth.service';
-import { UserMe } from '../const/models';
+import { UserMe } from '@const/models';
 
 describe('UsersService', () => {
   let service: UsersService;

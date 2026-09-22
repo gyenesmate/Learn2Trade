@@ -10,7 +10,7 @@
     margin-bottom: 2rem;
 
     h1 {
-      color: var(--text-primary);
+      color: var(--color-text-primary);
       margin: 0;
     }
   }
@@ -24,7 +24,7 @@
           display: block;
           margin-bottom: 0.5rem;
           font-weight: 500;
-          color: var(--text-primary);
+          color: var(--color-text-primary);
         }
 
         .input {
@@ -33,7 +33,7 @@
           border: 1px solid var(--border-color);
           border-radius: 4px;
           background-color: var(--bg-secondary);
-          color: var(--text-primary);
+          color: var(--color-text-primary);
           font-size: 1rem;
 
           &:focus {

@@ -3,10 +3,10 @@ import { ToastrService } from 'ngx-mat-toast';
 import { signal } from '@angular/core';
 
 import { CryptoCardComponent } from './crypto-card.component';
-import { AuthService } from '../../../services/auth.service';
-import { WatchlistSubscriptionsService } from '../../../services/watchlist-subscriptions.service';
-import { NotificationService } from '../../../services/notification.service';
-import { CryptoCurrency } from '../../../const/models';
+import { AuthService } from '@services/auth.service';
+import { WatchlistSubscriptionsService } from '@services/watchlist-subscriptions.service';
+import { NotificationService } from '@services/notification.service';
+import { CryptoCurrency } from '@const/models';
 
 describe('CryptoCardComponent', () => {
   let component: CryptoCardComponent;

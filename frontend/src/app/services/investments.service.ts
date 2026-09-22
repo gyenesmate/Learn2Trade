@@ -1,9 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
-import { Investment } from '../const/models';
-import { ApiService } from '../core/api.service';
-import { toNumber, toNumberOrNull } from '../core/number.util';
+import { Investment } from '@const/models';
+import { ApiService } from '@core/api.service';
+import { toNumber, toNumberOrNull } from '@core/number.util';
 import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })

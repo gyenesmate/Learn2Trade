@@ -11,18 +11,18 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { map } from 'rxjs';
-import { CryptoCurrency, Investment, PriceAlert } from '../../../const/models';
-import { CryptoCurrenciesService } from '../../../services/crypto-currencies.service';
-import { CryptoCardComponent } from '../../shared/crypto-card/crypto-card.component';
+import { CryptoCurrency, Investment, PriceAlert } from '@const/models';
+import { CryptoCurrenciesService } from '@services/crypto-currencies.service';
+import { CryptoCardComponent } from '@shared/crypto-card/crypto-card.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { InvestDialogComponent, InvestDialogResult } from '../../shared/invest-dialog/invest-dialog.component';
-import { AuthService } from '../../../services/auth.service';
-import { InvestmentsService } from '../../../services/investments.service';
-import { NotificationService } from '../../../services/notification.service';
-import { ActiveInvestmentComponent } from '../../shared/active-investment/active-investment.component';
-import { SetPriceAlertDialogComponent, SetPriceAlertDialogResult } from '../../shared/set-price-alert-dialog/set-price-alert-dialog.component';
-import { PriceAlertsService } from '../../../services/price-alerts.service';
-import { FiredAlertsWidgetComponent } from '../../shared/fired-alerts-widget/fired-alerts-widget.component';
+import { InvestDialogComponent, InvestDialogResult } from '@shared/invest-dialog/invest-dialog.component';
+import { AuthService } from '@services/auth.service';
+import { InvestmentsService } from '@services/investments.service';
+import { NotificationService } from '@services/notification.service';
+import { ActiveInvestmentComponent } from '@shared/active-investment/active-investment.component';
+import { SetPriceAlertDialogComponent, SetPriceAlertDialogResult } from '@shared/set-price-alert-dialog/set-price-alert-dialog.component';
+import { PriceAlertsService } from '@services/price-alerts.service';
+import { FiredAlertsWidgetComponent } from '@shared/fired-alerts-widget/fired-alerts-widget.component';
 
 @Component({
   selector: 'app-crypto-detail-page',

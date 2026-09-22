@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { Investment, CryptoCurrency } from '../../../const/models';
+import { Investment, CryptoCurrency } from '@const/models';
 
 @Component({
   selector: 'app-active-investment',

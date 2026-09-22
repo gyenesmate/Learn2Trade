@@ -1,4 +1,4 @@
-// Angular Material theme — TradeLab colors + Space Mono
+// Angular Material theme — trading blue + compact density
 @use 'sass:list';
 @use '@angular/material' as mat;
 @use 'sass:map';
@@ -13,8 +13,8 @@
     @include mat.theme(
       (
         color: (
-          primary: mat.$spring-green-palette,
-          tertiary: mat.$violet-palette,
+          primary: mat.$azure-palette,
+          tertiary: mat.$green-palette,
           theme-type: dark,
         ),
         typography: (
@@ -24,7 +24,7 @@
           medium-weight: typography.$weight-semibold,
           regular-weight: typography.$weight-regular,
         ),
-        density: 0,
+        density: -1,
       )
     );
 
@@ -32,26 +32,26 @@
       primary: map.get(colors.$primary, main),
       on-primary: map.get(colors.$dark, on-primary),
       primary-container: map.get(colors.$primary, dark),
-      on-primary-container: map.get(colors.$neutral, 80),
+      on-primary-container: map.get(colors.$text, primary),
       secondary: map.get(colors.$secondary, main),
-      on-secondary: map.get(colors.$neutral, 90),
-      secondary-container: #312e81,
-      tertiary: map.get(colors.$secondary, main),
-      on-tertiary: map.get(colors.$neutral, 90),
-      error: map.get(colors.$semantic, error),
-      on-error: map.get(colors.$neutral, 90),
+      on-secondary: #ffffff,
+      secondary-container: map.get(colors.$neutral, 20),
+      tertiary: map.get(colors.$semantic, success),
+      on-tertiary: #ffffff,
+      error: map.get(colors.$semantic, danger),
+      on-error: #ffffff,
       background: map.get(colors.$neutral, 0),
-      on-background: map.get(colors.$neutral, 80),
+      on-background: map.get(colors.$text, primary),
       surface: map.get(colors.$neutral, 10),
-      on-surface: map.get(colors.$neutral, 80),
-      on-surface-variant: map.get(colors.$neutral, 50),
+      on-surface: map.get(colors.$text, primary),
+      on-surface-variant: map.get(colors.$text, secondary),
       surface-container: map.get(colors.$neutral, 20),
       surface-container-low: map.get(colors.$neutral, 10),
       surface-container-high: map.get(colors.$neutral, 20),
       surface-container-highest: map.get(colors.$neutral, 30),
       outline: map.get(colors.$neutral, 30),
-      outline-variant: map.get(colors.$neutral, 30),
-      inverse-surface: map.get(colors.$neutral, 80),
+      outline-variant: map.get(colors.$neutral, 40),
+      inverse-surface: map.get(colors.$text, primary),
       inverse-on-surface: map.get(colors.$neutral, 0),
       inverse-primary: map.get(colors.$primary, dark),
       corner-extra-small: map.get(radius.$scale, xs),
@@ -60,33 +60,34 @@
       corner-large: map.get(radius.$scale, xl),
       corner-extra-large: map.get(radius.$scale, 2xl),
       body-large-size: map.get(map.get(typography.$scale, body-lg), size),
-      body-large-line-height: 1.6,
+      body-large-line-height: 1.5,
       body-medium-size: map.get(map.get(typography.$scale, body), size),
-      body-medium-line-height: 1.6,
+      body-medium-line-height: 1.43,
       body-small-size: map.get(map.get(typography.$scale, caption), size),
       body-small-line-height: 1.5,
       headline-large-size: map.get(map.get(typography.$scale, h1), size),
-      headline-large-line-height: 1.3,
-      headline-large-weight: typography.$weight-bold,
+      headline-large-line-height: 1.33,
+      headline-large-weight: typography.$weight-semibold,
       headline-medium-size: map.get(map.get(typography.$scale, h2), size),
-      headline-medium-line-height: 1.4,
+      headline-medium-line-height: 1.44,
       headline-medium-weight: typography.$weight-semibold,
       headline-small-size: map.get(map.get(typography.$scale, h3), size),
-      headline-small-line-height: 1.4,
+      headline-small-line-height: 1.43,
       headline-small-weight: typography.$weight-semibold,
       display-small-size: map.get(map.get(typography.$scale, display), size),
       display-small-line-height: 1.2,
-      display-small-weight: typography.$weight-bold,
+      display-small-weight: typography.$weight-semibold,
       label-small-size: map.get(map.get(typography.$scale, overline), size),
-      label-small-line-height: 1.5,
+      label-small-line-height: 1.45,
     ));
   }
 
-  body.theme-light {
+  body.theme-light,
+  [data-theme='light'] {
     color-scheme: light;
 
     @include mat.theme-overrides((
-      primary: map.get(colors.$primary, dark),
+      primary: map.get(colors.$primary, main),
       on-primary: #ffffff,
       background: map.get(colors.$light, bg),
       on-background: map.get(colors.$light, text),
@@ -95,11 +96,12 @@
       on-surface-variant: map.get(colors.$light, muted),
       surface-container: #ffffff,
       outline: map.get(colors.$light, border),
-      outline-variant: map.get(colors.$light, border),
+      outline-variant: map.get(colors.$light, border-strong),
     ));
   }
 
-  body.theme-dark {
+  body.theme-dark,
+  [data-theme='dark'] {
     color-scheme: dark;
   }
 }
