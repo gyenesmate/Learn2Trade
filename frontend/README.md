@@ -8,7 +8,9 @@ Project definitions and coding standards live in:
 
 - **`.cursor/rules/`** — always-on rules (Angular, Material, Learn2Trade project map)
 - **`.cursor/commands/`** — reusable AI commands (e.g. `/code-review`)
-- **`docs/`** — project and feature descriptions (start with `docs/TRADING_UI_CONTEXT.md` for UI)
+- **`docs/FILE_STRUCTURES.md`** — folder layout and file-placement rules
+- **`docs/Learn2Trade.md`** — architecture overview
+- **`docs/TRADING_UI_CONTEXT.md`** — trading UI design system
 - **`agents.md`** — how AI agents should work in this frontend
 
 Read those before changing architecture, styling, or feature behavior.

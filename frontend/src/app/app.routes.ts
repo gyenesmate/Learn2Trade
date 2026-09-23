@@ -1,64 +1,90 @@
 import { Routes } from '@angular/router';
-import { authGuard } from '@guards/auth.guard';
-import { adminGuard } from '@guards/admin.guard';
+import { authGuard } from '@core/guards/auth.guard';
+import { adminGuard } from '@core/guards/admin.guard';
+import { BaseLayoutComponent } from '@core/layout/base-layout/base-layout.component';
 
 export const routes: Routes = [
-  { path: '', redirectTo: '/home', pathMatch: 'full' },
   {
-    path: 'dashboard',
-    loadComponent: () => import('@components/pages/dashboard/dashboard.component').then(m => m.DashboardComponent),
-    canActivate: [authGuard]
+    path: '',
+    component: BaseLayoutComponent,
+    children: [
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('@features/dashboard/dashboard.component').then((m) => m.DashboardComponent),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'home',
+        loadComponent: () =>
+          import('@features/markets/markets.component').then((m) => m.MarketsComponent),
+      },
+      {
+        path: 'profile',
+        loadComponent: () =>
+          import('@features/portfolio/portfolio.component').then((m) => m.PortfolioComponent),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'edit-profile',
+        loadComponent: () =>
+          import('@features/portfolio/edit-profile/edit-profile.component').then(
+            (m) => m.EditProfileComponent
+          ),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('@features/auth/login/login.component').then((m) => m.LoginComponent),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'banned',
+        loadComponent: () =>
+          import('@features/auth/banned/banned.component').then((m) => m.BannedComponent),
+      },
+      {
+        path: 'register',
+        loadComponent: () =>
+          import('@features/auth/register/register.component').then((m) => m.RegisterComponent),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'crypto/:id',
+        loadComponent: () =>
+          import('@features/trading/trading.component').then((m) => m.TradingComponent),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'admin/crypto-currencies/new',
+        loadComponent: () =>
+          import('@features/markets/components/crypto-currency-edit/crypto-currency-edit.component').then(
+            (m) => m.CryptoCurrencyEditComponent
+          ),
+        canActivate: [authGuard, adminGuard],
+      },
+      {
+        path: 'admin/crypto-currencies/:id/edit',
+        loadComponent: () =>
+          import('@features/markets/components/crypto-currency-edit/crypto-currency-edit.component').then(
+            (m) => m.CryptoCurrencyEditComponent
+          ),
+        canActivate: [authGuard, adminGuard],
+      },
+      {
+        path: 'testing-ground',
+        loadComponent: () =>
+          import('@features/system/testing-ground/testing-ground.component').then(
+            (m) => m.TestingGroundComponent
+          ),
+      },
+      {
+        path: '**',
+        loadComponent: () =>
+          import('@features/system/not-found/not-found.component').then((m) => m.NotFoundComponent),
+      },
+    ],
   },
-  {
-    path: 'home',
-    loadComponent: () => import('@components/pages/home-page/home-page.component').then(m => m.HomePageComponent),
-    canActivate: []
-  },
-  {
-    path: 'profile',
-    loadComponent: () => import('@components/pages/profile-page/profile-page.component').then(m => m.ProfilePageComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'edit-profile',
-    loadComponent: () => import('@components/pages/edit-profile-page/edit-profile-page.component').then(m => m.EditProfilePageComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'login',
-    loadComponent: () => import('@components/pages/login-page/login-page.component').then(m => m.LoginPageComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'banned',
-    loadComponent: () => import('@components/pages/banned-page/banned-page.component').then(m => m.BannedPageComponent)
-  },
-  {
-    path: 'register',
-    loadComponent: () => import('@components/pages/register-page/register-page.component').then(m => m.RegisterPageComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'crypto/:id',
-    loadComponent: () => import('@components/pages/crypto-detail-page/crypto-detail-page.component').then(m => m.CryptoDetailPageComponent),
-    canActivate: [authGuard]
-  },
-  {
-    path: 'admin/crypto-currencies/new',
-    loadComponent: () => import('@components/pages/crypto-currency-edit-page/crypto-currency-edit-page.component').then(m => m.CryptoCurrencyEditPageComponent),
-    canActivate: [authGuard, adminGuard]
-  },
-  {
-    path: 'admin/crypto-currencies/:id/edit',
-    loadComponent: () => import('@components/pages/crypto-currency-edit-page/crypto-currency-edit-page.component').then(m => m.CryptoCurrencyEditPageComponent),
-    canActivate: [authGuard, adminGuard]
-  },
-  {
-    path: 'testing-ground',
-    loadComponent: () => import('@components/pages/testing-ground/testing-ground.component').then(m => m.TestingGroundComponent)
-  },
-  {
-    path: '**',
-    loadComponent: () => import('@components/pages/not-found-page/not-found-page.component').then(m => m.NotFoundPageComponent)
-  }
 ];

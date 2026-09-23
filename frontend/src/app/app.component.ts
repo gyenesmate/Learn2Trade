@@ -1,11 +1,10 @@
 import { Component, ChangeDetectionStrategy, OnInit, inject } from '@angular/core';
-import { NavigationComponent } from '@shared/navigation/navigation.component';
-import { FiredAlertsWidgetComponent } from '@shared/fired-alerts-widget/fired-alerts-widget.component';
-import { PriceAlertsService } from '@services/price-alerts.service';
+import { RouterOutlet } from '@angular/router';
+import { PriceAlertsService } from '@core/services/price-alerts.service';
 
 @Component({
   selector: 'app-root',
-  imports: [NavigationComponent, FiredAlertsWidgetComponent],
+  imports: [RouterOutlet],
   templateUrl: './app.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './app.component.scss',
@@ -16,6 +15,7 @@ export class AppComponent implements OnInit {
   title = 'cryptowatcher-app';
 
   ngOnInit(): void {
+    // Start background alert polling for the current user (layout hosts the widget UI).
     this.priceAlerts.start();
   }
 }

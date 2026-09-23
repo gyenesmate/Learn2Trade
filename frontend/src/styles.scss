@@ -1,14 +1,14 @@
 @use './styles/tokens';
 @use './styles/theme';
-@use './styles/material';
+@use './styles/material-overrides';
 @use './styles/base';
 @use './styles/components';
-@use './styles/utilities';
+@use './styles/tailwind';
 @use './styles/fonts';
 
 @include tokens.properties;
 @include theme.apply;
-@include material.overrides;
+@include material-overrides.overrides;
 @include base.reset;
 @include components.primitives;
-@include utilities.helpers;
+@include tailwind.helpers;

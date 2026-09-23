@@ -1,0 +1,29 @@
+.app-layout {
+  height: 100vh;
+  background: var(--color-background);
+}
+
+.app-layout__sidebar {
+  width: 220px;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+}
+
+.app-layout__body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  background: var(--color-background);
+}
+
+.app-layout__content {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: var(--space-md);
+  overflow: auto;
+
+  &--mobile {
+    padding-bottom: calc(var(--space-md) + 56px);
+  }
+}

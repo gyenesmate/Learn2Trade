@@ -9,7 +9,8 @@ These instructions apply to every AI agent working in the **Learn2Trade frontend
 | [`.cursor/rules/learn2trade.mdc`](./.cursor/rules/learn2trade.mdc) | Project map, where code/docs live |
 | [`.cursor/rules/angular-expert.mdc`](./.cursor/rules/angular-expert.mdc) | Angular 22+ patterns (signals, inject, RxJS, templates) |
 | [`.cursor/rules/material-expert.mdc`](./.cursor/rules/material-expert.mdc) | Angular Material theming and components |
-| [`docs/`](./docs/) | Feature and architecture descriptions (prefer over legacy notes) |
+| [`docs/FILE_STRUCTURES.md`](./docs/FILE_STRUCTURES.md) | Folder layout and file-placement rules |
+| [`docs/TRADING_UI_CONTEXT.md`](./docs/TRADING_UI_CONTEXT.md) | Trading UI design system |
 | [`.cursor/commands/code-review.md`](./.cursor/commands/code-review.md) | Branch review against the expert rules |
 
 Always-on Cursor rules under `.cursor/rules/` apply automatically. Prefer them over inventing new conventions.
@@ -42,9 +43,9 @@ Do not modernize working code merely because a newer API exists unless it is in 
 
 1. Read the task completely.
 2. Confirm Angular, Material, RxJS, and test tooling versions from `package.json`.
-3. Inspect `angular.json`, `tsconfig` path aliases, and bootstrap/config when relevant.
+3. Inspect `angular.json`, `tsconfig` path aliases (`@core`, `@shared`, `@features`), and bootstrap/config when relevant.
 4. Read the full target file and related templates, styles, services, guards, and tests.
-5. Use the project map in `learn2trade.mdc`; check `docs/` / future `docs/features/` for the feature.
+5. Use `docs/FILE_STRUCTURES.md` for placement; check `docs/` for the feature.
 6. Prefer an existing pattern in the repo over a new one.
 7. Identify root cause before patching symptoms (especially races, auth, lifecycle).
 

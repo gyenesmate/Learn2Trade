@@ -1,0 +1,44 @@
+<div class="sidebar__brand">
+  <mat-icon class="sidebar__logo" aria-hidden="true">candlestick_chart</mat-icon>
+  <span class="sidebar__wordmark">Learn2Trade</span>
+</div>
+
+<mat-nav-list class="sidebar__nav">
+  @if (isLoggedIn()) {
+    <a
+      mat-list-item
+      (click)="navigateTo('/dashboard')"
+      [class.active]="isActive('/dashboard')"
+    >
+      <mat-icon matListItemIcon>dashboard</mat-icon>
+      <span matListItemTitle>Dashboard</span>
+    </a>
+  }
+  <a mat-list-item (click)="navigateTo('/home')" [class.active]="isActive('/home')">
+    <mat-icon matListItemIcon>home</mat-icon>
+    <span matListItemTitle>Markets</span>
+  </a>
+  @if (isLoggedIn()) {
+    <a
+      mat-list-item
+      (click)="navigateTo('/profile')"
+      [class.active]="isActive('/profile')"
+    >
+      <mat-icon matListItemIcon>account_balance_wallet</mat-icon>
+      <span matListItemTitle>Portfolio</span>
+    </a>
+  }
+</mat-nav-list>
+
+<div class="sidebar__footer">
+  @if (!isLoggedIn()) {
+    <a mat-list-item (click)="navigateTo('/login')" [class.active]="isActive('/login')">
+      <mat-icon matListItemIcon>login</mat-icon>
+      <span matListItemTitle>Login</span>
+    </a>
+    <a mat-list-item (click)="navigateTo('/register')" [class.active]="isActive('/register')">
+      <mat-icon matListItemIcon>person_add</mat-icon>
+      <span matListItemTitle>Register</span>
+    </a>
+  }
+</div>

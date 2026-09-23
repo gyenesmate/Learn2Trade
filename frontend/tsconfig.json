@@ -19,13 +19,9 @@
     "module": "ES2022",
     "paths": {
       "@styles/*": ["./src/styles/*"],
-      "@components/*": ["./src/app/components/*"],
-      "@const/*": ["./src/app/const/*"],
       "@core/*": ["./src/app/core/*"],
-      "@env/*": ["./src/app/env/*"],
-      "@guards/*": ["./src/app/guards/*"],
-      "@services/*": ["./src/app/services/*"],
-      "@shared/*": ["./src/app/components/shared/*"]
+      "@shared/*": ["./src/app/shared/*"],
+      "@features/*": ["./src/app/features/*"]
     }
   },
   "angularCompilerOptions": {

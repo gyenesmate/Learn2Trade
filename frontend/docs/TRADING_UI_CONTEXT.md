@@ -11,11 +11,13 @@ This repo implements the design language with **Angular 22 + Angular Material + 
 | Spec concept | Learn2Trade location |
 | --- | --- |
 | Design tokens / CSS variables | `src/styles/_tokens.scss`, `_colors.scss`, `_spacing.scss`, `_radius.scss`, `_elevation.scss`, `_typography.scss` |
-| Material theme + overrides | `src/styles/_theme.scss`, `_material.scss` |
-| Semantic utilities / panels / trade buttons | `src/styles/_utilities.scss`, `_components.scss` |
+| Material theme + overrides | `src/styles/theme.scss`, `_material-overrides.scss` |
+| Semantic utilities / panels / trade buttons | `src/styles/_utilities.scss`, `_components.scss`, `tailwind.scss` |
 | Global reset / focus / scrollbars | `src/styles/_base.scss` |
-| App shell (sidebar + topbar) | `src/app/components/shared/navigation/` |
-| Shared UI primitives | `src/app/components/shared/` (`panel`, `status-chip`, `data-table`, …) |
+| App shell (sidebar + navbar) | `src/app/core/layout/` (`base-layout`, `sidebar`, `navbar`) |
+| Shared UI primitives | `src/app/shared/components/` |
+| Features | `src/app/features/` |
+| Structure / placement rules | `docs/FILE_STRUCTURES.md` |
 | Cursor / agent rules | `.cursor/rules/`, `agents.md` |
 
 **Do not add Tailwind** unless explicitly requested. Prefer semantic SCSS classes (`app-panel`, `text-profit`, `trade-buy-button`) over arbitrary colors.
@@ -140,10 +142,11 @@ Light is not a simple invert — keep contrast between page, panels, controls, a
 src/styles/
 ├── _tokens.scss          # CSS variables
 ├── _colors.scss          # Sass maps feeding tokens + Material
-├── _theme.scss           # mat.theme + system overrides
-├── _material.scss        # mat.*-overrides (centralized)
+├── theme.scss            # mat.theme + system overrides
+├── _material-overrides.scss
 ├── _components.scss      # buttons, cards, tags, trade actions
 ├── _utilities.scss       # app-panel, text-*, tabular-nums, layout helpers
+├── tailwind.scss         # semantic helpers entry (SCSS — not Tailwind CSS)
 ├── _base.scss
 ├── _typography.scss
 ├── _spacing.scss         # 4px base scale
@@ -320,7 +323,7 @@ Order book: Price / Size / Total; asks = danger, bids = success; depth as low-op
 
 Material provides behavior/a11y/overlays. App theme provides look.
 
-Centralize overrides in `_material.scss` via `mat.*-overrides`. No `::ng-deep` sprawl. Prefer density for compact trading controls.
+Centralize overrides in `_material-overrides.scss` via `mat.*-overrides`. Prefer density for compact trading controls. Avoid `::ng-deep` sprawl.
 
 Override buttons, form fields, select, menu (~36–40px items), tabs, table, paginator, dialog, snackbar (bottom-right).
 
@@ -348,7 +351,7 @@ Override buttons, form fields, select, menu (~36–40px items), tabs, table, pag
 Design tokens → Global theme → Reusable UI primitives → Feature components → Pages
 ```
 
-Future folders (when features grow): `layout/`, `features/{dashboard,markets,trading,portfolio,orders}/`. Until then, keep primitives under `components/shared/` and pages under `components/pages/`.
+Layout and shared primitives live under `core/layout/` and `shared/components/`; features under `features/`. See `docs/FILE_STRUCTURES.md`.
 
 Shared UI: appearance & interaction. Feature code: domain, API, trading logic.
 

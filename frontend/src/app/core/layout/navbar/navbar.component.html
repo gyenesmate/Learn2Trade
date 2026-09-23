@@ -1,0 +1,101 @@
+<mat-toolbar class="toolbar" [class.mobile-toolbar]="isMobile()">
+  <button
+    mat-icon-button
+    type="button"
+    class="menu-button"
+    (click)="menuToggle.emit()"
+    aria-label="Toggle sidebar"
+    matTooltip="Toggle sidebar"
+  >
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <span class="app-title">Learn2Trade</span>
+
+  <span class="spacer"></span>
+
+  <button
+    mat-icon-button
+    type="button"
+    (click)="toggleTheme()"
+    [attr.aria-label]="isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
+    [matTooltip]="isDark() ? 'Light theme' : 'Dark theme'"
+  >
+    <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+  </button>
+
+  @if (isLoggedIn()) {
+    @if (user(); as u) {
+      <div class="user-info">
+        @if (!isMobile()) {
+          <span class="balance tabular-nums">${{ u.balance }}</span>
+          <span class="username">{{ u.username }}</span>
+        }
+        <button
+          mat-icon-button
+          type="button"
+          [matMenuTriggerFor]="userMenu"
+          aria-label="User menu"
+        >
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item type="button" (click)="navigateTo('/profile')">
+            <mat-icon>person</mat-icon>
+            Profile
+          </button>
+          <button mat-menu-item type="button" (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            Logout
+          </button>
+        </mat-menu>
+      </div>
+    }
+  }
+</mat-toolbar>
+
+@if (isMobile()) {
+  <nav class="bottom-nav" aria-label="Primary">
+    @if (isLoggedIn()) {
+      <button
+        type="button"
+        class="nav-item"
+        (click)="navigateTo('/dashboard')"
+        [class.active]="isActive('/dashboard')"
+      >
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashboard</span>
+      </button>
+    }
+    <button
+      type="button"
+      class="nav-item"
+      (click)="navigateTo('/home')"
+      [class.active]="isActive('/home')"
+    >
+      <mat-icon>home</mat-icon>
+      <span>Markets</span>
+    </button>
+    @if (isLoggedIn()) {
+      <button
+        type="button"
+        class="nav-item"
+        (click)="navigateTo('/profile')"
+        [class.active]="isActive('/profile')"
+      >
+        <mat-icon>account_balance_wallet</mat-icon>
+        <span>Portfolio</span>
+      </button>
+    } @else {
+      <button
+        type="button"
+        class="nav-item"
+        (click)="navigateTo('/login')"
+        [class.active]="isActive('/login')"
+      >
+        <mat-icon>login</mat-icon>
+        <span>Login</span>
+      </button>
+    }
+  </nav>
+}

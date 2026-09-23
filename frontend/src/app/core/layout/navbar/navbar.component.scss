@@ -1,0 +1,92 @@
+.toolbar {
+  height: 56px;
+  background: var(--color-surface) !important;
+  color: var(--color-text-primary);
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: none;
+  position: sticky;
+  top: 0;
+  z-index: var(--z-index-sticky);
+
+  &.mobile-toolbar {
+    position: sticky;
+  }
+}
+
+.menu-button {
+  margin-right: var(--space-xs);
+}
+
+.app-title {
+  font-family: var(--font-family-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.balance {
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-primary);
+}
+
+.username {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: var(--space-xxs) 0;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  z-index: var(--z-index-sticky);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 64px;
+  min-height: 44px;
+  padding: var(--space-xxs);
+  border: none;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-text-muted);
+  transition: background var(--transition-fast), color var(--transition-fast);
+
+  &:hover,
+  &.active {
+    color: var(--color-primary);
+    background: rgba(59, 130, 246, 0.12);
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  span {
+    font-size: 10px;
+    font-weight: var(--font-weight-medium);
+  }
+}

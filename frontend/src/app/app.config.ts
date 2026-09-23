@@ -5,8 +5,8 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { provideNgxMatToast } from 'ngx-mat-toast';
 
 import { routes } from './app.routes';
-import { authInterceptor } from '@core/auth.interceptor';
-import { AuthService } from '@services/auth.service';
+import { authInterceptor } from '@core/services/auth.interceptor';
+import { AuthService } from '@core/services/auth.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -19,8 +19,8 @@ export const appConfig: ApplicationConfig = {
       position: { horizontal: 'end', vertical: 'bottom' },
       preventDuplicates: true,
       progressBar: true,
-      closeable: true
+      closeable: true,
     }),
     provideAppInitializer(() => inject(AuthService).bootstrap()),
-  ]
+  ],
 };

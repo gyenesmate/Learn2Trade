@@ -1,0 +1,56 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 56px;
+  padding: 0 var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sidebar__logo {
+  color: var(--color-primary);
+}
+
+.sidebar__wordmark {
+  font-family: var(--font-family-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.sidebar__nav {
+  padding: var(--space-sm) var(--space-xs);
+}
+
+.sidebar__footer {
+  margin-top: auto;
+  padding: var(--space-sm) var(--space-xs);
+  border-top: 1px solid var(--color-border);
+}
+
+:host ::ng-deep a.mat-mdc-list-item {
+  height: 40px;
+  margin-bottom: 4px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+}
+
+:host ::ng-deep a.mat-mdc-list-item:hover {
+  background: var(--color-surface-hover);
+  color: var(--color-text-primary);
+}
+
+:host ::ng-deep a.mat-mdc-list-item.active {
+  background: rgba(59, 130, 246, 0.14);
+  color: var(--color-primary);
+}
+
+:host ::ng-deep a.mat-mdc-list-item.active .mat-icon {
+  color: var(--color-primary);
+}

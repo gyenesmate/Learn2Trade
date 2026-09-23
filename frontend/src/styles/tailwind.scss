@@ -1,0 +1,8 @@
+// Semantic utility / layout helpers.
+// This project does not use the Tailwind CSS framework. Helpers live here so the
+// architecture matches docs (tailwind.scss) while remaining pure SCSS.
+@use 'utilities';
+
+@mixin helpers {
+  @include utilities.helpers;
+}

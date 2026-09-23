@@ -15,9 +15,9 @@ Project theme lives under `src/styles/`:
 | --- | --- |
 | `_tokens.scss` | App design tokens / CSS variables |
 | `_colors.scss`, `_typography.scss`, `_radius.scss`, `_spacing.scss`, `_elevation.scss`, `_motion.scss`, `_fonts.scss` | Primitive scales |
-| `_theme.scss` | `mat.theme` + `mat.theme-overrides` |
-| `_material.scss` | `mat.*-overrides` for components |
-| `_components.scss`, `_base.scss`, `_utilities.scss` | App-level styles |
+| `theme.scss` | `mat.theme` + system overrides |
+| `_material-overrides.scss` | `mat.*-overrides` for components |
+| `_components.scss`, `_base.scss`, `_utilities.scss`, `tailwind.scss` | App-level styles / semantic helpers |
 
 When changing look-and-feel, prefer tokens and these files over one-off component hacks.
 
@@ -48,7 +48,7 @@ html {
 **Do**
 
 - Use Material components and CDK primitives (`Dialog`, `Overlay`, a11y, table, form-field) instead of reinventing behavior.
-- Prefer outlined/filled variants and density already configured in `_material.scss` (compact trading density `-1`).
+- Prefer outlined/filled variants and density already configured in `_material-overrides.scss` (compact trading density `-1`).
 - Keep dialogs as focused Material dialogs; reuse existing shared dialogs when possible.
 - Preserve accessibility: labels, `aria-*`, focus management, contrast against dark/light trading themes.
 - Align custom surfaces with Material system roles and app tokens (`--color-surface`, `--color-primary`, etc.).
@@ -63,7 +63,7 @@ html {
 
 ## Components & patterns in this app
 
-- Prefer existing shared building blocks under `src/app/components/shared/` before new Material composites.
+- Prefer existing shared building blocks under `src/app/shared/components/` before new Material composites.
 - Forms: `mat-form-field` + reactive forms; match existing appearance (outline/fill) from nearby screens.
 - Feedback: use the project notification/toast approach (`ngx-mat-toast` / `NotificationService`) instead of inventing another snackbar path.
 - Tables: prefer the shared `data-table` patterns and Material table/sort/paginator conventions already in use.
@@ -73,4 +73,4 @@ html {
 
 - Theme token changes belong in `src/styles`, not scattered component SCSS, unless the style is truly local layout.
 - Component SCSS should handle layout/spacing composition; color/shape should come from tokens / Material overrides when shared.
-- After Material or theme edits, sanity-check key surfaces: login, dashboard, dialogs, navigation, form fields, buttons.
+- After Material or theme edits, sanity-check key surfaces: login, dashboard, dialogs, sidebar/navbar, form fields, buttons.
