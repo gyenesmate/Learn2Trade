@@ -1,8 +1,19 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  width: 100%;
+}
+
 .register-page {
-  min-height: 100vh;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
   background: linear-gradient(135deg, var(--color-bg) 0%, var(--color-surface) 100%);
   padding: var(--space-md);
 }
@@ -11,17 +22,20 @@
   background-color: var(--color-surface);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
-  padding: var(--space-xxl);
+  border: 1px solid var(--color-border);
+  padding: var(--space-xl);
   width: 100%;
   max-width: 500px;
+  max-height: 100%;
+  overflow: auto;
 }
 
 .register-header {
   text-align: center;
-  margin-bottom: var(--space-xl);
+  margin-bottom: var(--space-lg);
 
   h1 {
-    font-size: var(--font-size-xxl);
+    font-size: var(--font-size-xl);
     color: var(--color-primary);
     margin-bottom: var(--space-sm);
   }
@@ -35,12 +49,6 @@
 .register-form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-lg);
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: var(--space-md);
 }
 
@@ -51,38 +59,21 @@
 }
 
 .form-label {
-  font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text);
-}
-
-.checkbox-label {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--space-xs);
-  cursor: pointer;
-  line-height: 1.4;
-}
-
-.terms-link {
-  color: var(--color-primary);
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
 }
 
 .register-btn {
   width: 100%;
-  padding: var(--space-md);
-  font-size: var(--font-size-lg);
-  margin-top: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  font-size: var(--font-size-sm);
+  margin-top: var(--space-xs);
 }
 
 .register-footer {
   text-align: center;
-  margin-top: var(--space-xl);
-  padding-top: var(--space-lg);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-md);
   border-top: 1px solid var(--color-border);
 
   p {
@@ -92,7 +83,7 @@
 
   .login-link {
     color: var(--color-primary);
-    font-weight: var(--font-weight-bold);
+    font-weight: var(--font-weight-semibold);
     text-decoration: none;
 
     &:hover {
@@ -102,22 +93,17 @@
 }
 
 .field-error {
-  color: var(--color-danger, #d93025);
-  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
   margin: 0;
 }
 
-// Mobile responsive
 @media (max-width: 600px) {
   .register-container {
-    padding: var(--space-lg);
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
+    padding: var(--space-md);
   }
 
   .register-header h1 {
-    font-size: var(--font-size-xl);
+    font-size: var(--font-size-lg);
   }
 }

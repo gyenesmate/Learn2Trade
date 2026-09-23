@@ -1,14 +1,15 @@
-<mat-sidenav-container class="app-layout">
-  <mat-sidenav
-    class="app-layout__sidebar"
-    [mode]="isMobile() ? 'over' : 'side'"
-    [opened]="sidenavOpen()"
-    (openedChange)="sidenavOpen.set($event)"
-  >
-    <app-sidebar (navigated)="onSidebarNavigated()" />
-  </mat-sidenav>
+<div
+  class="app-layout"
+  [class.app-layout--sidebar-collapsed]="!sidebarExpanded()"
+>
+  <aside class="app-layout__sidebar" aria-label="Application sidebar">
+    <app-sidebar
+      [collapsed]="!sidebarExpanded()"
+      (navigated)="onSidebarNavigated()"
+    />
+  </aside>
 
-  <mat-sidenav-content class="app-layout__body">
+  <div class="app-layout__body">
     <app-navbar
       [isMobile]="isMobile()"
       (menuToggle)="toggleSidenav()"
@@ -20,5 +21,5 @@
 
     <!-- TODO: Replace with Material snackbar/dialog-based alerts UI -->
     <app-fired-alerts-widget />
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  </div>
+</div>
