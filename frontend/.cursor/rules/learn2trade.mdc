@@ -30,7 +30,7 @@ Do not put sidebar/navbar in `AppComponent`. Do not use `*-page` or `app-shell` 
 - Angular + Material + CDK ^22
 - RxJS 7.8, Zone.js present
 - Vitest (`ng test`); Playwright e2e
-- Charts: `lightweight-charts`; toasts: `ngx-mat-toast`
+- Charts: `lightweight-charts`; notifications: custom `app-snackbar` stack via `NotificationService`
 
 ## Path aliases
 

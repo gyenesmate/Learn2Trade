@@ -1,5 +1,6 @@
 import { Injectable, effect, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { Subscription, firstValueFrom, timer } from 'rxjs';
 import { CryptoCurrency, PriceAlert } from '@core/models/models';
 import { ApiService } from '@core/services/api.service';
@@ -15,6 +16,7 @@ export class PriceAlertsService {
   private readonly auth = inject(AuthService);
   private readonly cryptos = inject(CryptoCurrenciesService);
   private readonly notification = inject(NotificationService);
+  private readonly router = inject(Router);
 
   readonly alerts = signal<PriceAlert[]>([]);
   readonly firedAlerts = signal<PriceAlert[]>([]);
@@ -256,12 +258,29 @@ export class PriceAlertsService {
       this.firedAlerts.update((list) => [...newlyFired, ...list]);
       for (const a of newlyFired) {
         const crypto = await this.getCryptoCached(a.crypto_currency_id);
-        const name = crypto?.symbol || a.crypto_currency_id;
-        this.notification.alert(
-          `${name}: ${a.alert_type === 'above' ? '≥' : '≤'} ${a.alert_price}${
-            a.description ? ' — ' + a.description : ''
-          }`
-        );
+        const label = crypto
+          ? `${crypto.name}${crypto.symbol ? ` (${crypto.symbol})` : ''}${
+              crypto.exchange_currency ? ` / ${crypto.exchange_currency}` : ''
+            }`
+          : a.crypto_currency_id;
+        const message = `${a.alert_type === 'above' ? '≥' : '≤'} ${a.alert_price}${
+          a.description ? ` — ${a.description}` : ''
+        }`;
+
+        this.notification.alert(message, label, [
+          {
+            label: 'View',
+            run: () => {
+              void this.router.navigate(['/crypto', a.crypto_currency_id]);
+            },
+          },
+          {
+            label: 'Stop',
+            run: () => {
+              void this.deactivate(a.id);
+            },
+          },
+        ]);
       }
     }
   }

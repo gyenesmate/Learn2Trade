@@ -1,0 +1,23 @@
+<div
+  #stack
+  class="notification-stack"
+  [class.notification-stack--scrollable]="scrollable()"
+  aria-live="polite"
+  (scroll)="onStackScroll()"
+>
+  <div class="notification-stack__fade" aria-hidden="true"></div>
+  <div #content class="notification-stack__content">
+    @for (item of items(); track item.id) {
+      <div
+        class="notification-stack__item"
+        [attr.data-snackbar-id]="item.id"
+        animate.enter="snack-enter"
+        animate.leave="snack-leave"
+      >
+        <div class="notification-stack__clip">
+          <app-snackbar [data]="item" (dismissed)="dismiss(item.id)" />
+        </div>
+      </div>
+    }
+  </div>
+</div>

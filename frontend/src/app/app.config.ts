@@ -2,7 +2,6 @@ import { ApplicationConfig, inject, provideAppInitializer, provideZoneChangeDete
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors, withXhr } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { provideNgxMatToast } from 'ngx-mat-toast';
 
 import { routes } from './app.routes';
 import { authInterceptor } from '@core/services/auth.interceptor';
@@ -14,13 +13,6 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withXhr(), withInterceptors([authInterceptor])),
     provideAnimationsAsync(),
-    provideNgxMatToast({
-      duration: 3500,
-      position: { horizontal: 'end', vertical: 'bottom' },
-      preventDuplicates: true,
-      progressBar: true,
-      closeable: true,
-    }),
     provideAppInitializer(() => inject(AuthService).bootstrap()),
   ],
 };

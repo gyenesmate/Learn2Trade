@@ -132,13 +132,6 @@
       supporting-text-color: map.get(colors.$text, primary),
       container-shape: map.get(radius.$scale, sm),
     ));
-
-    @include mat.snack-bar-overrides((
-      container-color: map.get(colors.$neutral, 20),
-      supporting-text-color: map.get(colors.$text, primary),
-      button-color: map.get(colors.$primary, main),
-      container-shape: map.get(radius.$scale, md),
-    ));
   }
 
   body.theme-light,

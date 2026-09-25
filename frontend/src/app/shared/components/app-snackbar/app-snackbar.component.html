@@ -1,0 +1,28 @@
+<div class="app-snackbar__accent" aria-hidden="true"></div>
+
+<div class="app-snackbar__content">
+  @if (data().title) {
+    <div class="app-snackbar__title">{{ data().title }}</div>
+  }
+  <div class="app-snackbar__message">{{ data().message }}</div>
+
+  @if (data().actions?.length) {
+    <div class="app-snackbar__actions">
+      @for (action of data().actions; track action.label) {
+        <button mat-button type="button" class="app-snackbar__action" (click)="run(action)">
+          {{ action.label }}
+        </button>
+      }
+    </div>
+  }
+</div>
+
+<button
+  mat-icon-button
+  type="button"
+  class="app-snackbar__close"
+  aria-label="Dismiss"
+  (click)="dismiss()"
+>
+  <mat-icon>close</mat-icon>
+</button>

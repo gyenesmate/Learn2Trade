@@ -1,47 +1,69 @@
 import { TestBed } from '@angular/core/testing';
-import { ToastrService } from 'ngx-mat-toast';
-import { Mock } from 'vitest';
+import { firstValueFrom } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 import { NotificationService } from './notification.service';
 
 describe('NotificationService', () => {
   let service: NotificationService;
-  let success: Mock;
-  let info: Mock;
-  let warning: Mock;
-  let error: Mock;
 
   beforeEach(() => {
-    success = vi.fn();
-    info = vi.fn();
-    warning = vi.fn();
-    error = vi.fn();
-
     TestBed.configureTestingModule({
-      providers: [
-        NotificationService,
-        {
-          provide: ToastrService,
-          useValue: { success, info, warning, error },
-        },
-      ],
+      providers: [NotificationService],
     });
-
     service = TestBed.inject(NotificationService);
   });
 
-  it('success/info/error call the matching toastr methods', () => {
+  it('emits success/info/warning with auto-dismiss duration', async () => {
+    const next = firstValueFrom(service.requests$.pipe(take(1)));
     service.success('ok');
-    service.info('i');
-    service.error('e');
+    await expect(next).resolves.toEqual(
+      expect.objectContaining({
+        message: 'ok',
+        title: 'Success',
+        variant: 'success',
+        duration: 3500,
+      })
+    );
 
-    expect(success).toHaveBeenCalledWith('ok', 'Success');
-    expect(info).toHaveBeenCalledWith('i', 'Info');
-    expect(error).toHaveBeenCalledWith('e', 'Error');
+    const info = firstValueFrom(service.requests$.pipe(take(1)));
+    service.info('i');
+    await expect(info).resolves.toEqual(
+      expect.objectContaining({ variant: 'info', duration: 3500 })
+    );
+
+    const warning = firstValueFrom(service.requests$.pipe(take(1)));
+    service.warning('w');
+    await expect(warning).resolves.toEqual(
+      expect.objectContaining({ variant: 'warning', duration: 3500 })
+    );
   });
 
-  it('alert uses warning with custom default title', () => {
-    service.alert('price hit');
-    expect(warning).toHaveBeenCalledWith('price hit', 'Crypto Alert');
+  it('emits error with duration 0', async () => {
+    const next = firstValueFrom(service.requests$.pipe(take(1)));
+    service.error('e');
+    await expect(next).resolves.toEqual(
+      expect.objectContaining({
+        message: 'e',
+        title: 'Error',
+        variant: 'error',
+        duration: 0,
+      })
+    );
+  });
+
+  it('emits alert with duration 0 and optional actions', async () => {
+    const actions = [{ label: 'View', run: vi.fn() }];
+    const next = firstValueFrom(service.requests$.pipe(take(1)));
+    service.alert('price hit', 'Crypto Alert', actions);
+    await expect(next).resolves.toEqual(
+      expect.objectContaining({
+        message: 'price hit',
+        title: 'Crypto Alert',
+        variant: 'alert',
+        duration: 0,
+        actions,
+      })
+    );
   });
 });

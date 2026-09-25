@@ -11,7 +11,7 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { map } from 'rxjs';
-import { CryptoCurrency, Investment, PriceAlert } from '@core/models/models';
+import { CryptoCurrency, Investment } from '@core/models/models';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { CryptoCardComponent } from '@shared/components/crypto-card/crypto-card.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -22,11 +22,10 @@ import { NotificationService } from '@core/services/notification.service';
 import { ActiveInvestmentComponent } from '@features/trading/components/active-investment/active-investment.component';
 import { SetPriceAlertDialogComponent, SetPriceAlertDialogResult } from '@features/trading/components/set-price-alert-dialog/set-price-alert-dialog.component';
 import { PriceAlertsService } from '@core/services/price-alerts.service';
-import { FiredAlertsWidgetComponent } from '@shared/components/fired-alerts-widget/fired-alerts-widget.component';
 
 @Component({
   selector: 'app-trading',
-  imports: [RouterModule, CryptoCardComponent, MatDialogModule, ActiveInvestmentComponent, FiredAlertsWidgetComponent],
+  imports: [RouterModule, CryptoCardComponent, MatDialogModule, ActiveInvestmentComponent],
   templateUrl: './trading.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./trading.component.scss']
@@ -59,14 +58,6 @@ export class TradingComponent implements OnInit {
   readonly activeInvestments = signal<Investment[]>([]);
   readonly investing = signal(false);
   readonly selling = signal(false);
-
-  readonly alertsForSelected = computed(() => {
-    const id = this.selectedId();
-    if (!id) return [] as PriceAlert[];
-    return this.priceAlerts.alerts().filter(
-      (a) => a.crypto_currency_id === id && !!a.is_active
-    );
-  });
 
   readonly card = viewChild<CryptoCardComponent>('card');
 

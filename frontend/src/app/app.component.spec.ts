@@ -1,24 +1,12 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { AppComponent } from './app.component';
-import { ToastrService } from 'ngx-mat-toast';
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [AppComponent],
-      providers: [
-        provideRouter([]),
-        {
-          provide: ToastrService,
-          useValue: {
-            success: vi.fn().mockName('ToastrService.success'),
-            info: vi.fn().mockName('ToastrService.info'),
-            warning: vi.fn().mockName('ToastrService.warning'),
-            error: vi.fn().mockName('ToastrService.error'),
-          },
-        },
-      ],
+      providers: [provideRouter([])],
     }).compileComponents();
   });
 

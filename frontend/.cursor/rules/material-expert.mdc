@@ -65,7 +65,7 @@ html {
 
 - Prefer existing shared building blocks under `src/app/shared/components/` before new Material composites.
 - Forms: `mat-form-field` + reactive forms; match existing appearance (outline/fill) from nearby screens.
-- Feedback: use the project notification/toast approach (`ngx-mat-toast` / `NotificationService`) instead of inventing another snackbar path.
+- Feedback: use `NotificationService` (`app-snackbar` stack) instead of inventing another toast path.
 - Tables: prefer the shared `data-table` patterns and Material table/sort/paginator conventions already in use.
 - Icons: use Material icons consistently with existing navigation and actions.
 

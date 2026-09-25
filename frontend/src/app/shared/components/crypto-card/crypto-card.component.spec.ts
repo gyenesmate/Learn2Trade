@@ -1,5 +1,4 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ToastrService } from 'ngx-mat-toast';
 import { signal } from '@angular/core';
 
 import { CryptoCardComponent } from './crypto-card.component';
@@ -25,15 +24,6 @@ describe('CryptoCardComponent', () => {
     await TestBed.configureTestingModule({
       imports: [CryptoCardComponent],
       providers: [
-        {
-          provide: ToastrService,
-          useValue: {
-            success: vi.fn(),
-            info: vi.fn(),
-            warning: vi.fn(),
-            error: vi.fn(),
-          },
-        },
         {
           provide: AuthService,
           useValue: {

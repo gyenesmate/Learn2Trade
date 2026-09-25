@@ -1,0 +1,79 @@
+:host {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  box-sizing: border-box;
+  width: max-content;
+  min-width: 280px;
+  max-width: min(420px, 92vw);
+  padding: 12px 8px;
+  color: var(--color-text-primary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.app-snackbar__accent {
+  flex: 0 0 3px;
+  align-self: stretch;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary);
+}
+
+:host[data-variant='success'] .app-snackbar__accent {
+  background: var(--color-success);
+}
+
+:host[data-variant='info'] .app-snackbar__accent {
+  background: var(--color-primary);
+}
+
+:host[data-variant='warning'] .app-snackbar__accent,
+:host[data-variant='alert'] .app-snackbar__accent {
+  background: var(--color-warning);
+}
+
+:host[data-variant='error'] .app-snackbar__accent {
+  background: var(--color-danger);
+}
+
+.app-snackbar__content {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 2px;
+}
+
+.app-snackbar__title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.app-snackbar__message {
+  font-size: var(--font-size-sm);
+  line-height: 1.35;
+  color: var(--color-text-secondary);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.app-snackbar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.app-snackbar__action {
+  min-width: 0;
+  padding-inline: 8px;
+}
+
+.app-snackbar__close {
+  flex: 0 0 auto;
+  margin-top: -4px;
+}

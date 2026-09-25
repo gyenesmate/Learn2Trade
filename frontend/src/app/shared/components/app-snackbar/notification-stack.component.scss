@@ -1,0 +1,196 @@
+:host {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: var(--z-index-toast);
+  display: block;
+  width: fit-content;
+  max-width: min(420px, calc(100vw - 32px));
+  pointer-events: none;
+}
+
+@property --stack-fade-size {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+.notification-stack {
+  --stack-fade-size: 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  max-height: 50vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overflow-anchor: none;
+  overscroll-behavior: contain;
+  pointer-events: auto;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* legacy Edge */
+  transition: --stack-fade-size 0.28s ease;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--stack-fade-size),
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--stack-fade-size),
+    #000 100%
+  );
+
+  &::-webkit-scrollbar {
+    display: none; /* Chromium / Safari */
+  }
+}
+
+.notification-stack--scrollable {
+  --stack-fade-size: 40px;
+}
+
+.notification-stack__fade {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  flex: 0 0 auto;
+  width: 100%;
+  height: 40px;
+  margin-bottom: -40px;
+  pointer-events: none;
+  opacity: 0;
+  backdrop-filter: blur(0);
+  -webkit-backdrop-filter: blur(0);
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--color-background) 45%, transparent),
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(to bottom, #000 10%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 10%, transparent 100%);
+  transition:
+    opacity 0.28s ease,
+    backdrop-filter 0.28s ease,
+    -webkit-backdrop-filter 0.28s ease;
+}
+
+.notification-stack--scrollable .notification-stack__fade {
+  opacity: 1;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.notification-stack__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.notification-stack__item {
+  display: grid;
+  grid-template-rows: 1fr;
+  flex: 0 0 auto;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 0;
+  pointer-events: none;
+}
+
+/* Gap lives inside the collapsing grid cell so it animates away with the row. */
+.notification-stack__item + .notification-stack__item .notification-stack__clip {
+  padding-top: 8px;
+}
+
+.notification-stack__clip {
+  min-height: 0;
+  width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+/*
+ * Enter: row height opens first (siblings rise), then the card slide-fades in.
+ * Leave: reverse — card slides out, then row collapses (siblings drop once).
+ * Outer animation duration spans the full sequence so Angular keeps the class.
+ */
+.snack-enter {
+  animation: snack-row-enter 0.4s cubic-bezier(0.05, 0.7, 0.1, 1) both;
+}
+
+.snack-enter .notification-stack__clip {
+  animation: snack-card-enter 0.22s cubic-bezier(0.05, 0.7, 0.1, 1) 0.18s both;
+}
+
+.snack-leave {
+  animation: snack-row-leave 0.4s cubic-bezier(0.3, 0, 0.8, 0.15) both;
+}
+
+.snack-leave .notification-stack__clip {
+  animation: snack-card-leave 0.22s cubic-bezier(0.3, 0, 0.8, 0.15) both;
+}
+
+@keyframes snack-row-enter {
+  0% {
+    grid-template-rows: 0fr;
+  }
+
+  45%,
+  100% {
+    grid-template-rows: 1fr;
+  }
+}
+
+@keyframes snack-card-enter {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes snack-row-leave {
+  0%,
+  55% {
+    grid-template-rows: 1fr;
+  }
+
+  100% {
+    grid-template-rows: 0fr;
+  }
+}
+
+@keyframes snack-card-leave {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notification-stack,
+  .notification-stack__fade {
+    transition: none;
+  }
+
+  .snack-enter,
+  .snack-enter .notification-stack__clip,
+  .snack-leave,
+  .snack-leave .notification-stack__clip {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0s !important;
+  }
+}

@@ -33,7 +33,7 @@ src/
 │   │       ├── status-chip/
 │   │       ├── crypto-card/
 │   │       ├── confirmation-dialog/
-│   │       └── fired-alerts-widget/
+│   │       └── app-snackbar/   # stacked notifications (hosted by AppComponent)
 │   │
 │   └── features/
 │       ├── dashboard/
@@ -80,8 +80,8 @@ AppComponent
 
 | Layer | Owns |
 | --- | --- |
-| **AppComponent** | Minimal root: top-level `RouterOutlet` and app-wide bootstrap only (e.g. alert polling start) |
-| **BaseLayoutComponent** | Persistent trading shell: navbar + sidebar + content outlet + layout-level hosts (e.g. fired alerts until Material popup) |
+| **AppComponent** | Minimal root: top-level `RouterOutlet`, app-wide bootstrap (e.g. alert polling), and global hosts (e.g. notification stack) |
+| **BaseLayoutComponent** | Persistent trading shell: navbar + sidebar + content outlet |
 | **Feature** | Route content and feature-specific UI/logic |
 | **Shared components** | Reusable presentation primitives only |
 | **Core services/utils** | Cross-cutting business/infrastructure |
