@@ -1,20 +1,28 @@
-<h2 mat-dialog-title>Invest in {{ data.crypto.name }}</h2>
+<app-base-dialog>
+  <ng-container dialogTitle>Invest in {{ data.crypto.name }}</ng-container>
 
-<div mat-dialog-content class="dialog-content">
-  <div class="row"><strong>Symbol:</strong> {{ data.crypto.symbol }}</div>
-  <div class="row"><strong>Exchange:</strong> {{ data.crypto.exchange_currency }}</div>
-  <div class="row"><strong>Current price:</strong> {{ data.currentPrice | number:'1.2-6' }}</div>
+  <div class="dialog-content">
+    <div class="row"><strong>Symbol:</strong> {{ data.crypto.symbol }}</div>
+    <div class="row"><strong>Exchange:</strong> {{ data.crypto.exchange_currency }}</div>
+    <div class="row"><strong>Current price:</strong> {{ data.currentPrice | number:'1.2-6' }}</div>
 
-  <div class="form">
-    <label class="form-label">Amount ($)</label>
-    <input class="input" type="number" min="1" step="0.01" [(ngModel)]="amount" />
+    <div class="form">
+      <mat-form-field class="full-width">
+        <mat-label>Amount ($)</mat-label>
+        <input matInput type="number" min="1" step="0.01" [(ngModel)]="amount" name="amount" />
+      </mat-form-field>
 
-    <label class="form-label">Description</label>
-    <textarea class="input" rows="3" [(ngModel)]="description" placeholder="Optional note..."></textarea>
+      <mat-form-field class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput rows="3" [(ngModel)]="description" name="description"></textarea>
+      </mat-form-field>
+    </div>
   </div>
-</div>
 
-<div mat-dialog-actions align="end">
-  <button class="btn btn-secondary" (click)="cancel()">Cancel</button>
-  <button class="btn btn-primary" (click)="confirm()" [disabled]="!amount || amount <= 0">Invest</button>
-</div>
+  <ng-container dialogActions>
+    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-flat-button color="primary" type="button" (click)="confirm()" [disabled]="!amount || amount <= 0">
+      Invest
+    </button>
+  </ng-container>
+</app-base-dialog>

@@ -6,13 +6,14 @@ When ambiguous, prefer: **consistency → readability → information hierarchy 
 
 ## Project adaptations
 
-This repo implements the design language with **Angular 22 + Angular Material + SCSS** (not Tailwind).
+This repo implements the design language with **Angular 22 + Angular Material + SCSS**.
 
 | Spec concept | Learn2Trade location |
 | --- | --- |
 | Design tokens / CSS variables | `src/styles/_tokens.scss`, `_colors.scss`, `_spacing.scss`, `_radius.scss`, `_elevation.scss`, `_typography.scss` |
 | Material theme + overrides | `src/styles/theme.scss`, `_material-overrides.scss` |
-| Semantic utilities / panels / trade buttons | `src/styles/_utilities.scss`, `_components.scss`, `tailwind.scss` |
+| Layout utilities (flex / grid) | `src/styles/_utilities.scss` via `tailwind.scss` |
+| Semantic panels / trade buttons | `src/styles/_components.scss`, `_utilities.scss` |
 | Global reset / focus / scrollbars | `src/styles/_base.scss` |
 | App shell (sidebar + navbar) | `src/app/core/layout/` (`base-layout`, `sidebar`, `navbar`) |
 | Shared UI primitives | `src/app/shared/components/` |
@@ -20,11 +21,15 @@ This repo implements the design language with **Angular 22 + Angular Material + 
 | Structure / placement rules | `docs/FILE_STRUCTURES.md` |
 | Cursor / agent rules | `.cursor/rules/`, `agents.md` |
 
-**Do not add Tailwind** unless explicitly requested. Prefer semantic SCSS classes (`app-panel`, `text-profit`, `trade-buy-button`) over arbitrary colors.
+**Layout:** always prefer the Tailwind-style flex/grid utilities in `tailwind.scss` / `_utilities.scss` (`flex`, `grid`, `gap-*`, `items-*`, `justify-*`, `w-full`, …) over one-off layout rules in component SCSS. Keep semantic tokens for color, surfaces, and radius — do not invent arbitrary hex in utilities.
+
+**Do not install the Tailwind CSS npm package** unless product explicitly asks; this project ships the utility *system* as SCSS helpers with Tailwind-compatible class names.
 
 **Typography:** use **IBM Plex Sans** (UI) and **Space Grotesk** (brand accents) — already loaded. Do not switch to Inter/Roboto unless product asks.
 
 **Primary brand:** trading-terminal blue (`#3b82f6`) with semantic green/red for P&L only. Dark theme is the default trading experience.
+
+**Form fields:** default `mat-form-field` appearance is **outline** (border + `var(--radius-md)`). On error, only the **label** and `mat-error` text use danger color — the field border stays theme-neutral / focus-primary. Show validation after blur (`touched`) as well as after submit (`markAllAsTouched`).
 
 Reproduce the **design language, hierarchy, spacing, density, and component relationships** — not pixel-perfect mockups.
 
@@ -136,7 +141,7 @@ Light is not a simple invert — keep contrast between page, panels, controls, a
 
 ---
 
-## 4. SCSS integration (no Tailwind)
+## 4. SCSS integration + layout utilities
 
 ```text
 src/styles/
@@ -144,9 +149,9 @@ src/styles/
 ├── _colors.scss          # Sass maps feeding tokens + Material
 ├── theme.scss            # mat.theme + system overrides
 ├── _material-overrides.scss
-├── _components.scss      # buttons, cards, tags, trade actions
-├── _utilities.scss       # app-panel, text-*, tabular-nums, layout helpers
-├── tailwind.scss         # semantic helpers entry (SCSS — not Tailwind CSS)
+├── _components.scss      # buttons, cards, tags, trade actions, neu
+├── _utilities.scss       # Tailwind-style flex/grid + semantic text helpers
+├── tailwind.scss         # layout utilities entry (SCSS helpers)
 ├── _base.scss
 ├── _typography.scss
 ├── _spacing.scss         # 4px base scale
@@ -156,7 +161,16 @@ src/styles/
 └── _fonts.scss
 ```
 
-Prefer:
+Prefer layout utilities for structure:
+
+```html
+<div class="flex flex-col gap-md min-0">
+  <div class="flex items-center justify-between gap-sm">…</div>
+  <div class="grid grid-cols-2 gap-md">…</div>
+</div>
+```
+
+Prefer semantic shells for surfaces:
 
 ```html
 <div class="app-panel">
@@ -165,7 +179,7 @@ Prefer:
 </div>
 ```
 
-Avoid arbitrary hex in templates/component SCSS when a token exists.
+Avoid arbitrary hex in templates/component SCSS when a token exists. Avoid duplicating `display: flex` / `grid` in component SCSS when a utility class already exists.
 
 ---
 
@@ -255,9 +269,20 @@ Mobile (&lt;768): task-focused — bottom nav or drawer; do not miniaturize the 
 
 ---
 
-## 11. Trading workspace
+## 11. Layout (flex / grid utilities — required)
 
-CSS **Grid** for macro layout; **Flexbox** inside panels. Chart gets remaining space (`minmax(0, 1fr)`). Avoid absolute positioning for primary content. Nested flex/grid: `min-width: 0; min-height: 0`.
+**Always** compose page and panel layout with the Tailwind-style helpers from `src/styles/_utilities.scss` (loaded via `tailwind.scss`):
+
+| Concern | Prefer |
+| --- | --- |
+| Macro workspace | `grid`, `grid-cols-*`, `trading-workspace` |
+| Inside panels / forms / auth shells | `flex`, `flex-col`, `items-*`, `justify-*`, `gap-*` |
+| Shrink / scroll safety | `min-0`, `min-w-0`, `overflow-auto` / `overflow-hidden` |
+| Width constraints | `w-full`, `max-w-sm` / `max-w-md` / `max-w-lg` |
+
+CSS **Grid** for macro layout; **Flexbox** inside panels. Chart gets remaining space (`minmax(0, 1fr)` via workspace helpers). Avoid absolute positioning for primary content. Nested flex/grid hosts need `min-0`.
+
+Do **not** reintroduce one-off `display: flex` / `display: grid` blocks in feature SCSS when an equivalent utility exists (see login/register as the reference pattern).
 
 Recommended large desktop columns:
 
@@ -365,14 +390,15 @@ UI-local state only: tabs, sidebar collapsed, timeframe, visibility, sort/filter
 2. No arbitrary colors when a semantic token exists.  
 3. No theme-specific hardcoding in feature SCSS.  
 4. Support dark and light.  
-5. SCSS utilities for layout helpers; theme files for Material overrides.  
+5. Layout via `_utilities.scss` / `tailwind.scss` flex+grid helpers; theme files for Material overrides.  
 6. No inline styles except dynamic values.  
-7. Avoid `::ng-deep`. Keep page SCSS small.  
-8. Grid for workspaces; Flex for panel internals.  
+7. Avoid `::ng-deep`. Keep page SCSS small (surface/brand only; layout in utilities).  
+8. Grid for workspaces; Flex for panel internals — using utility classes.  
 9. Fixed table headers/paginators; scroll bodies.  
 10. Do not clone desktop layout onto mobile.  
 11. Prefer Angular Material behavior before custom widgets.  
 12. Keep business logic out of generic UI primitives.
+13. Form fields: outline + radius tokens; errors after blur; error color on label/message only.
 
 ---
 

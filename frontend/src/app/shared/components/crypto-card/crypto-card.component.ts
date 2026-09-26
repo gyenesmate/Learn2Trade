@@ -2,6 +2,7 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, Renderer2, NgZone, DestroyRef, ChangeDetectionStrategy, inject, input, viewChild, effect } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { CryptoCurrency } from '@core/models/models';
 import { AuthService } from '@core/services/auth.service';
@@ -15,7 +16,7 @@ import { ColorType } from 'lightweight-charts';
 
 @Component({
   selector: 'app-crypto-card',
-  imports: [MatButtonModule, MatIconModule, DecimalPipe],
+  imports: [MatButtonModule, MatCardModule, MatIconModule, DecimalPipe],
   providers: [DecimalPipe],
   templateUrl: './crypto-card.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

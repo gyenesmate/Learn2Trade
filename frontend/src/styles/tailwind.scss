@@ -1,6 +1,5 @@
-// Semantic utility / layout helpers.
-// This project does not use the Tailwind CSS framework. Helpers live here so the
-// architecture matches docs (tailwind.scss) while remaining pure SCSS.
+// Layout utilities entry — Tailwind-style flex/grid helpers (SCSS, not the Tailwind npm package).
+// Prefer these classes for page/panel layout; keep semantic tokens for color/surfaces.
 @use 'utilities';
 
 @mixin helpers {

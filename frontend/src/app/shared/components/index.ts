@@ -1,4 +1,5 @@
 export * from './confirmation-dialog/confirmation-dialog.component';
+export * from './base-dialog/base-dialog.component';
 export * from './panel/panel.component';
 export * from './status-chip/status-chip.component';
 export * from './data-table/data-table.component';

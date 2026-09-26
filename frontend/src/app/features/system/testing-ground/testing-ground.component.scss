@@ -1,3 +1,28 @@
 .testing-ground {
   padding: 1rem;
 }
+
+.demo-section {
+  margin-bottom: 2rem;
+}
+
+.neu-demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: var(--neu-bg);
+  border-radius: var(--radius-lg);
+}
+
+.neu-sample {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 80px;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  user-select: none;
+}

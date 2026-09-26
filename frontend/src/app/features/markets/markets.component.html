@@ -12,7 +12,7 @@
       <h2>Browse Cryptocurrencies</h2>
       <div class="crypto-grid">
         @for (crypto of cryptocurrencies(); track crypto) {
-          <div class="crypto-card card">
+          <div class="crypto-card-slot">
             <app-crypto-card [state]="'compact'" [data]="crypto" [watchlistCryptoIds]="watchlistCryptoIds()"></app-crypto-card>
             <a class="btn btn-primary crypto-card__action" [routerLink]="['/crypto', crypto.id]">View Chart</a>
           </div>

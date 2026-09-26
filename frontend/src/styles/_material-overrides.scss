@@ -40,6 +40,25 @@
       filled-label-text-color: map.get(colors.$text, secondary),
       filled-caret-color: map.get(colors.$primary, main),
       outlined-caret-color: map.get(colors.$primary, main),
+      // Error: label + message only — keep field border / indicator stable
+      error-text-color: map.get(colors.$semantic, error),
+      error-trailing-icon-color: map.get(colors.$text, muted),
+      error-focus-trailing-icon-color: map.get(colors.$text, muted),
+      error-hover-trailing-icon-color: map.get(colors.$text, muted),
+      outlined-error-outline-color: map.get(colors.$neutral, 30),
+      outlined-error-focus-outline-color: map.get(colors.$primary, main),
+      outlined-error-hover-outline-color: map.get(colors.$primary, medium),
+      outlined-error-label-text-color: map.get(colors.$semantic, error),
+      outlined-error-focus-label-text-color: map.get(colors.$semantic, error),
+      outlined-error-hover-label-text-color: map.get(colors.$semantic, error),
+      outlined-error-caret-color: map.get(colors.$primary, main),
+      filled-error-active-indicator-color: map.get(colors.$neutral, 40),
+      filled-error-focus-active-indicator-color: map.get(colors.$primary, main),
+      filled-error-hover-active-indicator-color: map.get(colors.$neutral, 40),
+      filled-error-label-text-color: map.get(colors.$semantic, error),
+      filled-error-focus-label-text-color: map.get(colors.$semantic, error),
+      filled-error-hover-label-text-color: map.get(colors.$semantic, error),
+      filled-error-caret-color: map.get(colors.$primary, main),
     ));
 
     @include mat.card-overrides((
@@ -147,6 +166,10 @@
       outlined-input-text-color: map.get(colors.$light, text),
       outlined-input-text-placeholder-color: map.get(colors.$light, muted),
       filled-input-text-color: map.get(colors.$light, text),
+      outlined-error-outline-color: map.get(colors.$light, border),
+      outlined-error-hover-outline-color: map.get(colors.$primary, medium),
+      filled-error-active-indicator-color: map.get(colors.$light, border),
+      filled-error-hover-active-indicator-color: map.get(colors.$light, border),
     ));
 
     @include mat.card-overrides((

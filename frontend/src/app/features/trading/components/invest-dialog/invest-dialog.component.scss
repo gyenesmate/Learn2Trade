@@ -15,11 +15,6 @@
   margin-top: var(--space-sm);
 }
 
-.form-label {
-  font-size: var(--font-size-sm);
-  color: var(--color-muted);
-}
-
-textarea.input {
-  resize: vertical;
+.full-width {
+  width: 100%;
 }

@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -7,12 +7,23 @@ import {
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core/services/notification.service';
 
 @Component({
   selector: 'app-register',
-  imports: [ReactiveFormsModule, RouterLink],
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+  ],
   templateUrl: './register.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./register.component.scss']
@@ -33,19 +44,37 @@ export class RegisterComponent {
     { validators: [this.matchPasswords] }
   );
   submitted = false;
+  readonly hidePassword = signal(true);
+  readonly hideConfirmPassword = signal(true);
 
-  private matchPasswords(control: AbstractControl): ValidationErrors | null {
-    const password = control.get('password')?.value;
-    const confirmPassword = control.get('confirmPassword')?.value;
-    if (!password || !confirmPassword) {
+  private matchPasswords(group: AbstractControl): ValidationErrors | null {
+    const password = group.get('password');
+    const confirm = group.get('confirmPassword');
+    if (!password || !confirm) {
       return null;
     }
 
-    return password === confirmPassword ? null : { passwordMismatch: true };
+    if (!password.value || !confirm.value) {
+      return null;
+    }
+
+    if (password.value !== confirm.value) {
+      const other = { ...(confirm.errors ?? {}) };
+      other['passwordMismatch'] = true;
+      confirm.setErrors(other);
+      return { passwordMismatch: true };
+    }
+
+    if (confirm.hasError('passwordMismatch')) {
+      const { passwordMismatch: _removed, ...rest } = confirm.errors ?? {};
+      confirm.setErrors(Object.keys(rest).length ? rest : null);
+    }
+    return null;
   }
 
   async onSubmit(): Promise<void> {
     this.submitted = true;
+    this.form.markAllAsTouched();
     if (this.form.invalid) {
       return;
     }
@@ -74,9 +103,5 @@ export class RegisterComponent {
 
   get confirmPasswordControl() {
     return this.form.get('confirmPassword');
-  }
-
-  get passwordMismatch(): boolean {
-    return this.form.errors?.['passwordMismatch'] === true;
   }
 }

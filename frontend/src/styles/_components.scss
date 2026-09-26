@@ -266,4 +266,38 @@
     color: var(--color-warning);
     background: var(--color-warning-soft);
   }
+
+  .neu {
+    background: var(--neu-bg);
+    border: 1px solid color-mix(in srgb, var(--neu-dark) 35%, transparent);
+    border-radius: var(--radius-lg);
+    transition:
+      box-shadow var(--transition-fast),
+      transform var(--transition-fast);
+  }
+
+  .neu--raised {
+    box-shadow:
+      calc(-1 * var(--neu-offset)) calc(-1 * var(--neu-offset)) var(--neu-blur) var(--neu-light),
+      var(--neu-offset) var(--neu-offset) var(--neu-blur) var(--neu-dark);
+  }
+
+  .neu--floating {
+    box-shadow:
+      calc(-1 * var(--neu-offset-float)) calc(-1 * var(--neu-offset-float)) var(--neu-blur-float)
+        var(--neu-light),
+      var(--neu-offset-float) var(--neu-offset-float) var(--neu-blur-float) var(--neu-dark);
+  }
+
+  .neu--pressed {
+    box-shadow:
+      inset var(--neu-offset-press) var(--neu-offset-press) var(--neu-blur-press) var(--neu-dark),
+      inset calc(-1 * var(--neu-offset-press)) calc(-1 * var(--neu-offset-press))
+        var(--neu-blur-press) var(--neu-light);
+  }
+
+  .neu:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+  }
 }

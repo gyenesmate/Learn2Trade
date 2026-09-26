@@ -1,83 +1,83 @@
-<div class="register-page">
-  <div class="register-container">
-    <div class="register-header">
-      <h1>Join CryptoWatcher</h1>
-      <p>Create your account to start tracking cryptocurrencies</p>
-    </div>
+<div class="register-page flex flex-auto flex-col min-0 w-full">
+  <div class="register-page-body flex flex-1 items-center justify-center min-0 h-full overflow-hidden p-md">
+    <div class="register-container flex flex-col w-full max-w-md max-h-full overflow-auto p-xl rounded-lg border bg-surface shadow-lg">
+      <div class="register-header text-center mb-lg">
+        <h1 class="m-0 mb-sm text-primary">Join CryptoWatcher</h1>
+        <p class="m-0 text-muted">Create your account to start tracking cryptocurrencies</p>
+      </div>
 
-    <form class="register-form" [formGroup]="form" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="userName" class="form-label">Username</label>
-        <input
-          type="text"
-          id="userName"
-          class="input"
-          placeholder="Enter your username"
-          formControlName="userName"
-          required
-          >
-          @if (submitted && userNameControl?.invalid) {
-            <p class="field-error">Username is required.</p>
+      <form class="register-form flex flex-col gap-md" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <mat-form-field class="w-full">
+          <mat-label>Username</mat-label>
+          <input matInput type="text" formControlName="userName" />
+          @if (userNameControl?.hasError('required')) {
+            <mat-error>Username is required.</mat-error>
           }
-        </div>
+        </mat-form-field>
 
-        <div class="form-group">
-          <label for="email" class="form-label">Email</label>
+        <mat-form-field class="w-full">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" />
+          @if (emailControl?.hasError('required')) {
+            <mat-error>Email is required.</mat-error>
+          } @else if (emailControl?.hasError('email')) {
+            <mat-error>Please enter a valid email.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field class="w-full">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="hidePassword.set(!hidePassword())"
+            [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'"
+            [attr.aria-pressed]="!hidePassword()"
+          >
+            <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          @if (passwordControl?.invalid) {
+            <mat-error>
+              Password must be at least 8 characters and include a capital letter and a number.
+            </mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field class="w-full">
+          <mat-label>Confirm Password</mat-label>
           <input
-            type="email"
-            id="email"
-            class="input"
-            placeholder="Enter your email"
-            formControlName="email"
-            required
-            >
-            @if (submitted && emailControl?.invalid) {
-              <p class="field-error">Please enter a valid email.</p>
-            }
-          </div>
+            matInput
+            [type]="hideConfirmPassword() ? 'password' : 'text'"
+            formControlName="confirmPassword"
+          />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="hideConfirmPassword.set(!hideConfirmPassword())"
+            [attr.aria-label]="hideConfirmPassword() ? 'Show password' : 'Hide password'"
+            [attr.aria-pressed]="!hideConfirmPassword()"
+          >
+            <mat-icon>{{ hideConfirmPassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          @if (confirmPasswordControl?.hasError('required')) {
+            <mat-error>Please confirm your password.</mat-error>
+          } @else if (confirmPasswordControl?.hasError('passwordMismatch')) {
+            <mat-error>Passwords do not match.</mat-error>
+          }
+        </mat-form-field>
 
-          <div class="form-group">
-            <label for="password" class="form-label">Password</label>
-            <input
-              type="password"
-              id="password"
-              class="input"
-              placeholder="Create a password"
-              formControlName="password"
-              required
-              >
-              @if (submitted && passwordControl?.invalid) {
-                <p class="field-error">
-                  Password must be at least 8 characters and include a capital letter and a number.
-                </p>
-              }
-            </div>
+        <button type="submit" class="btn btn-primary register-btn w-full">Create Account</button>
+      </form>
 
-            <div class="form-group">
-              <label for="confirmPassword" class="form-label">Confirm Password</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                class="input"
-                placeholder="Confirm your password"
-                formControlName="confirmPassword"
-                required
-                >
-                @if (submitted && confirmPasswordControl?.invalid) {
-                  <p class="field-error">Please confirm your password.</p>
-                }
-                @if (submitted && confirmPasswordControl?.valid && passwordMismatch) {
-                  <p class="field-error">
-                    Passwords do not match.
-                  </p>
-                }
-              </div>
-
-              <button type="submit" class="btn btn-primary register-btn">Create Account</button>
-            </form>
-
-            <div class="register-footer">
-              <p>Already have an account? <a [routerLink]="['/login']" class="login-link">Sign in</a></p>
-            </div>
-          </div>
-        </div>
+      <div class="register-footer text-center mt-lg pt-md">
+        <p class="m-0 text-muted">
+          Already have an account?
+          <a [routerLink]="['/login']" class="login-link">Sign in</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

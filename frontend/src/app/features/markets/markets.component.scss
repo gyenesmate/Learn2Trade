@@ -46,55 +46,14 @@
   gap: var(--space-md);
 }
 
-.crypto-card {
-  padding: var(--space-lg);
+.crypto-card-slot {
   transition: transform var(--transition-normal);
 
   &:hover {
     transform: translateY(-2px);
   }
 
-  &__header {
-    display: flex;
-    align-items: center;
-    gap: var(--space-sm);
-    margin-bottom: var(--space-md);
-  }
-
-  &__icon {
-    width: 40px;
-    height: 40px;
-    border-radius: var(--radius-round);
-  }
-
-  &__name {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-bold);
-  }
-
-  &__symbol {
-    color: var(--color-muted);
-    font-size: var(--font-size-sm);
-  }
-
-  &__price {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-md);
-  }
-
-  .price {
-    font-size: var(--font-size-lg);
-    font-weight: var(--font-weight-bold);
-  }
-
-  .price-change {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-bold);
-  }
-
-  &__action {
+  .crypto-card__action {
     width: 100%;
   }
 }

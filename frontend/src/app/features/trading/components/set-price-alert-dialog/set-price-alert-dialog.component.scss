@@ -1,9 +1,12 @@
 .content {
-  min-width: 320px;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
 }
 
-.form-row {
-  margin-top: 12px;
+.full-width {
+  width: 100%;
 }
 
 .hint {
@@ -12,6 +15,6 @@
 
 .hint.small {
   opacity: 0.8;
-  margin-top: 12px;
+  margin-top: 4px;
   font-size: 0.9rem;
 }

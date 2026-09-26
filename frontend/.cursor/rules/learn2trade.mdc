@@ -74,7 +74,7 @@ Same-folder `./` imports may stay relative.
 | `docs/features/` | Planned per-feature guides |
 | `docs/OLD_DESCRITIONS/` | Legacy only |
 
-Visual direction: dark-first trading terminal. Semantic tokens only. No Tailwind CSS framework (SCSS helpers live in `styles/tailwind.scss`).
+Visual direction: dark-first trading terminal. Semantic tokens only. Layout via Tailwind-style flex/grid utilities in `styles/tailwind.scss` / `_utilities.scss` (SCSS helpers — not the Tailwind npm package).
 
 ## Guidelines
 
@@ -83,5 +83,5 @@ Visual direction: dark-first trading terminal. Semantic tokens only. No Tailwind
 3. Preserve auth/guard behavior and route URLs.
 4. Reuse `shared/components` and `core/services` before inventing new abstractions.
 5. Feature-specific dialogs/components stay under the feature.
-6. Styles: tokens + Material overrides globally; local SCSS for layout only.
+6. Styles: tokens + Material overrides globally; layout via flex/grid utilities; local SCSS for brand/surface only.
 7. Validate with `npm run build` / `npm run test:unit` when practical.

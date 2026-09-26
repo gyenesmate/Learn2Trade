@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { TokenResponse, UserMe } from '@core/models/models';
 import { ApiService } from '@core/services/api.service';
-import { TokenStorageService } from '@core/services/token-storage.services';
+import { TokenStorageService } from '@core/services/token-storage.service';
 import { toNumber } from '@core/utils/number.util';
 
 const SESSION_TIMEOUT_MS = 60 * 60 * 1000;

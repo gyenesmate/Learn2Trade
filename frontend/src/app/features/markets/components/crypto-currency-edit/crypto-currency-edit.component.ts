@@ -1,12 +1,14 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { NotificationService } from '@core/services/notification.service';
 
 @Component({
   selector: 'app-crypto-currency-edit',
-  imports: [FormsModule, RouterModule],
+  imports: [ReactiveFormsModule, RouterModule, MatFormFieldModule, MatInputModule],
   templateUrl: './crypto-currency-edit.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./crypto-currency-edit.component.scss']
@@ -16,16 +18,17 @@ export class CryptoCurrencyEditComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly cryptoCurrencies = inject(CryptoCurrenciesService);
   private readonly notification = inject(NotificationService);
+  private readonly fb = inject(FormBuilder);
 
   id: string | null = null;
   readonly loading = signal(false);
   readonly saving = signal(false);
 
-  form = {
-    name: '',
-    symbol: '',
-    exchange_currency: 'USD'
-  };
+  readonly form = this.fb.nonNullable.group({
+    name: ['', Validators.required],
+    symbol: ['', Validators.required],
+    exchange_currency: ['USD', Validators.required],
+  });
 
   get isNew(): boolean {
     return !this.id;
@@ -43,11 +46,11 @@ export class CryptoCurrencyEditComponent implements OnInit {
         void this.router.navigate(['/profile']);
         return;
       }
-      this.form = {
+      this.form.patchValue({
         name: existing.name,
         symbol: existing.symbol,
-        exchange_currency: existing.exchange_currency
-      };
+        exchange_currency: existing.exchange_currency,
+      });
     } catch (err) {
       console.error('Error loading crypto currency:', err);
       this.notification.error('Error loading crypto currency');
@@ -57,22 +60,26 @@ export class CryptoCurrencyEditComponent implements OnInit {
   }
 
   async save(): Promise<void> {
-    const name = this.form.name.trim();
-    const exchange_currency = this.form.exchange_currency.trim();
-    const symbol = this.form.symbol.trim();
-
-    if (!name || !symbol || !exchange_currency) {
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
       this.notification.error('Please fill all fields');
       return;
     }
 
+    const { name, symbol, exchange_currency } = this.form.getRawValue();
+    const payload = {
+      name: name.trim(),
+      symbol: symbol.trim(),
+      exchange_currency: exchange_currency.trim(),
+    };
+
     this.saving.set(true);
     try {
       if (this.id) {
-        await this.cryptoCurrencies.update(this.id, { name, symbol, exchange_currency });
+        await this.cryptoCurrencies.update(this.id, payload);
         this.notification.success('Crypto currency updated');
       } else {
-        await this.cryptoCurrencies.create({ name, symbol, exchange_currency });
+        await this.cryptoCurrencies.create(payload);
         this.notification.success('Crypto currency created');
       }
       void this.router.navigate(['/profile']);

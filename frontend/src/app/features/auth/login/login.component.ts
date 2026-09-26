@@ -1,13 +1,25 @@
-import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIconModule } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '@core/services/auth.service';
 import { A11yModule } from '@angular/cdk/a11y';
 import { NotificationService } from '@core/services/notification.service';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule, A11yModule, RouterLink],
+  imports: [
+    ReactiveFormsModule,
+    A11yModule,
+    RouterLink,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+  ],
   templateUrl: './login.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./login.component.scss']
@@ -23,9 +35,11 @@ export class LoginComponent {
     password: ['', Validators.required]
   });
   submitted = false;
+  readonly hidePassword = signal(true);
 
   async onSubmit(): Promise<void> {
     this.submitted = true;
+    this.form.markAllAsTouched();
     if (this.form.invalid) {
       return;
     }

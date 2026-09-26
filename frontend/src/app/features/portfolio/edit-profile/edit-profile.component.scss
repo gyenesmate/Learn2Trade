@@ -17,50 +17,19 @@
 
   .profile-content {
     .edit-form {
-      .form-group {
-        margin-bottom: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
 
-        .form-label {
-          display: block;
-          margin-bottom: 0.5rem;
-          font-weight: 500;
-          color: var(--color-text-primary);
-        }
-
-        .input {
-          width: 100%;
-          padding: 0.75rem;
-          border: 1px solid var(--border-color);
-          border-radius: 4px;
-          background-color: var(--bg-secondary);
-          color: var(--color-text-primary);
-          font-size: 1rem;
-
-          &:focus {
-            outline: none;
-            border-color: var(--primary-color);
-          }
-        }
-
-        .avatar-preview {
-          margin-top: 1rem;
-          text-align: center;
-
-          .avatar-image {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--border-color);
-          }
-        }
+      .full-width {
+        width: 100%;
       }
 
       .form-actions {
         display: flex;
         gap: 1rem;
         justify-content: flex-end;
-        margin-top: 2rem;
+        margin-top: 1rem;
       }
     }
   }

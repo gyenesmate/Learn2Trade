@@ -2,7 +2,11 @@ import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { CryptoCurrency } from '@core/models/models';
+import { BaseDialogComponent } from '@shared/components/base-dialog/base-dialog.component';
 
 export interface InvestDialogData {
   crypto: CryptoCurrency;
@@ -16,7 +20,15 @@ export interface InvestDialogResult {
 
 @Component({
   selector: 'app-invest-dialog',
-  imports: [FormsModule, MatDialogModule, DecimalPipe],
+  imports: [
+    FormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    DecimalPipe,
+    BaseDialogComponent,
+  ],
   templateUrl: './invest-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./invest-dialog.component.scss']

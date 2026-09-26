@@ -31,6 +31,12 @@
   --gradient-primary: #{map.get($palette, accent-gradient)};
 }
 
+@mixin _neu-scheme($bg, $light, $dark) {
+  --neu-bg: #{$bg};
+  --neu-light: #{$light};
+  --neu-dark: #{$dark};
+}
+
 @mixin _static-tokens {
   --color-primary: #{map.get(colors.$primary, main)};
   --color-primary-hover: #{map.get(colors.$primary, hover)};
@@ -106,11 +112,23 @@
   @each $name, $value in breakpoints.$scale {
     --breakpoint-#{$name}: #{$value};
   }
+
+  --neu-offset: 5px;
+  --neu-blur: 12px;
+  --neu-offset-float: 8px;
+  --neu-blur-float: 18px;
+  --neu-offset-press: 4px;
+  --neu-blur-press: 10px;
 }
 
 @mixin _theme-roots {
   @include _static-tokens;
   @include _color-scheme(colors.$dark);
+  @include _neu-scheme(
+    map.get(colors.$dark, surface),
+    rgba(255, 255, 255, 0.04),
+    rgba(0, 0, 0, 0.5)
+  );
 }
 
 @mixin properties {
@@ -121,10 +139,20 @@
   body.theme-dark,
   [data-theme='dark'] {
     @include _color-scheme(colors.$dark);
+    @include _neu-scheme(
+      map.get(colors.$dark, surface),
+      rgba(255, 255, 255, 0.04),
+      rgba(0, 0, 0, 0.5)
+    );
   }
 
   body.theme-light,
   [data-theme='light'] {
     @include _color-scheme(colors.$light);
+    @include _neu-scheme(
+      map.get(colors.$light, bg),
+      rgba(255, 255, 255, 0.85),
+      rgba(163, 177, 198, 0.55)
+    );
   }
 }

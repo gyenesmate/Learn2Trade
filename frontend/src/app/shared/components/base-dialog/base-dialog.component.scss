@@ -1,0 +1,21 @@
+:host {
+  display: block;
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-sizing: border-box;
+}
+
+.base-dialog__content {
+  margin: 0;
+  padding: var(--space-sm) 0 var(--space-md);
+}
+
+.base-dialog__actions {
+  margin: 0;
+  padding-top: var(--space-sm);
+  gap: var(--space-sm);
+}

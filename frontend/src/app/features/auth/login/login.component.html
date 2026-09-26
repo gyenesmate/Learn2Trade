@@ -1,46 +1,49 @@
-<div class="login-page">
-  <div class="login-container">
-    <div class="login-header">
-      <h1>Welcome to CryptoWatcher</h1>
-      <p>Sign in to your account</p>
-    </div>
+<div class="login-page flex flex-auto flex-col min-0 w-full">
+  <div class="login-page-body flex flex-1 items-center justify-center min-0 h-full overflow-hidden p-md">
+    <div class="login-container flex flex-col w-full max-w-sm max-h-full overflow-auto p-xl rounded-lg border bg-surface shadow-lg">
+      <div class="login-header flex flex-col items-center text-center mb-lg">
+        <h1 class="m-0 mb-sm text-primary">Welcome to CryptoWatcher</h1>
+        <p class="m-0 text-muted">Sign in to your account</p>
+      </div>
 
-    <form class="login-form" [formGroup]="form" (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="email" class="form-label">Email</label>
-        <input
-          type="email"
-          id="email"
-          class="input"
-          placeholder="Enter your email"
-          formControlName="email"
-          required
-          >
-          @if (submitted && emailControl?.invalid) {
-            <p class="field-error">Please enter a valid email.</p>
+      <form class="login-form flex flex-col gap-md" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <mat-form-field class="w-full">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" />
+          @if (emailControl?.hasError('required')) {
+            <mat-error>Email is required.</mat-error>
+          } @else if (emailControl?.hasError('email')) {
+            <mat-error>Please enter a valid email.</mat-error>
           }
-        </div>
+        </mat-form-field>
 
-        <div class="form-group">
-          <label for="password" class="form-label">Password</label>
-          <input
-            type="password"
-            id="password"
-            class="input"
-            placeholder="Enter your password"
-            formControlName="password"
-            required
-            >
-            @if (submitted && passwordControl?.invalid) {
-              <p class="field-error">Password is required.</p>
-            }
-          </div>
+        <mat-form-field class="w-full">
+          <mat-label>Password</mat-label>
+          <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" />
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="hidePassword.set(!hidePassword())"
+            [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'"
+            [attr.aria-pressed]="!hidePassword()"
+          >
+            <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          @if (passwordControl?.hasError('required')) {
+            <mat-error>Password is required.</mat-error>
+          }
+        </mat-form-field>
 
-          <button type="submit" class="btn btn-primary login-btn">Sign In</button>
-        </form>
+        <button type="submit" class="btn btn-primary login-btn w-full">Sign In</button>
+      </form>
 
-        <div class="login-footer">
-          <p>Don't have an account? <a [routerLink]="['/register']" class="register-link">Sign up</a></p>
-        </div>
+      <div class="login-footer text-center mt-lg pt-md">
+        <p class="m-0 text-muted">
+          Don't have an account?
+          <a [routerLink]="['/register']" class="register-link">Sign up</a>
+        </p>
       </div>
     </div>
+  </div>
+</div>

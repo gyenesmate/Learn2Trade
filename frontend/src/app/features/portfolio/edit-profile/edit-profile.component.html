@@ -6,27 +6,23 @@
   <div class="profile-content">
     <section class="edit-form card">
       <h2>Edit Your Information</h2>
-      <form (ngSubmit)="saveProfile()">
-        <div class="form-group">
-          <label for="userName" class="form-label">Username</label>
-          <input
-            type="text"
-            id="userName"
-            class="input"
-            [(ngModel)]="username"
-            name="username"
-            required
-          >
-        </div>
+      <form [formGroup]="form" (ngSubmit)="saveProfile()">
+        <mat-form-field class="full-width">
+          <mat-label>Username</mat-label>
+          <input matInput type="text" formControlName="username" />
+          @if (form.controls.username.touched && form.controls.username.invalid) {
+            <mat-error>Username is required.</mat-error>
+          }
+        </mat-form-field>
 
-        <div class="form-group">
-          <label for="theme" class="form-label">Theme</label>
-          <select id="theme" class="input" [(ngModel)]="theme" name="theme">
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
-            <option value="system">System</option>
-          </select>
-        </div>
+        <mat-form-field class="full-width">
+          <mat-label>Theme</mat-label>
+          <mat-select formControlName="theme">
+            <mat-option value="light">Light</mat-option>
+            <mat-option value="dark">Dark</mat-option>
+            <mat-option value="system">System</mat-option>
+          </mat-select>
+        </mat-form-field>
 
         <div class="form-actions">
           <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>

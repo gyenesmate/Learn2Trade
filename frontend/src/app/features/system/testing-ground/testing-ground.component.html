@@ -1,7 +1,20 @@
 <div class="testing-ground">
   <h2>Testing Ground</h2>
-  <p>Demo of `crypto-card` with dummy Ethereum data.</p>
 
-  <app-crypto-card [state]="'compact'" [data]="ethData"></app-crypto-card>
-  
+  <section class="demo-section">
+    <h3>Neumorphism</h3>
+    <p>Opt-in <code>appNeumorphic</code> states (surface must match page bg for the illusion).</p>
+    <div class="neu-demo-row">
+      <div appNeumorphic neuState="raised" class="neu-sample">Raised</div>
+      <div appNeumorphic neuState="pressed" class="neu-sample">Pressed</div>
+      <div appNeumorphic neuState="floating" class="neu-sample">Floating</div>
+      <div appNeumorphic [neuInteractive]="true" class="neu-sample" tabindex="0">Interactive</div>
+    </div>
+  </section>
+
+  <section class="demo-section">
+    <h3>Crypto card</h3>
+    <p>Demo of <code>crypto-card</code> with dummy Ethereum data.</p>
+    <app-crypto-card [state]="'compact'" [data]="ethData"></app-crypto-card>
+  </section>
 </div>

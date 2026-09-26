@@ -1,5 +1,5 @@
 @if (data(); as coin) {
-  <div class="crypto-card" [class.detailed]="state() === 'detailed'" [class.compact]="state() === 'compact'">
+  <mat-card appearance="outlined" class="crypto-card" [class.detailed]="state() === 'detailed'" [class.compact]="state() === 'compact'">
     <div class="crypto-header">
       <span class="crypto-name">{{ coin.name }} ({{ coin.symbol }})</span>
       <span class="crypto-exchange">{{ exchangeLabel }} / {{ coin.exchange_currency }}</span>
@@ -43,9 +43,9 @@
         <div [innerHTML]="tooltipHtml"></div>
       </div>
     </div>
-  </div>
+  </mat-card>
 } @else {
-  <div class="crypto-card placeholder">
+  <mat-card appearance="outlined" class="crypto-card placeholder">
     <div class="crypto-header">
       <span class="crypto-name">Loading...</span>
       <span class="crypto-exchange">&nbsp;</span>
@@ -59,5 +59,5 @@
       <!-- loading spinner or skeleton -->
       <div class="spinner"></div>
     </div>
-  </div>
+  </mat-card>
 }
