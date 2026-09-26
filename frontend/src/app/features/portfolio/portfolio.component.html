@@ -94,32 +94,25 @@
 
       @if (isAdmin()) {
         <section class="admin-management card">
-          @if (adminLoading()) {
-            <div class="admin-loading">Loading...</div>
-          }
-          @if (!adminLoading()) {
-            <app-data-table
-              [title]="'Crypto currencies'"
-              [columns]="cryptoColumns"
-              [data]="cryptoCurrencies()"
-              [actionBar]="cryptoActionBar"
-              [rowActions]="cryptoRowActions">
-            </app-data-table>
-          }
+          <app-data-table
+            [title]="'Crypto currencies'"
+            [columns]="cryptoColumns"
+            [data]="cryptoCurrencies()"
+            [actionBar]="cryptoActionBar"
+            [rowActions]="cryptoRowActions"
+            [multiSelect]="true"
+            [loading]="adminLoading()">
+          </app-data-table>
         </section>
         <section class="admin-management card">
-          @if (adminLoading()) {
-            <div class="admin-loading">Loading...</div>
-          }
-          @if (!adminLoading()) {
-            <app-data-table
-              [title]="'Users'"
-              [columns]="userColumns"
-              [data]="users()"
-              [actionBar]="[]"
-              [rowActions]="userRowActions">
-            </app-data-table>
-          }
+          <app-data-table
+            [title]="'Users'"
+            [columns]="userColumns"
+            [data]="users()"
+            [actionBar]="[]"
+            [rowActions]="userRowActions"
+            [loading]="adminLoading()">
+          </app-data-table>
         </section>
       }
     </div>

@@ -151,6 +151,15 @@
       supporting-text-color: map.get(colors.$text, primary),
       container-shape: map.get(radius.$scale, sm),
     ));
+
+    @include mat.autocomplete-overrides((
+      background-color: map.get(colors.$neutral, 10),
+      container-shape: map.get(radius.$scale, md),
+    ));
+
+    @include mat.progress-spinner-overrides((
+      active-indicator-color: map.get(colors.$primary, main),
+    ));
   }
 
   body.theme-light,
@@ -206,6 +215,10 @@
     @include mat.menu-overrides((
       container-color: map.get(colors.$light, surface),
       item-label-text-color: map.get(colors.$light, text),
+    ));
+
+    @include mat.autocomplete-overrides((
+      background-color: map.get(colors.$light, surface),
     ));
   }
 }

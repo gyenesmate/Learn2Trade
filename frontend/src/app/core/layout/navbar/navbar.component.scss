@@ -7,10 +7,26 @@
   position: sticky;
   top: 0;
   z-index: var(--z-index-sticky);
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-inline: var(--space-sm);
 
   &.mobile-toolbar {
     position: sticky;
   }
+}
+
+.navbar-left,
+.navbar-center,
+.navbar-right {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.navbar-search {
+  width: 100%;
+  max-width: 480px;
 }
 
 .menu-button {
@@ -22,27 +38,32 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
-}
-
-.spacer {
-  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .user-info {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+  min-width: 0;
 }
 
 .balance {
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-sm);
   color: var(--color-text-primary);
+  white-space: nowrap;
 }
 
 .username {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 10rem;
 }
 
 .bottom-nav {

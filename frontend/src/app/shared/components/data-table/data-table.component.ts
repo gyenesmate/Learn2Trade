@@ -1,6 +1,7 @@
 import {
   Component,
   input,
+  output,
   effect,
   HostListener,
   signal,
@@ -16,6 +17,8 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { TableColumn, TableAction, RowAction } from './data-table-utilities';
 
 @Component({
@@ -27,6 +30,8 @@ import { TableColumn, TableAction, RowAction } from './data-table-utilities';
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
+    MatCheckboxModule,
+    MatProgressSpinnerModule,
     DatePipe,
     CurrencyPipe,
   ],
@@ -44,9 +49,19 @@ export class DataTableComponent<T> {
   readonly data = input<T[]>([]);
   readonly actionBar = input<TableAction[]>([]);
   readonly rowActions = input<RowAction<T>[]>([]);
+  readonly multiSelect = input(false);
+  readonly loading = input(false);
+  /** Escape hatch when the domain id field is not named `id`. */
+  readonly rowId = input<(row: T) => string>((row) =>
+    String((row as { id?: unknown }).id ?? '')
+  );
+  readonly selectionChange = output<T[]>();
 
   readonly innerWidth = signal<number>(window.innerWidth);
   readonly expandedRow = signal<T | null>(null);
+  /** Per-column text filter values. Other filter types will be added later. */
+  readonly columnFilters = signal<Record<string, string>>({});
+  private readonly selectedIds = signal<Set<string>>(new Set());
 
   private readonly paginator = viewChild(MatPaginator);
   private readonly sort = viewChild(MatSort);
@@ -54,20 +69,33 @@ export class DataTableComponent<T> {
   dataSource = new MatTableDataSource<T>([]);
 
   readonly displayedColumns = computed(() => {
-    const cols = this.columns();
+    const cols = this.columns().filter((c) => c.key !== 'id');
     const actions = this.rowActions();
+    const select = this.multiSelect() ? (['select'] as string[]) : [];
+
     if (this.innerWidth() < 600) {
-      const result: string[] = cols[0] ? [String(cols[0].key)] : [];
+      const result: string[] = [...select];
+      if (cols[0]) result.push(String(cols[0].key));
       if (!result.includes('expand')) result.push('expand');
       if (actions?.length && !result.includes('actions')) result.push('actions');
       return result;
     }
-    const result = cols.map((col) => String(col.key)).filter((c) => c !== 'expand');
-    if (actions?.length) {
-      if (!result.includes('actions')) result.push('actions');
+
+    const result = [...select, ...cols.map((col) => String(col.key)).filter((c) => c !== 'expand')];
+    if (actions?.length && !result.includes('actions')) {
+      result.push('actions');
     }
-    return result.filter((c) => c !== 'actions' || !!actions?.length);
+    return result;
   });
+
+  /** Second header row column defs (filter__*). */
+  readonly filterRowColumns = computed(() =>
+    this.displayedColumns().map((key) => `filter__${key}`)
+  );
+
+  readonly hasFilterRow = computed(
+    () => this.multiSelect() || this.columns().some((c) => c.filterable === true)
+  );
 
   @HostListener('window:resize', ['$event'])
   onResize(event: UIEvent): void {
@@ -76,6 +104,23 @@ export class DataTableComponent<T> {
   }
 
   constructor() {
+    this.dataSource.filterPredicate = (row: T, filter: string) => {
+      let filters: Record<string, string> = {};
+      try {
+        filters = JSON.parse(filter) as Record<string, string>;
+      } catch {
+        return true;
+      }
+      return Object.entries(filters).every(([key, raw]) => {
+        const q = raw.trim().toLowerCase();
+        if (!q) return true;
+        const value = (row as Record<string, unknown>)[key];
+        return String(value ?? '')
+          .toLowerCase()
+          .includes(q);
+      });
+    };
+
     effect(() => {
       this.dataSource.data = this.data();
     });
@@ -86,10 +131,60 @@ export class DataTableComponent<T> {
       if (p) this.dataSource.paginator = p;
       if (s) this.dataSource.sort = s;
     });
+
+    effect(() => {
+      // Re-apply column filters whenever the map changes.
+      this.dataSource.filter = JSON.stringify(this.columnFilters());
+    });
   }
 
   isMobile(): boolean {
     return this.innerWidth() < 600;
+  }
+
+  resolveRowId(row: T): string {
+    return this.rowId()(row);
+  }
+
+  isSelected(row: T): boolean {
+    return this.selectedIds().has(this.resolveRowId(row));
+  }
+
+  toggleRowSelection(row: T, checked: boolean): void {
+    const id = this.resolveRowId(row);
+    if (!id) return;
+    const next = new Set(this.selectedIds());
+    if (checked) next.add(id);
+    else next.delete(id);
+    this.selectedIds.set(next);
+    this.emitSelection();
+  }
+
+  isPageAllSelected(): boolean {
+    const page = this.pageRows();
+    return page.length > 0 && page.every((row) => this.isSelected(row));
+  }
+
+  isPagePartiallySelected(): boolean {
+    const page = this.pageRows();
+    const selectedCount = page.filter((row) => this.isSelected(row)).length;
+    return selectedCount > 0 && selectedCount < page.length;
+  }
+
+  togglePageSelection(checked: boolean): void {
+    const next = new Set(this.selectedIds());
+    for (const row of this.pageRows()) {
+      const id = this.resolveRowId(row);
+      if (!id) continue;
+      if (checked) next.add(id);
+      else next.delete(id);
+    }
+    this.selectedIds.set(next);
+    this.emitSelection();
+  }
+
+  setColumnFilter(key: string, value: string): void {
+    this.columnFilters.update((current) => ({ ...current, [key]: value }));
   }
 
   onRowContext(event: MouseEvent, tooltip: { show: () => void; hide: () => void }): void {
@@ -106,17 +201,12 @@ export class DataTableComponent<T> {
   formatRowTooltip(row: Record<string, unknown>): string {
     if (!row || this.innerWidth() > 600) return '';
     try {
-      const keys = Object.keys(row);
+      const keys = Object.keys(row).filter((k) => k !== 'id');
       const parts = keys.slice(0, 2).map((k) => `${k}: ${row[k]}`);
       return parts.join(' — ');
     } catch {
       return String(row);
     }
-  }
-
-  applyFilter(event: Event): void {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
   }
 
   toggleRow(row: T): void {
@@ -127,8 +217,6 @@ export class DataTableComponent<T> {
   isExpanded(row: T): boolean {
     return this.expandedRow() === row;
   }
-
-  isExpandedRow = (_index: number, row: T): boolean => this.isExpanded(row);
 
   formatCell(row: Record<string, unknown>, column: TableColumn<T>): string {
     if (!row || !column) return '';
@@ -143,5 +231,20 @@ export class DataTableComponent<T> {
       default:
         return value !== undefined && value !== null ? String(value) : '';
     }
+  }
+
+  private pageRows(): T[] {
+    if (!this.dataSource.paginator) {
+      return this.dataSource.filteredData;
+    }
+    const start = this.dataSource.paginator.pageIndex * this.dataSource.paginator.pageSize;
+    const end = start + this.dataSource.paginator.pageSize;
+    return this.dataSource.filteredData.slice(start, end);
+  }
+
+  private emitSelection(): void {
+    const ids = this.selectedIds();
+    const selected = this.data().filter((row) => ids.has(this.resolveRowId(row)));
+    this.selectionChange.emit(selected);
   }
 }

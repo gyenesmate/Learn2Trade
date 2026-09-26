@@ -1,6 +1,6 @@
 /**
  * Declarative sidebar navigation entry.
- * Visibility is evaluated against auth state when rendering.
+ * Visibility is evaluated against auth state when rendering / searching.
  */
 export type SidebarLinkVisibility =
   | 'always'
@@ -28,4 +28,29 @@ export interface SidebarLink {
   disabled?: boolean;
   /** Placement group in the sidebar */
   section?: SidebarLinkSection;
+  /** Extra terms for global search matching */
+  keywords?: string[];
+  /** Alternate names for global search */
+  aliases?: string[];
+  /** Search ranking boost */
+  priority?: number;
+}
+
+export function isSidebarLinkVisible(
+  link: SidebarLink,
+  loggedIn: boolean,
+  admin: boolean
+): boolean {
+  switch (link.visibility) {
+    case 'always':
+      return true;
+    case 'authenticated':
+      return loggedIn;
+    case 'anonymous':
+      return !loggedIn;
+    case 'admin':
+      return admin;
+    default:
+      return true;
+  }
 }

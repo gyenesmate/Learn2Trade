@@ -51,14 +51,14 @@ export class PortfolioComponent {
   readonly adminLoading = signal(false);
 
   cryptoColumns: TableColumn<CryptoCurrency>[] = [
-    { key: 'name', label: 'Name' },
-    { key: 'symbol', label: 'Symbol' },
-    { key: 'exchange_currency', label: 'Quote' }
+    { key: 'name', label: 'Name', filterable: true },
+    { key: 'symbol', label: 'Symbol', filterable: true },
+    { key: 'exchange_currency', label: 'Quote', filterable: true }
   ];
 
   userColumns: TableColumn<User>[] = [
-    { key: 'username', label: 'User name' },
-    { key: 'email', label: 'Email' },
+    { key: 'username', label: 'User name', filterable: true },
+    { key: 'email', label: 'Email', filterable: true },
     { key: 'is_admin', label: 'Admin', type: 'boolean' }
   ];
 
@@ -72,22 +72,22 @@ export class PortfolioComponent {
   ];
 
   cryptoActionBar: TableAction[] = [
-    { label: 'Add', icon: 'add', callback: () => this.addCryptoCurrency() }
+    { label: 'Add', icon: 'add', variant: 'primary', callback: () => this.addCryptoCurrency() }
   ];
 
   watchlistColumns: TableColumn<any>[] = [
-    { key: 'name', label: 'Name' },
-    { key: 'symbol', label: 'Symbol' },
-    { key: 'exchangeCurrency', label: 'Quote' }
+    { key: 'name', label: 'Name', filterable: true },
+    { key: 'symbol', label: 'Symbol', filterable: true },
+    { key: 'exchangeCurrency', label: 'Quote', filterable: true }
   ];
-  readonly watchlistRows = signal<Array<{ cryptoCurrencyId: string; name: string; symbol: string; exchangeCurrency: string }>>([]);
+  readonly watchlistRows = signal<Array<{ id: string; cryptoCurrencyId: string; name: string; symbol: string; exchangeCurrency: string }>>([]);
   watchlistRowActions: RowAction<any>[] = [
     { label: 'Delete', icon: 'delete', color: 'warn', callback: (row) => void this.deleteWatchlistSubscription(row) }
   ];
 
   investmentsColumns: TableColumn<any>[] = [
-    { key: 'currencyName', label: 'Currency' },
-    { key: 'exchange', label: 'Exchange' },
+    { key: 'currencyName', label: 'Currency', filterable: true },
+    { key: 'exchange', label: 'Exchange', filterable: true },
     { key: 'amount', label: 'Amount', type: 'currency' as any },
     { key: 'soldAt', label: 'Sold at', type: 'date' },
     { key: 'createdAt', label: 'Created at', type: 'date' }
@@ -98,10 +98,10 @@ export class PortfolioComponent {
   ];
 
   alertsColumns: TableColumn<any>[] = [
-    { key: 'currencyName', label: 'Currency' },
-    { key: 'type', label: 'Type' },
+    { key: 'currencyName', label: 'Currency', filterable: true },
+    { key: 'type', label: 'Type', filterable: true },
     { key: 'alertPrice', label: 'Target', type: 'number' },
-    { key: 'description', label: 'Description' },
+    { key: 'description', label: 'Description', filterable: true },
     { key: 'isActive', label: 'Active', type: 'boolean' },
     { key: 'createdAt', label: 'Created at', type: 'date' }
   ];
@@ -242,6 +242,7 @@ export class PortfolioComponent {
         subs.map((s) => {
           const crypto = cryptoById.get(s.crypto_currency_id);
           return {
+            id: s.crypto_currency_id,
             cryptoCurrencyId: s.crypto_currency_id,
             name: crypto?.name ?? s.crypto_currency_id,
             symbol: crypto?.symbol ?? '',

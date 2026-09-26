@@ -20,6 +20,8 @@ src/
 │   │   │   ├── base-layout/
 │   │   │   ├── sidebar/
 │   │   │   └── navbar/
+│   │   │       └── global-search/   # search UI (mat-autocomplete); engine lives in core/search
+│   │   ├── search/                  # app-wide search infrastructure (providers, ranking)
 │   │   ├── services/
 │   │   ├── utils/
 │   │   ├── guards/
@@ -117,7 +119,7 @@ Current:
 
 - `base-layout/` — main app shell
 - `sidebar/` — primary navigation, active route, collapse coordination via parent
-- `navbar/` — theme, user menu, balance, mobile bottom nav controls
+- `navbar/` — theme, user menu, balance, mobile bottom nav controls, centered global search UI (`navbar/global-search/`)
 
 Future layouts (`auth-layout`, `fullscreen-layout`) only when routes truly need a different shell. Do not create them speculatively.
 
@@ -164,8 +166,15 @@ features/trading/
 | Kind | Location |
 | --- | --- |
 | App-wide / business API | `core/services/` |
+| Cross-cutting app subsystem (search, …) | `core/<subsystem>/` |
 | Feature-only | `features/<feature>/services/` |
 | Component-only | next to that component under `services/` |
+
+Complex cross-application subsystems may receive their own directory under `core/` instead of placing all related files into generic `services/` or `utils/` directories.
+
+Example: `core/search/` owns provider contracts, ranking, and `GlobalSearchService`. The navbar-owned presentation lives in `core/layout/navbar/global-search/` and must not contain feature-specific search logic.
+
+Feature-owned search contributions (e.g. market provider) live under `features/<feature>/search/` and register via `GLOBAL_SEARCH_PROVIDERS` at the application root so the always-visible navbar can use them before lazy routes load.
 
 Examples in `core/services/`: `auth`, `users`, `crypto-currencies`, `investments`, `price-alerts`, `watchlist-subscriptions`, `notification`, `api`, `token-storage.services`, `auth.interceptor`.
 
@@ -224,11 +233,14 @@ No global Material overrides inside feature SCSS. Prefer tokens over arbitrary h
 
 1. App root / global host? → `app/` or appropriate `core/`
 2. Persistent shell shared by routes? → `core/layout/`
-3. App-wide business/infra? → `core/services/`
-4. Globally reusable utility? → `core/utils/`
-5. Reusable presentation? → `shared/components/`
-6. One business feature? → `features/<feature>/`
-7. Exists only for one component? → keep colocated
+3. App-wide business/infra HTTP API? → `core/services/`
+4. Cross-cutting subsystem (search engine, …)? → `core/<subsystem>/`
+5. Globally reusable utility? → `core/utils/`
+6. Reusable presentation? → `shared/components/`
+7. One business feature? → `features/<feature>/`
+8. Exists only for one component? → keep colocated
+
+Search split: engine → `core/search/`; autocomplete UI → `core/layout/navbar/global-search/`; feature providers/definitions → `features/<feature>/search/`.
 
 ---
 

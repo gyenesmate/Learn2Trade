@@ -1,0 +1,38 @@
+<mat-form-field class="global-search__field w-full" subscriptSizing="dynamic">
+  <mat-icon matPrefix>search</mat-icon>
+  <input
+    #queryInput
+    matInput
+    type="search"
+    placeholder="Search markets, features or commands..."
+    [formControl]="queryControl"
+    [matAutocomplete]="searchAutocomplete"
+    autocomplete="off"
+    aria-label="Global search"
+  />
+</mat-form-field>
+
+<mat-autocomplete
+  #searchAutocomplete="matAutocomplete"
+  class="global-search-panel"
+  [displayWith]="displayResult"
+  (optionSelected)="onOptionSelected($event.option.value)"
+  (opened)="panelOpen.set(true)"
+  (closed)="panelOpen.set(false)"
+>
+  @if (state().loading) {
+    <mat-option disabled>Searching…</mat-option>
+  } @else if (state().query && state().groups.length === 0) {
+    <mat-option disabled>No results for "{{ state().query }}"</mat-option>
+  } @else {
+    @for (group of state().groups; track group.type) {
+      <mat-optgroup [label]="group.label">
+        @for (result of group.results; track result.id) {
+          <mat-option [value]="result">
+            <app-search-result [result]="result" />
+          </mat-option>
+        }
+      </mat-optgroup>
+    }
+  }
+</mat-autocomplete>

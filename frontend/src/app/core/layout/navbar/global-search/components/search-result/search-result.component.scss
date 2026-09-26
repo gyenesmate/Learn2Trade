@@ -1,0 +1,22 @@
+.search-result__icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-muted);
+}
+
+.search-result__title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-result__description {
+  font-size: var(--font-size-xs);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

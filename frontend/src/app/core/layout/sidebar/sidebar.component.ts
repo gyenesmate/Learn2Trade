@@ -15,7 +15,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
-import { SidebarLink } from './sidebar-link.model';
+import { SidebarLink, isSidebarLinkVisible } from './sidebar-link.model';
+import { SIDEBAR_LINKS } from './sidebar.links';
 
 @Component({
   selector: 'app-sidebar',
@@ -38,71 +39,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
   readonly isAdmin = computed(() => this.authService.currentUser()?.is_admin === true);
   readonly currentRoute = signal('');
 
-  /** Site definitions — add/remove entries here to change navigation. */
-  private readonly links: readonly SidebarLink[] = [
-    {
-      id: 'dashboard',
-      route: '/dashboard',
-      label: 'Dashboard',
-      icon: 'dashboard',
-      visibility: 'authenticated',
-      section: 'main',
-    },
-    {
-      id: 'markets',
-      route: '/home',
-      label: 'Markets',
-      icon: 'home',
-      visibility: 'always',
-      section: 'main',
-    },
-    {
-      id: 'portfolio',
-      route: '/profile',
-      label: 'Portfolio',
-      icon: 'account_balance_wallet',
-      visibility: 'authenticated',
-      section: 'main',
-    },
-    {
-      id: 'admin-users',
-      label: 'Users',
-      icon: 'group',
-      visibility: 'admin',
-      section: 'admin',
-    },
-    {
-      id: 'admin-crypto',
-      label: 'Crypto admin',
-      icon: 'currency_bitcoin',
-      visibility: 'admin',
-      section: 'admin',
-    },
-    {
-      id: 'admin-settings',
-      label: 'Admin settings',
-      icon: 'admin_panel_settings',
-      visibility: 'admin',
-      section: 'admin',
-    },
-    {
-      id: 'login',
-      route: '/login',
-      label: 'Login',
-      icon: 'login',
-      visibility: 'anonymous',
-      section: 'footer',
-    },
-    {
-      id: 'register',
-      route: '/register',
-      label: 'Register',
-      icon: 'person_add',
-      visibility: 'anonymous',
-      section: 'footer',
-    },
-  ];
-
   readonly mainLinks = computed(() =>
     this.visibleLinks().filter((link) => (link.section ?? 'main') === 'main')
   );
@@ -120,7 +56,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   private readonly visibleLinks = computed(() => {
     const loggedIn = this.isLoggedIn();
     const admin = this.isAdmin();
-    return this.links.filter((link) => this.isLinkVisible(link, loggedIn, admin));
+    return SIDEBAR_LINKS.filter((link) => isSidebarLinkVisible(link, loggedIn, admin));
   });
 
   ngOnInit(): void {
@@ -151,7 +87,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (link.disabled === true) {
       return true;
     }
-    // Admin entries are never shown to non-admins; keep enabled when visible.
     return link.visibility === 'admin' && !this.isAdmin();
   }
 
@@ -161,20 +96,5 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
     void this.router.navigate([link.route]);
     this.navigated.emit();
-  }
-
-  private isLinkVisible(link: SidebarLink, loggedIn: boolean, admin: boolean): boolean {
-    switch (link.visibility) {
-      case 'always':
-        return true;
-      case 'authenticated':
-        return loggedIn;
-      case 'anonymous':
-        return !loggedIn;
-      case 'admin':
-        return admin;
-      default:
-        return true;
-    }
   }
 }

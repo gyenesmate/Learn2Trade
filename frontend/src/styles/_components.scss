@@ -90,6 +90,20 @@
     font-size: var(--font-size-xs);
   }
 
+  /* Compact trading spinner — uses Material overrides for brand color. */
+  .progress-spinner {
+    --mdc-circular-progress-active-indicator-color: var(--color-primary);
+  }
+
+  .loading-spinner {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    color: var(--color-text-muted);
+    font-size: var(--font-size-sm);
+  }
+
   .trade-buy-button,
   .trade-sell-button {
     display: inline-flex;

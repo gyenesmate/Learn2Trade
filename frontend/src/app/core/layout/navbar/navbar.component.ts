@@ -21,6 +21,7 @@ import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
 import { UsersService } from '@core/services/users.service';
+import { GlobalSearchComponent } from './global-search/global-search.component';
 
 @Component({
   selector: 'app-navbar',
@@ -30,6 +31,7 @@ import { UsersService } from '@core/services/users.service';
     MatButtonModule,
     MatMenuModule,
     MatTooltipModule,
+    GlobalSearchComponent,
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',

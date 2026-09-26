@@ -1,57 +1,61 @@
 <mat-toolbar class="toolbar" [class.mobile-toolbar]="isMobile()">
-  <button
-    mat-icon-button
-    type="button"
-    class="menu-button"
-    (click)="menuToggle.emit()"
-    aria-label="Toggle sidebar"
-    matTooltip="Toggle sidebar"
-  >
-    <mat-icon>menu</mat-icon>
-  </button>
+  <div class="navbar-left flex flex-1 items-center justify-start min-w-0">
+    <button
+      mat-icon-button
+      type="button"
+      class="menu-button"
+      (click)="menuToggle.emit()"
+      aria-label="Toggle sidebar"
+      matTooltip="Toggle sidebar"
+    >
+      <mat-icon>menu</mat-icon>
+    </button>
+  </div>
 
-  <span class="app-title">Learn2Trade</span>
+  <div class="navbar-center flex flex-1 items-center justify-center min-w-0">
+    <app-global-search class="navbar-search" />
+  </div>
 
-  <span class="spacer"></span>
+  <div class="navbar-right flex flex-1 items-center justify-end min-w-0 gap-sm">
+    <button
+      mat-icon-button
+      type="button"
+      (click)="toggleTheme()"
+      [attr.aria-label]="isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
+      [matTooltip]="isDark() ? 'Light theme' : 'Dark theme'"
+    >
+      <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
 
-  <button
-    mat-icon-button
-    type="button"
-    (click)="toggleTheme()"
-    [attr.aria-label]="isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
-    [matTooltip]="isDark() ? 'Light theme' : 'Dark theme'"
-  >
-    <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
-  </button>
-
-  @if (isLoggedIn()) {
-    @if (user(); as u) {
-      <div class="user-info">
-        @if (!isMobile()) {
-          <span class="balance tabular-nums">${{ u.balance }}</span>
-          <span class="username">{{ u.username }}</span>
-        }
-        <button
-          mat-icon-button
-          type="button"
-          [matMenuTriggerFor]="userMenu"
-          aria-label="User menu"
-        >
-          <mat-icon>account_circle</mat-icon>
-        </button>
-        <mat-menu #userMenu="matMenu">
-          <button mat-menu-item type="button" (click)="navigateTo('/profile')">
-            <mat-icon>person</mat-icon>
-            Profile
+    @if (isLoggedIn()) {
+      @if (user(); as u) {
+        <div class="user-info">
+          @if (!isMobile()) {
+            <span class="balance tabular-nums">${{ u.balance }}</span>
+            <span class="username">{{ u.username }}</span>
+          }
+          <button
+            mat-icon-button
+            type="button"
+            [matMenuTriggerFor]="userMenu"
+            aria-label="User menu"
+          >
+            <mat-icon>account_circle</mat-icon>
           </button>
-          <button mat-menu-item type="button" (click)="logout()">
-            <mat-icon>logout</mat-icon>
-            Logout
-          </button>
-        </mat-menu>
-      </div>
+          <mat-menu #userMenu="matMenu">
+            <button mat-menu-item type="button" (click)="navigateTo('/profile')">
+              <mat-icon>person</mat-icon>
+              Profile
+            </button>
+            <button mat-menu-item type="button" (click)="logout()">
+              <mat-icon>logout</mat-icon>
+              Logout
+            </button>
+          </mat-menu>
+        </div>
+      }
     }
-  }
+  </div>
 </mat-toolbar>
 
 @if (isMobile()) {
