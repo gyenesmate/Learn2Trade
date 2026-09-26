@@ -18,7 +18,6 @@ export interface TableAction {
   /** Visual style from global `.btn` primitives. Defaults to `'primary'`. */
   variant?: 'primary' | 'secondary';
   callback: () => void;
-  tooltip?: string;
 }
 
 export interface RowAction<T> {

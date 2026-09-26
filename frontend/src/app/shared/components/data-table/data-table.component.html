@@ -14,8 +14,6 @@
               class="btn"
               [class.btn-primary]="(action.variant ?? 'primary') === 'primary'"
               [class.btn-secondary]="action.variant === 'secondary'"
-              [matTooltip]="action.tooltip || action.label"
-              [matTooltipShowDelay]="0"
               (click)="action.callback()">
               @if (action.icon) {
                 <mat-icon>{{ action.icon }}</mat-icon>
