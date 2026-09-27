@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
-import { AnalyticsCardState } from './analytics-card-utilities';
+import { AnalyticsCardState } from './analytics-card.types';
 import { Investment } from '@core/models/models';
 import { isInvestmentSold } from '@core/utils/investment.util';
 

@@ -16,6 +16,12 @@ export interface UserMe extends User {
   profit_index: number;
 }
 
+export interface UserProfileUpdate {
+  username?: string;
+  avatar_url?: string | null;
+  theme?: 'light' | 'dark' | 'system';
+}
+
 export interface TokenResponse {
   access_token: string;
   token_type: string;

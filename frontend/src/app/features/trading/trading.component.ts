@@ -15,17 +15,22 @@ import { CryptoCurrency, Investment } from '@core/models/models';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { CryptoCardComponent } from '@shared/components/crypto-card/crypto-card.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { InvestDialogComponent, InvestDialogResult } from '@features/trading/components/invest-dialog/invest-dialog.component';
+import { InvestDialogComponent } from '@features/trading/components/invest-dialog/invest-dialog.component';
+import { InvestDialogResult } from '@features/trading/components/invest-dialog/invest-dialog.types';
 import { AuthService } from '@core/services/auth.service';
 import { InvestmentsService } from '@core/services/investments.service';
 import { NotificationService } from '@core/services/notification.service';
 import { ActiveInvestmentComponent } from '@features/trading/components/active-investment/active-investment.component';
-import { SetPriceAlertDialogComponent, SetPriceAlertDialogResult } from '@features/trading/components/set-price-alert-dialog/set-price-alert-dialog.component';
+import { SetPriceAlertDialogComponent } from '@features/trading/components/set-price-alert-dialog/set-price-alert-dialog.component';
+import { SetPriceAlertDialogResult } from '@features/trading/components/set-price-alert-dialog/set-price-alert-dialog.types';
 import { PriceAlertsService } from '@core/services/price-alerts.service';
+import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
+import { PageHeaderAction } from '@shared/components/page-header/page-header.types';
+import { TRADING_HEADER_ACTIONS } from './trading.const';
 
 @Component({
   selector: 'app-trading',
-  imports: [RouterModule, CryptoCardComponent, MatDialogModule, ActiveInvestmentComponent],
+  imports: [RouterModule, CryptoCardComponent, MatDialogModule, ActiveInvestmentComponent, PageHeaderComponent],
   templateUrl: './trading.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./trading.component.scss']
@@ -58,6 +63,22 @@ export class TradingComponent implements OnInit {
   readonly activeInvestments = signal<Investment[]>([]);
   readonly investing = signal(false);
   readonly selling = signal(false);
+
+  readonly pageTitle = computed(() => this.selectedCrypto()?.name ?? 'Crypto');
+  readonly headerActions = computed<PageHeaderAction[]>(() => {
+    if (!this.selectedCrypto()) return [];
+    return [
+      {
+        ...TRADING_HEADER_ACTIONS.invest,
+        disabled: this.investing(),
+        callback: () => this.openInvest(),
+      },
+      {
+        ...TRADING_HEADER_ACTIONS.setAlert,
+        callback: () => this.openSetAlert(),
+      },
+    ];
+  });
 
   readonly card = viewChild<CryptoCardComponent>('card');
 

@@ -7,10 +7,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { AuthService } from '@core/services/auth.service';
 import { UsersService } from '@core/services/users.service';
 import { NotificationService } from '@core/services/notification.service';
+import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
+import { EDIT_PROFILE_PAGE_TITLE } from './edit-profile.const';
 
 @Component({
   selector: 'app-edit-profile',
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSelectModule],
+  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, PageHeaderComponent],
   templateUrl: './edit-profile.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./edit-profile.component.scss']
@@ -21,6 +23,8 @@ export class EditProfileComponent {
   private readonly usersService = inject(UsersService);
   private readonly notification = inject(NotificationService);
   private readonly fb = inject(FormBuilder);
+
+  readonly pageTitle = EDIT_PROFILE_PAGE_TITLE;
 
   readonly form = this.fb.nonNullable.group({
     username: [this.authService.currentUser()?.username ?? '', Validators.required],

@@ -5,10 +5,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { NotificationService } from '@core/services/notification.service';
+import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
+import { CRYPTO_CURRENCY_EDIT_TITLES } from './crypto-currency-edit.const';
 
 @Component({
   selector: 'app-crypto-currency-edit',
-  imports: [ReactiveFormsModule, RouterModule, MatFormFieldModule, MatInputModule],
+  imports: [ReactiveFormsModule, RouterModule, MatFormFieldModule, MatInputModule, PageHeaderComponent],
   templateUrl: './crypto-currency-edit.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./crypto-currency-edit.component.scss']
@@ -32,6 +34,10 @@ export class CryptoCurrencyEditComponent implements OnInit {
 
   get isNew(): boolean {
     return !this.id;
+  }
+
+  get pageTitle(): string {
+    return this.isNew ? CRYPTO_CURRENCY_EDIT_TITLES.add : CRYPTO_CURRENCY_EDIT_TITLES.edit;
   }
 
   async ngOnInit(): Promise<void> {

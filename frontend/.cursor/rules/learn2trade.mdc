@@ -80,8 +80,10 @@ Visual direction: dark-first trading terminal. Semantic tokens only. Layout via 
 
 1. Read the target feature + one similar feature before editing.
 2. Place new files per `FILE_STRUCTURES.md` ownership rules.
-3. Preserve auth/guard behavior and route URLs.
-4. Reuse `shared/components` and `core/services` before inventing new abstractions.
-5. Feature-specific dialogs/components stay under the feature.
-6. Styles: tokens + Material overrides globally; layout via flex/grid utilities; local SCSS for brand/surface only.
-7. Validate with `npm run build` / `npm run test:unit` when practical.
+3. Component/subsystem-specific interfaces → colocated `*.types.ts` (see `core/search/search.types.ts`); static configs/labels → `*.const.ts`; domain entities → `core/models/`.
+4. Preserve auth/guard behavior and route URLs.
+5. Reuse `shared/components` and `core/services` before inventing new abstractions.
+6. Feature-specific dialogs/components stay under the feature.
+7. Page chrome: use `app-page-header` for title + actions; do not reinvent per-feature headers.
+8. Styles: tokens + Material overrides globally; layout via flex/grid utilities; local SCSS for brand/surface only.
+9. Validate with `npm run build` / `npm run test:unit` when practical.

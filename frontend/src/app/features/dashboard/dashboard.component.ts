@@ -1,5 +1,7 @@
 import { Component, OnInit, ChangeDetectionStrategy, inject, signal } from '@angular/core';
-import { TableColumn } from '@shared/components/data-table/data-table-utilities';
+import { TableColumn } from '@shared/components/data-table/data-table.types';
+import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
+import { PageHeaderAction } from '@shared/components/page-header/page-header.types';
 import { AnalyticsCardComponent } from '@features/dashboard/components/analytics-card/analytics-card.component';
 import { CryptoCurrency, Investment } from '@core/models/models';
 import { AuthService } from '@core/services/auth.service';
@@ -7,10 +9,11 @@ import { InvestmentsService } from '@core/services/investments.service';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { NotificationService } from '@core/services/notification.service';
 import { isInvestmentSold } from '@core/utils/investment.util';
+import { DASHBOARD_HEADER_ACTIONS, DASHBOARD_PAGE_TITLE } from './dashboard.const';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [AnalyticsCardComponent],
+  imports: [AnalyticsCardComponent, PageHeaderComponent],
   templateUrl: './dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./dashboard.component.scss']
@@ -20,6 +23,18 @@ export class DashboardComponent implements OnInit {
   private readonly investmentsService = inject(InvestmentsService);
   private readonly cryptosService = inject(CryptoCurrenciesService);
   private readonly notification = inject(NotificationService);
+
+  readonly pageTitle = DASHBOARD_PAGE_TITLE;
+  readonly headerActions: PageHeaderAction[] = [
+    {
+      ...DASHBOARD_HEADER_ACTIONS.exportReport,
+      callback: () => undefined,
+    },
+    {
+      ...DASHBOARD_HEADER_ACTIONS.addInvestment,
+      callback: () => undefined,
+    },
+  ];
 
   readonly portfolio = signal<{
     totalValue: number;

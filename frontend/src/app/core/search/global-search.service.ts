@@ -10,19 +10,14 @@ import {
   startWith,
   switchMap,
 } from 'rxjs';
-import { SearchProvider } from './search-provider';
 import {
   GLOBAL_SEARCH_PROVIDERS,
+  GlobalSearchState,
+  SearchProvider,
   SearchResult,
   SearchResultGroup,
 } from './search.types';
 import { dedupeById, groupResults, normalizeQuery, rankResults } from './search.utils';
-
-export interface GlobalSearchState {
-  query: string;
-  loading: boolean;
-  groups: SearchResultGroup[];
-}
 
 @Injectable({ providedIn: 'root' })
 export class GlobalSearchService {

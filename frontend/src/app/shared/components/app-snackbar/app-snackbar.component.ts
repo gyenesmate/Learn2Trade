@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { AppSnackbarAction, AppSnackbarData } from './app-snackbar.model';
+import { AppSnackbarAction, AppSnackbarData } from './app-snackbar.types';
 
 @Component({
   selector: 'app-snackbar',

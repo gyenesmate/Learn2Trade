@@ -1,4 +1,4 @@
-import { SidebarLink } from './sidebar-link.model';
+import { SidebarLink } from './sidebar-link.types';
 
 /** Single source for sidebar navigation and navigation search. */
 export const SIDEBAR_LINKS: readonly SidebarLink[] = [

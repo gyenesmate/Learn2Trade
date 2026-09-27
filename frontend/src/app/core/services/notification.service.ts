@@ -4,7 +4,7 @@ import {
   AppSnackbarAction,
   AppSnackbarRequest,
   AppSnackbarVariant,
-} from '@shared/components/app-snackbar/app-snackbar.model';
+} from '@shared/components/app-snackbar/app-snackbar.types';
 
 const AUTO_DISMISS_MS = 3500;
 

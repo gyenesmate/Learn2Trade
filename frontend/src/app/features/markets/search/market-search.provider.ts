@@ -3,8 +3,7 @@ import { Observable, from, map, of, shareReplay } from 'rxjs';
 import { CryptoCurrency } from '@core/models/models';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { AuthService } from '@core/services/auth.service';
-import { SearchProvider } from '@core/search/search-provider';
-import { SearchResult } from '@core/search/search.types';
+import { SearchProvider, SearchResult } from '@core/search/search.types';
 import { normalizeQuery } from '@core/search/search.utils';
 
 @Injectable({ providedIn: 'root' })

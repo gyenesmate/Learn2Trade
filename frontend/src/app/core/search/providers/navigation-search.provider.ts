@@ -1,10 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
-import { SIDEBAR_LINKS } from '@core/layout/sidebar/sidebar.links';
-import { isSidebarLinkVisible } from '@core/layout/sidebar/sidebar-link.model';
-import { SearchProvider } from '../search-provider';
-import { SearchResult } from '../search.types';
+import { SIDEBAR_LINKS } from '@core/layout/sidebar/sidebar.const';
+import { isSidebarLinkVisible } from '@core/layout/sidebar/sidebar-link.utils';
+import { SearchProvider, SearchResult } from '../search.types';
 import { matchesQuery, normalizeQuery } from '../search.utils';
 
 @Injectable({ providedIn: 'root' })

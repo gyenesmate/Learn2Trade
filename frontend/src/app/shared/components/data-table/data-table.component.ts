@@ -19,7 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { TableColumn, TableAction, RowAction } from './data-table-utilities';
+import { TableColumn, TableAction, RowAction } from './data-table.types';
 
 @Component({
   selector: 'app-data-table',

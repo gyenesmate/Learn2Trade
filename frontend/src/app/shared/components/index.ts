@@ -6,3 +6,4 @@ export * from './data-table/data-table.component';
 export * from './crypto-card/crypto-card.component';
 export * from './app-snackbar/app-snackbar.component';
 export * from './app-snackbar/notification-stack.component';
+export * from './page-header/page-header.component';

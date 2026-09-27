@@ -1,5 +1,5 @@
 import { InjectionToken } from '@angular/core';
-import type { SearchProvider } from './search-provider';
+import { Observable } from 'rxjs';
 
 export type SearchResultType =
   | 'navigation'
@@ -34,6 +34,17 @@ export interface SearchResultGroup {
   type: SearchResultType;
   label: string;
   results: SearchResult[];
+}
+
+export interface SearchProvider {
+  readonly id: string;
+  search(query: string): Observable<SearchResult[]>;
+}
+
+export interface GlobalSearchState {
+  query: string;
+  loading: boolean;
+  groups: SearchResultGroup[];
 }
 
 export const GLOBAL_SEARCH_PROVIDERS = new InjectionToken<readonly SearchProvider[]>(

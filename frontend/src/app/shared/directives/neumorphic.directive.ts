@@ -1,6 +1,5 @@
 import { Directive, computed, input, signal } from '@angular/core';
-
-export type NeuState = 'raised' | 'pressed' | 'floating';
+import { NeuState } from './neumorphic.types';
 
 @Directive({
   selector: '[appNeumorphic]',

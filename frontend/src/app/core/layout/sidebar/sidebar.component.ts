@@ -15,8 +15,9 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
-import { SidebarLink, isSidebarLinkVisible } from './sidebar-link.model';
-import { SIDEBAR_LINKS } from './sidebar.links';
+import { SidebarLink } from './sidebar-link.types';
+import { isSidebarLinkVisible } from './sidebar-link.utils';
+import { SIDEBAR_LINKS } from './sidebar.const';
 
 @Component({
   selector: 'app-sidebar',

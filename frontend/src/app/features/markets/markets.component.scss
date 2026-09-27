@@ -1,34 +1,13 @@
 .home-page {
-  min-height: 100vh;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
-}
-
-.header {
-  background-color: var(--color-surface);
-  padding: var(--space-md);
-  box-shadow: var(--shadow-sm);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-
-  &__title {
-    font-size: var(--font-size-xl);
-    color: var(--color-primary);
-    margin: 0;
-  }
-
-  &__nav {
-    display: flex;
-    gap: var(--space-sm);
-  }
 }
 
 .main-content {
   flex: 1;
   display: flex;
   gap: var(--space-lg);
-  padding: var(--space-lg);
 }
 
 .crypto-browser {

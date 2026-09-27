@@ -1,11 +1,5 @@
 <div class="dashboard">
-  <header class="dashboard-header">
-    <h1>Dashboard</h1>
-    <div class="header-actions">
-      <button class="btn btn-secondary">Export Report</button>
-      <button class="btn btn-primary">Add Investment</button>
-    </div>
-  </header>
+  <app-page-header [title]="pageTitle" [actions]="headerActions" />
 
   <div class="dashboard-content">
     @if (portfolio(); as portfolio) {

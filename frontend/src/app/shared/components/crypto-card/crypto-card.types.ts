@@ -8,5 +8,4 @@ export interface CryptoCardData {
   high?: number;
   low?: number;
   volume?: number;
-  // Add more fields as needed
 }

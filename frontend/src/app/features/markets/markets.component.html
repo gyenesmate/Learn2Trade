@@ -1,11 +1,5 @@
 <div class="home-page">
-  <header class="header">
-    <h1 class="header__title">CryptoWatcher</h1>
-    <nav class="header__nav">
-      <a class="btn btn-secondary" [routerLink]="['/dashboard']">Dashboard</a>
-      <a class="btn btn-secondary" [routerLink]="['/profile']">Profile</a>
-    </nav>
-  </header>
+  <app-page-header [title]="pageTitle" [actions]="headerActions" />
 
   <main class="main-content">
     <section class="crypto-browser">
@@ -43,7 +37,6 @@
             </tbody>
           </table>
         </div>
-        <a class="btn btn-secondary" [routerLink]="['/profile']" fragment="watchlist">Manage Watchlist</a>
       </section>
     </aside>
   </main>

@@ -18,14 +18,17 @@ import { firstValueFrom } from 'rxjs';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
 import { DataTableComponent } from '@shared/components/data-table/data-table.component';
-import { TableColumn, RowAction, TableAction } from '@shared/components/data-table/data-table-utilities';
+import { TableColumn, RowAction, TableAction } from '@shared/components/data-table/data-table.types';
+import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
+import { PageHeaderAction } from '@shared/components/page-header/page-header.types';
 import { WatchlistSubscriptionsService } from '@core/services/watchlist-subscriptions.service';
 import { InvestmentsService } from '@core/services/investments.service';
 import { PriceAlertsService } from '@core/services/price-alerts.service';
+import { PORTFOLIO_HEADER_ACTIONS, PORTFOLIO_PAGE_TITLE, PORTFOLIO_TABLE_ACTIONS } from './portfolio.const';
 
 @Component({
   selector: 'app-portfolio',
-  imports: [FormsModule, MatDialogModule, DataTableComponent],
+  imports: [FormsModule, MatDialogModule, DataTableComponent, PageHeaderComponent],
   templateUrl: './portfolio.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./portfolio.component.scss']
@@ -40,6 +43,14 @@ export class PortfolioComponent {
   private readonly priceAlertsService = inject(PriceAlertsService);
   private readonly dialog = inject(MatDialog);
   private readonly notification = inject(NotificationService);
+
+  readonly pageTitle = PORTFOLIO_PAGE_TITLE;
+  readonly headerActions: PageHeaderAction[] = [
+    {
+      ...PORTFOLIO_HEADER_ACTIONS.editProfile,
+      callback: () => this.editProfile(),
+    },
+  ];
 
   readonly user = this.authService.currentUser;
   readonly isAdmin = computed(() => !!this.user()?.is_admin);
@@ -63,16 +74,16 @@ export class PortfolioComponent {
   ];
 
   cryptoRowActions: RowAction<CryptoCurrency>[] = [
-    { label: 'Edit', icon: 'edit', callback: (row) => this.editCryptoCurrency(row) },
-    { label: 'Delete', icon: 'delete', color: 'warn', callback: (row) => this.deleteCryptoCurrency(row) }
+    { ...PORTFOLIO_TABLE_ACTIONS.edit, callback: (row) => this.editCryptoCurrency(row) },
+    { ...PORTFOLIO_TABLE_ACTIONS.delete, callback: (row) => this.deleteCryptoCurrency(row) }
   ];
 
   userRowActions: RowAction<User>[] = [
-    { label: 'Ban/Unban', icon: 'block', color: 'warn', callback: (row) => this.deleteUser(row) }
+    { ...PORTFOLIO_TABLE_ACTIONS.ban, callback: (row) => this.deleteUser(row) }
   ];
 
   cryptoActionBar: TableAction[] = [
-    { label: 'Add', icon: 'add', variant: 'primary', callback: () => this.addCryptoCurrency() }
+    { ...PORTFOLIO_TABLE_ACTIONS.addCrypto, callback: () => this.addCryptoCurrency() }
   ];
 
   watchlistColumns: TableColumn<any>[] = [
@@ -82,7 +93,7 @@ export class PortfolioComponent {
   ];
   readonly watchlistRows = signal<Array<{ id: string; cryptoCurrencyId: string; name: string; symbol: string; exchangeCurrency: string }>>([]);
   watchlistRowActions: RowAction<any>[] = [
-    { label: 'Delete', icon: 'delete', color: 'warn', callback: (row) => void this.deleteWatchlistSubscription(row) }
+    { ...PORTFOLIO_TABLE_ACTIONS.delete, callback: (row) => void this.deleteWatchlistSubscription(row) }
   ];
 
   investmentsColumns: TableColumn<any>[] = [
@@ -94,7 +105,7 @@ export class PortfolioComponent {
   ];
   readonly investmentsRows = signal<Array<{ id: string; cryptoCurrencyId: string; currencyName: string; exchange: string; amount: number; soldAt: any; createdAt: any }>>([]);
   investmentsRowActions: RowAction<any>[] = [
-    { label: 'View', icon: 'visibility', callback: (row) => this.router.navigate(['/crypto', row.cryptoCurrencyId]) }
+    { ...PORTFOLIO_TABLE_ACTIONS.view, callback: (row) => this.router.navigate(['/crypto', row.cryptoCurrencyId]) }
   ];
 
   alertsColumns: TableColumn<any>[] = [
@@ -107,7 +118,7 @@ export class PortfolioComponent {
   ];
   readonly alertsRows = signal<Array<{ id: string; cryptoCurrencyId: string; currencyName: string; type: string; alertPrice: number; description: string; isActive: boolean; createdAt: any }>>([]);
   alertsRowActions: RowAction<any>[] = [
-    { label: 'Delete', icon: 'delete', color: 'warn', callback: (row) => void this.deleteAlert(row) }
+    { ...PORTFOLIO_TABLE_ACTIONS.delete, callback: (row) => void this.deleteAlert(row) }
   ];
 
   private readonly cryptoByIdCache = signal(new Map<string, CryptoCurrency>());

@@ -1,0 +1,34 @@
+<header class="page-header">
+  <div class="page-header__start">
+    @if (showBack()) {
+      <button
+        type="button"
+        mat-icon-button
+        class="page-header__back"
+        aria-label="Go back"
+        (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    }
+    <h1 class="page-header__title">{{ title() }}</h1>
+  </div>
+
+  @if (actions().length) {
+    <div class="page-header__actions">
+      @for (action of actions(); track action.label) {
+        <button
+          type="button"
+          class="btn"
+          [class.btn-primary]="(action.variant ?? 'primary') === 'primary'"
+          [class.btn-secondary]="action.variant === 'secondary'"
+          [disabled]="action.disabled === true"
+          (click)="action.callback()">
+          @if (action.icon) {
+            <mat-icon>{{ action.icon }}</mat-icon>
+          }
+          {{ action.label }}
+        </button>
+      }
+    </div>
+  }
+</header>

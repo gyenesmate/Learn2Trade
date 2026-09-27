@@ -1,19 +1,8 @@
 <div class="crypto-detail-page">
-  <header class="crypto-detail-header">
-    <a class="btn btn-secondary" routerLink="/home">← Back</a>
-    @if (selectedCrypto(); as selectedCrypto) {
-      <div class="crypto-detail-title">
-        <h1>{{ selectedCrypto.name }}</h1>
-        <div class="crypto-detail-sub">{{ selectedCrypto.symbol }} / {{ selectedCrypto.exchange_currency }}</div>
-      </div>
-    }
-  </header>
+  <app-page-header [title]="pageTitle()" [actions]="headerActions()" />
 
   @if (selectedCrypto(); as selectedCrypto) {
-    <div class="crypto-detail-actions">
-      <button class="btn btn-primary" (click)="openInvest()" [disabled]="investing()">Invest</button>
-      <button class="btn btn-secondary" (click)="openSetAlert()">Set alert</button>
-    </div>
+    <div class="crypto-detail-sub">{{ selectedCrypto.symbol }} / {{ selectedCrypto.exchange_currency }}</div>
     <app-crypto-card #card [state]="'detailed'" [data]="selectedCrypto"></app-crypto-card>
     @if (activeInvestments().length) {
       <div class="crypto-detail-bottom">

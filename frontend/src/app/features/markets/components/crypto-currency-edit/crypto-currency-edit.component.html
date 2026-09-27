@@ -1,8 +1,5 @@
 <div class="crypto-currency-edit-page card">
-  <header class="page-header">
-    <h1>{{ isNew ? 'Add crypto currency' : 'Edit crypto currency' }}</h1>
-    <a class="btn btn-secondary" routerLink="/profile">Back</a>
-  </header>
+  <app-page-header [title]="pageTitle" />
 
   @if (loading()) {
     <div class="loading">Loading...</div>

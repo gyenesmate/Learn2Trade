@@ -5,18 +5,8 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { CryptoCurrency } from '@core/models/models';
 import { BaseDialogComponent } from '@shared/components/base-dialog/base-dialog.component';
-
-export interface InvestDialogData {
-  crypto: CryptoCurrency;
-  currentPrice: number;
-}
-
-export interface InvestDialogResult {
-  amount: number;
-  description: string;
-}
+import { InvestDialogData, InvestDialogResult } from './invest-dialog.types';
 
 @Component({
   selector: 'app-invest-dialog',

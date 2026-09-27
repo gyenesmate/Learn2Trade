@@ -7,16 +7,19 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CryptoCurrency, UserMe } from '@core/models/models';
 import { CryptoCardComponent } from '@shared/components/crypto-card/crypto-card.component';
+import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
+import { PageHeaderAction } from '@shared/components/page-header/page-header.types';
 import { AuthService } from '@core/services/auth.service';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { WatchlistSubscriptionsService } from '@core/services/watchlist-subscriptions.service';
+import { MARKETS_HEADER_ACTIONS, MARKETS_PAGE_TITLE } from './markets.const';
 
 @Component({
   selector: 'app-markets',
-  imports: [RouterModule, CryptoCardComponent],
+  imports: [RouterModule, CryptoCardComponent, PageHeaderComponent],
   templateUrl: './markets.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./markets.component.scss']
@@ -25,6 +28,15 @@ export class MarketsComponent implements OnInit {
   private readonly auth = inject(AuthService);
   private readonly cryptoService = inject(CryptoCurrenciesService);
   private readonly watchlistSubscriptions = inject(WatchlistSubscriptionsService);
+  private readonly router = inject(Router);
+
+  readonly pageTitle = MARKETS_PAGE_TITLE;
+  readonly headerActions: PageHeaderAction[] = [
+    {
+      ...MARKETS_HEADER_ACTIONS.manageWatchlist,
+      callback: () => void this.router.navigate(['/profile'], { fragment: 'watchlist' }),
+    },
+  ];
 
   private readonly fallbackCryptocurrencies: CryptoCurrency[] = [
     { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', exchange_currency: 'USD', created_at: '', updated_at: '' },

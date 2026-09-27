@@ -34,10 +34,11 @@
   flex-direction: column;
   flex: 1 1 auto;
   min-height: 0;
-  padding: var(--space-md);
+  /* Sole page gutter — feature pages must not add outer padding. */
+  padding: var(--space-lg);
   overflow: auto;
 
   &--mobile {
-    padding-bottom: calc(var(--space-md) + 56px);
+    padding-bottom: calc(var(--space-lg) + 56px);
   }
 }

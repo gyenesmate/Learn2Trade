@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-
-export type StatusChipTone = 'neutral' | 'long' | 'short' | 'success' | 'danger' | 'warning';
+import { StatusChipTone } from './status-chip.types';
 
 @Component({
   selector: 'app-status-chip',

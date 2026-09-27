@@ -194,15 +194,62 @@ Examples: `number.util.ts`, `investment.util.ts` → `core/utils/`.
 
 ---
 
-## 9. Models
+## 9. Types & models
 
-Ownership determines placement:
+### Domain models (`models/`)
 
-- App-wide shared domain types → `core/models/`
-- Feature-only → `features/<feature>/models/`
-- Truly local → colocated with the component
+App-wide shared **domain / API** shapes (entities the backend owns):
+
+- App-wide → `core/models/`
+- Feature-only domain → `features/<feature>/models/`
 
 Do not create a dumping-ground `models/` for unrelated domains.
+
+### Component / subsystem types (`*.types.ts`)
+
+UI contracts, dialog payloads, table column configs, search result shapes, and other **component- or subsystem-specific** interfaces/types live in a colocated `*.types.ts` file — not inside the `.component.ts` / `.service.ts` / `*-utilities.ts`.
+
+Canonical example: `core/search/`:
+
+```text
+core/search/
+├── search.types.ts          # SearchResult, SearchResultGroup, tokens, …
+├── search.utils.ts          # pure helpers (rank, normalize, …)
+├── global-search.service.ts
+└── providers/
+```
+
+| Kind | File naming | Location |
+| --- | --- | --- |
+| Component / subsystem interfaces & types | `<name>.types.ts` | Next to the component or under the subsystem folder |
+| Pure helpers (no types-only dumps) | `<name>.utils.ts` | Same folder as the types they support |
+| Exported constants / static configs | `<name>.const.ts` | Same folder (labels, icons, route lists, action defs without callbacks) |
+| Shared domain entities | `models.ts` / `models/` | `core/models/` or `features/<feature>/models/` |
+
+Rules:
+
+- Prefer `*.types.ts` over `*.model.ts` or `*-utilities.ts` when the file is primarily interfaces/types.
+- Prefer `*.const.ts` over ad-hoc `*.links.ts` or inline magic strings for reused static values (see `sidebar.const.ts`, feature `*.const.ts`).
+- Do **not** export large type surfaces from `.component.ts` — put them in `.types.ts` and import from there.
+- Keep InjectionTokens next to the types they bind when they are subsystem contracts (see `GLOBAL_SEARCH_PROVIDERS` in `search.types.ts`).
+- Truly one-off private types used only inside a single file may stay local (not exported).
+- Wire live callbacks in the component; keep label/icon/variant descriptors in `*.const.ts`.
+
+Canonical colocated trio example:
+
+```text
+core/layout/sidebar/
+├── sidebar.const.ts         # SIDEBAR_LINKS
+├── sidebar-link.types.ts
+├── sidebar-link.utils.ts
+└── sidebar.component.*
+
+shared/components/page-header/
+├── page-header.types.ts
+├── page-header.const.ts
+├── page-header.utils.ts
+└── page-header.component.*
+```
 
 ---
 
@@ -236,9 +283,11 @@ No global Material overrides inside feature SCSS. Prefer tokens over arbitrary h
 3. App-wide business/infra HTTP API? → `core/services/`
 4. Cross-cutting subsystem (search engine, …)? → `core/<subsystem>/`
 5. Globally reusable utility? → `core/utils/`
-6. Reusable presentation? → `shared/components/`
-7. One business feature? → `features/<feature>/`
-8. Exists only for one component? → keep colocated
+6. Component/subsystem-specific types? → colocated `*.types.ts`
+7. Static labels / configs / route lists? → colocated `*.const.ts`
+8. Reusable presentation? → `shared/components/`
+9. One business feature? → `features/<feature>/`
+10. Exists only for one component? → keep colocated (`*.types.ts` / `*.const.ts` as needed)
 
 Search split: engine → `core/search/`; autocomplete UI → `core/layout/navbar/global-search/`; feature providers/definitions → `features/<feature>/search/`.
 
@@ -257,6 +306,8 @@ Search split: engine → `core/search/`; autocomplete UI → `core/layout/navbar
 - Prefer existing aliases `@core`, `@shared`, `@features`.
 - Preserve route URLs when renaming components.
 - Reuse existing implementations; do not leave obsolete duplicates.
+- Exported component/subsystem types → `*.types.ts` (see §9); do not grow type dumps inside components or `*-utilities.ts`.
+- Exported static configs / labels / action descriptors → `*.const.ts` (see §9); wire callbacks in the component.
 
 ---
 

@@ -1,31 +1,11 @@
 .crypto-detail-page {
-  padding: var(--space-lg);
-  max-width: 1400px;
-  margin: 0 auto;
-}
-
-.crypto-detail-header {
-  display: flex;
-  align-items: center;
-  gap: var(--space-md);
-  margin-bottom: var(--space-lg);
-}
-
-.crypto-detail-title {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-xs);
-
-  h1 {
-    margin: 0;
-    font-size: var(--font-size-xl);
-    color: var(--color-text);
-  }
+  width: 100%;
 }
 
 .crypto-detail-sub {
   color: var(--color-muted);
   font-size: var(--font-size-sm);
+  margin: calc(-1 * var(--space-sm)) 0 var(--space-md);
 }
 
 .crypto-not-found {
@@ -35,29 +15,8 @@
   gap: var(--space-sm);
 }
 
-// Mobile responsive
-@media (max-width: 1024px) {
-  .crypto-detail-header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-@media (max-width: 768px) {
-  .crypto-detail-page {
-    padding: var(--space-md);
-  }
-}
-
-.crypto-detail-actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: var(--space-sm);
-}
-
 .crypto-detail-bottom {
-  display: flex;
-  flex-direction: column;
+  margin-top: var(--space-lg);
+  display: grid;
   gap: var(--space-md);
-  margin-top: var(--space-md);
 }

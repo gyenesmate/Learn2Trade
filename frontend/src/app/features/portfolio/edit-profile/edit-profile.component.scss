@@ -1,20 +1,18 @@
-.edit-profile-page {
-  padding: 2rem;
-  max-width: 800px;
-  margin: 0 auto;
+/* Half of the occupyable main content width; page gutter comes from base-layout. */
+:host {
+  display: block;
+  width: 100%;
+  max-width: 50%;
+  margin-inline: auto;
+}
 
-  .profile-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-
-    h1 {
-      color: var(--color-text-primary);
-      margin: 0;
-    }
+@media (max-width: 768px) {
+  :host {
+    max-width: 100%;
   }
+}
 
+.edit-profile-page {
   .profile-content {
     .edit-form {
       display: flex;
@@ -27,9 +25,9 @@
 
       .form-actions {
         display: flex;
-        gap: 1rem;
+        gap: var(--space-md);
         justify-content: flex-end;
-        margin-top: 1rem;
+        margin-top: var(--space-md);
       }
     }
   }

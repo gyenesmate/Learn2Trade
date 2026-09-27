@@ -12,7 +12,7 @@ import {
 import { Subscription } from 'rxjs';
 import { NotificationService } from '@core/services/notification.service';
 import { AppSnackbarComponent } from './app-snackbar.component';
-import { AppSnackbarData, AppSnackbarRequest } from './app-snackbar.model';
+import { AppSnackbarData, AppSnackbarRequest } from './app-snackbar.types';
 
 /** Leave animation duration — keep scroll locked for this long after dismiss. */
 const LEAVE_SCROLL_LOCK_MS = 450;
