@@ -13,6 +13,6 @@ export class BannedComponent {
   supportEmail = 'support@example.com';
 
   goHome(): void {
-    void this.router.navigate(['/home']);
+    void this.router.navigate(['/markets']);
   }
 }

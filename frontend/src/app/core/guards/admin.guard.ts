@@ -7,7 +7,7 @@ export const adminGuard: CanActivateFn = async () => {
   const router = inject(Router);
   const isAdmin = await users.isCurrentUserAdmin();
   if (!isAdmin) {
-    await router.navigate(['/home']);
+    await router.navigate(['/markets']);
     return false;
   }
   return true;

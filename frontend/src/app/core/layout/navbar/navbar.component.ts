@@ -120,7 +120,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   async logout(): Promise<void> {
     try {
       await this.authService.logout();
-      void this.router.navigate(['/home']);
+      void this.router.navigate(['/markets']);
     } catch (error) {
       console.error('Logout error:', error);
     }

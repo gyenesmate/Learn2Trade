@@ -15,7 +15,7 @@ export const SIDEBAR_LINKS: readonly SidebarLink[] = [
   },
   {
     id: 'markets',
-    route: '/home',
+    route: '/markets',
     label: 'Markets',
     icon: 'home',
     visibility: 'always',

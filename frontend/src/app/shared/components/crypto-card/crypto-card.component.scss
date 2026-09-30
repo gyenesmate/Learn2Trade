@@ -1,14 +1,97 @@
 // Layout only — surface chrome comes from mat-card + global overrides
+:host {
+	display: block;
+	height: 100%;
+	min-height: 0;
+}
+
 .crypto-card {
 	padding: 1rem;
 	margin: 0.5rem 0;
 	min-width: 220px;
 }
+
 .crypto-header {
 	display: flex;
 	justify-content: space-between;
-	font-weight: bold;
+	align-items: flex-start;
+	gap: var(--space-sm);
 	margin-bottom: 0.5rem;
+}
+
+.crypto-header__identity {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 0.35rem 0.5rem;
+	min-width: 0;
+}
+
+.crypto-name {
+	font-weight: 700;
+	color: var(--color-text);
+}
+
+.crypto-exchange {
+	font-weight: 500;
+	font-size: 0.85rem;
+	color: var(--color-muted);
+}
+
+.crypto-header__actions {
+	display: flex;
+	align-items: center;
+	gap: var(--space-sm);
+	flex-shrink: 0;
+}
+
+.crypto-live {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	font-size: 0.75rem;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--color-muted);
+}
+
+.crypto-live__dot {
+	width: 0.5rem;
+	height: 0.5rem;
+	border-radius: 50%;
+	background: var(--color-muted);
+	flex-shrink: 0;
+}
+
+.crypto-live.live {
+	color: var(--color-success);
+
+	.crypto-live__dot {
+		background: var(--color-success);
+		box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-success) 55%, transparent);
+		animation: crypto-live-pulse 1.6s ease-out infinite;
+	}
+}
+
+.crypto-live.reconnecting {
+	color: var(--color-warning);
+
+	.crypto-live__dot {
+		background: var(--color-warning);
+		animation: crypto-live-pulse 1s ease-out infinite;
+	}
+}
+
+@keyframes crypto-live-pulse {
+	0% {
+		box-shadow: 0 0 0 0 color-mix(in srgb, currentColor 55%, transparent);
+	}
+	70% {
+		box-shadow: 0 0 0 0.45rem transparent;
+	}
+	100% {
+		box-shadow: 0 0 0 0 transparent;
+	}
 }
 
 .watchlist-toggle {
@@ -38,29 +121,35 @@
 		opacity: 1;
 	}
 }
+
 .crypto-info {
 	display: flex;
 	align-items: center;
 	gap: 1rem;
 	margin-bottom: 0.5rem;
 }
+
 .crypto-price {
 	font-size: 1.2rem;
 	font-weight: bold;
 	color: var(--color-text);
 }
+
 .crypto-change.up {
 	color: var(--color-crypto-up, #198754);
 }
+
 .crypto-change.down {
 	color: var(--color-crypto-down, #dc3545);
 }
+
 .crypto-chart-placeholder {
 	margin-top: 1rem;
+
 	.chart-box {
 		width: 100%;
 		height: 120px;
-		background: repeating-linear-gradient(135deg, rgba(0,0,0,0.04), rgba(0,0,0,0.08) 10px);
+		background: repeating-linear-gradient(135deg, rgba(0, 0, 0, 0.04), rgba(0, 0, 0, 0.08) 10px);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -71,39 +160,13 @@
 	}
 }
 
-.chart-controls {
-	display: flex;
-	gap: 0.5rem;
-	align-items: center;
-	margin-top: 0.5rem;
-	flex-wrap: wrap;
-	button {
-		padding: 0.25rem 0.5rem;
-		border-radius: 4px;
-		border: 1px solid var(--color-border);
-		background: var(--color-surface);
-		color: var(--color-text);
-		cursor: pointer;
-	}
-	.price-detail {
-		margin-left: auto;
-		font-size: 0.9rem;
-		color: var(--color-muted);
-	}
-}
-
-.crypto-chart, .crypto-chart-compact {
+.crypto-chart-compact {
 	margin-top: 0.5rem;
 	width: 100%;
-	height: 400px;
+	height: 80px;
 	border-radius: 6px;
-	border: 1px solid var(--color-border);
 	position: relative;
 	overflow: hidden;
-}
-
-.crypto-chart-compact {
-	height: 80px;
 }
 
 .crypto-card.compact {
@@ -113,35 +176,27 @@
 	}
 }
 
-.chart-tooltip {
-	position: absolute;
-	pointer-events: none;
-	background: var(--color-surface);
-	color: var(--color-text);
-	border: 1px solid var(--color-border);
-	padding: 6px 8px;
-	font-size: 12px;
-	line-height: 1.2;
-	border-radius: 4px;
-	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-	z-index: 30;
+.crypto-card.detailed {
+	height: 100%;
+	margin: 0;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
 
-	.tt-row { margin: 2px 0; }
-	strong { display: inline-block; width: 18px; }
+.crypto-card__chart {
+	flex: 1 1 auto;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
 
-	.tt-val { 
-		padding-left: 6px;
-
-		.green { color: #138a00; font-weight: 600; }
-		.red { color: #c62828; font-weight: 600; }
-		.gray { color: #666; }
-	}
+.crypto-card__unsupported {
+	color: var(--color-muted);
+	margin: var(--space-md) 0 0;
 }
 
 body.theme-dark .crypto-chart-placeholder .chart-box {
-	background: repeating-linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.1) 10px);
-}
-
-body.theme-dark .chart-tooltip .tt-val .gray {
-	color: #a1a1aa;
+	background: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.1) 10px);
 }

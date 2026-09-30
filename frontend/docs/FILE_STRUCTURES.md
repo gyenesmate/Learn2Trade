@@ -2,7 +2,7 @@
 
 Source of truth for Learn2Trade frontend folder layout, ownership, and where new files belong.
 
-Also see: `.cursor/rules/learn2trade.mdc`, `docs/TRADING_UI_CONTEXT.md`, `agents.md`.
+Also see: `.cursor/rules/learn2trade.mdc`, `docs/TRADING_UI_CONTEXT.md`, `docs/CRYPTO_WEBSOCKETS.md`, `agents.md`.
 
 ---
 
@@ -22,6 +22,8 @@ src/
 │   │   │   └── navbar/
 │   │   │       └── global-search/   # search UI (mat-autocomplete); engine lives in core/search
 │   │   ├── search/                  # app-wide search infrastructure (providers, ranking)
+│   │   ├── websocket/               # single physical WS transport
+│   │   ├── binance/                 # market-data (miniTicker) + REST helpers
 │   │   ├── services/
 │   │   ├── utils/
 │   │   ├── guards/
@@ -34,6 +36,7 @@ src/
 │   │       ├── data-table/
 │   │       ├── status-chip/
 │   │       ├── crypto-card/
+│   │       │   └── crypto-chart/   # detailed kline chart (colocated under card)
 │   │       ├── confirmation-dialog/
 │   │       └── app-snackbar/   # stacked notifications (hosted by AppComponent)
 │   │
@@ -130,7 +133,7 @@ Future layouts (`auth-layout`, `fullscreen-layout`) only when routes truly need 
 | Feature | Role | Primary routes (URLs unchanged) |
 | --- | --- | --- |
 | `dashboard/` | Portfolio overview widgets | `/dashboard` |
-| `markets/` | Market list / admin crypto edit | `/home`, `/admin/crypto-currencies/...` |
+| `markets/` | Market list / admin crypto edit | `/markets`, `/admin/crypto-currencies/...` |
 | `trading/` | Asset detail, invest/alerts UI | `/crypto/:id` |
 | `portfolio/` | Profile / edit profile | `/profile`, `/edit-profile` |
 | `auth/` | Login, register, banned | `/login`, `/register`, `/banned` |
@@ -172,7 +175,11 @@ features/trading/
 
 Complex cross-application subsystems may receive their own directory under `core/` instead of placing all related files into generic `services/` or `utils/` directories.
 
-Example: `core/search/` owns provider contracts, ranking, and `GlobalSearchService`. The navbar-owned presentation lives in `core/layout/navbar/global-search/` and must not contain feature-specific search logic.
+Examples:
+
+- `core/search/` — provider contracts, ranking, and `GlobalSearchService`. The navbar-owned presentation lives in `core/layout/navbar/global-search/` and must not contain feature-specific search logic.
+- `core/websocket/` — low-level single-socket transport.
+- `core/binance/` — Binance public market-data (ref-counted miniTicker) and REST (`exchangeInfo`, klines). See `docs/CRYPTO_WEBSOCKETS.md`.
 
 Feature-owned search contributions (e.g. market provider) live under `features/<feature>/search/` and register via `GLOBAL_SEARCH_PROVIDERS` at the application root so the always-visible navbar can use them before lazy routes load.
 

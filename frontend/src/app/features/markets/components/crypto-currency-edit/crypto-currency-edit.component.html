@@ -16,24 +16,46 @@
       </mat-form-field>
 
       <mat-form-field class="full-width">
-        <mat-label>Symbol</mat-label>
-        <input matInput formControlName="symbol" />
-        @if (form.controls.symbol.touched && form.controls.symbol.invalid) {
-          <mat-error>Symbol is required.</mat-error>
+        <mat-label>Binance market</mat-label>
+        <input
+          matInput
+          formControlName="market"
+          [matAutocomplete]="marketAuto"
+          placeholder="Search base / quote / symbol"
+          autocomplete="off"
+        />
+        <mat-autocomplete
+          #marketAuto="matAutocomplete"
+          [displayWith]="displayMarket"
+          (optionSelected)="onMarketSelected($event.option.value)"
+        >
+          @if (marketsLoading()) {
+            <mat-option disabled>Loading markets…</mat-option>
+          } @else if (filteredMarkets().length === 0) {
+            <mat-option disabled>No matching markets</mat-option>
+          } @else {
+            @for (m of filteredMarkets(); track m.symbol) {
+              <mat-option [value]="m">
+                {{ displayMarket(m) }}
+                <span class="market-symbol">({{ m.symbol }})</span>
+              </mat-option>
+            }
+          }
+        </mat-autocomplete>
+        @if (form.controls.market.touched && form.controls.market.invalid) {
+          <mat-error>Select a valid Binance market.</mat-error>
         }
       </mat-form-field>
 
-      <mat-form-field class="full-width">
-        <mat-label>Quote currency</mat-label>
-        <input matInput formControlName="exchange_currency" />
-        @if (form.controls.exchange_currency.touched && form.controls.exchange_currency.invalid) {
-          <mat-error>Quote currency is required.</mat-error>
-        }
-      </mat-form-field>
+      @if (marketMissingWarning()) {
+        <p class="warning">
+          This crypto’s symbol/quote is not a TRADING Binance spot market. Pick a valid market before saving.
+        </p>
+      }
 
       <div class="actions">
         <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
-        <button type="submit" class="btn btn-primary" [disabled]="saving()">
+        <button type="submit" class="btn btn-primary" [disabled]="saving() || form.invalid">
           {{ saving() ? 'Saving...' : 'Save' }}
         </button>
       </div>

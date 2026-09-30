@@ -59,7 +59,7 @@ Same-folder `./` imports may stay relative.
 | Feature | Routes |
 | --- | --- |
 | dashboard | `/dashboard` |
-| markets | `/home`, `/admin/crypto-currencies/...` |
+| markets | `/markets`, `/admin/crypto-currencies/...` |
 | trading | `/crypto/:id` |
 | portfolio | `/profile`, `/edit-profile` |
 | auth | `/login`, `/register`, `/banned` |
@@ -70,6 +70,7 @@ Same-folder `./` imports may stay relative.
 | Path | Role |
 | --- | --- |
 | `docs/FILE_STRUCTURES.md` | Structure & placement rules |
+| `docs/CRYPTO_WEBSOCKETS.md` | Binance public market WS architecture |
 | `docs/TRADING_UI_CONTEXT.md` | Trading UI design system |
 | `docs/features/` | Planned per-feature guides |
 | `docs/OLD_DESCRITIONS/` | Legacy only |

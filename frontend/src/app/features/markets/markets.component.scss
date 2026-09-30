@@ -25,6 +25,18 @@
   gap: var(--space-md);
 }
 
+.markets-status {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 12rem;
+  color: var(--color-muted);
+
+  &--empty p {
+    margin: 0;
+  }
+}
+
 .crypto-card-slot {
   transition: transform var(--transition-normal);
 

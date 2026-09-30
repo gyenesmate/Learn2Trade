@@ -1,13 +1,16 @@
 import {
   Component,
+  OnDestroy,
   OnInit,
   ChangeDetectionStrategy,
   inject,
   effect,
   signal,
   untracked,
+  computed,
 } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CryptoCurrency, UserMe } from '@core/models/models';
 import { CryptoCardComponent } from '@shared/components/crypto-card/crypto-card.component';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
@@ -15,22 +18,31 @@ import { PageHeaderAction } from '@shared/components/page-header/page-header.typ
 import { AuthService } from '@core/services/auth.service';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { WatchlistSubscriptionsService } from '@core/services/watchlist-subscriptions.service';
-import { MARKETS_HEADER_ACTIONS, MARKETS_PAGE_TITLE } from './markets.const';
+import { BinanceMarketDataService } from '@core/binance/binance-market-data.service';
+import { toBinancePair } from '@core/binance/binance.utils';
+import {
+  MARKETS_CARD_LIMIT,
+  MARKETS_EMPTY_MESSAGE,
+  MARKETS_HEADER_ACTIONS,
+  MARKETS_PAGE_TITLE,
+} from './markets.const';
 
 @Component({
   selector: 'app-markets',
-  imports: [RouterModule, CryptoCardComponent, PageHeaderComponent],
+  imports: [RouterModule, CryptoCardComponent, PageHeaderComponent, MatProgressSpinnerModule],
   templateUrl: './markets.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./markets.component.scss']
 })
-export class MarketsComponent implements OnInit {
+export class MarketsComponent implements OnInit, OnDestroy {
   private readonly auth = inject(AuthService);
   private readonly cryptoService = inject(CryptoCurrenciesService);
   private readonly watchlistSubscriptions = inject(WatchlistSubscriptionsService);
+  private readonly marketData = inject(BinanceMarketDataService);
   private readonly router = inject(Router);
 
   readonly pageTitle = MARKETS_PAGE_TITLE;
+  readonly emptyMessage = MARKETS_EMPTY_MESSAGE;
   readonly headerActions: PageHeaderAction[] = [
     {
       ...MARKETS_HEADER_ACTIONS.manageWatchlist,
@@ -38,15 +50,12 @@ export class MarketsComponent implements OnInit {
     },
   ];
 
-  private readonly fallbackCryptocurrencies: CryptoCurrency[] = [
-    { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', exchange_currency: 'USD', created_at: '', updated_at: '' },
-    { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', exchange_currency: 'USD', created_at: '', updated_at: '' },
-    { id: 'cardano', name: 'Cardano', symbol: 'ADA', exchange_currency: 'USD', created_at: '', updated_at: '' },
-    { id: 'binancecoin', name: 'Binance Coin', symbol: 'BNB', exchange_currency: 'USD', created_at: '', updated_at: '' },
-    { id: 'ripple', name: 'Ripple', symbol: 'XRP', exchange_currency: 'USD', created_at: '', updated_at: '' }
-  ];
-
-  readonly cryptocurrencies = signal<CryptoCurrency[]>([...this.fallbackCryptocurrencies]);
+  readonly loading = signal(true);
+  readonly cryptocurrencies = signal<CryptoCurrency[]>([]);
+  /** First-N cards rendered on the markets grid. */
+  readonly displayedCryptocurrencies = computed(() =>
+    this.cryptocurrencies().slice(0, MARKETS_CARD_LIMIT)
+  );
   readonly watchlistCryptos = signal<CryptoCurrency[]>([]);
   readonly watchlistCryptoIds = signal(new Set<string>());
 
@@ -56,17 +65,30 @@ export class MarketsComponent implements OnInit {
       const cryptos = this.cryptocurrencies();
       untracked(() => void this.refreshWatchlist(user, cryptos));
     });
+
+    effect(() => {
+      const displayed = this.displayedCryptocurrencies();
+      const pairs = displayed
+        .map((c) => toBinancePair(c.symbol, c.exchange_currency))
+        .filter((p): p is string => !!p);
+      untracked(() => this.marketData.setMiniTickerTargets(pairs));
+    });
   }
 
   async ngOnInit(): Promise<void> {
+    this.loading.set(true);
     try {
       const fromDb = await this.cryptoService.getAll();
-      if (Array.isArray(fromDb) && fromDb.length) {
-        this.cryptocurrencies.set(fromDb);
-      }
+      this.cryptocurrencies.set(Array.isArray(fromDb) ? fromDb : []);
     } catch {
-      // fallback stays
+      this.cryptocurrencies.set([]);
+    } finally {
+      this.loading.set(false);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.marketData.setMiniTickerTargets([]);
   }
 
   private async refreshWatchlist(

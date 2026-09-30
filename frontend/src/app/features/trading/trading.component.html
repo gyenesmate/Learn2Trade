@@ -1,27 +1,44 @@
 <div class="crypto-detail-page">
-  <app-page-header [title]="pageTitle()" [actions]="headerActions()" />
+  <app-page-header [title]="pageTitle()" />
 
   @if (selectedCrypto(); as selectedCrypto) {
-    <div class="crypto-detail-sub">{{ selectedCrypto.symbol }} / {{ selectedCrypto.exchange_currency }}</div>
-    <app-crypto-card #card [state]="'detailed'" [data]="selectedCrypto"></app-crypto-card>
-    @if (activeInvestments().length) {
-      <div class="crypto-detail-bottom">
-        @for (inv of activeInvestments(); track inv) {
-          <app-active-investment
-            [investment]="inv"
-            [crypto]="selectedCrypto"
-            [currentPrice]="card?.livePrice || 0"
-            (sell)="sellActiveInvestment(inv.id)">
-          </app-active-investment>
-        }
+    <div class="crypto-detail-layout">
+      <div class="crypto-detail-chart">
+        <app-crypto-card
+          #card
+          [state]="'detailed'"
+          [data]="selectedCrypto"
+          (livePriceChange)="onCardLivePrice()"
+        />
       </div>
-    }
+
+      <aside class="crypto-detail-side">
+        <mat-card appearance="outlined" class="crypto-detail-side__card">
+          <app-data-table
+            [title]="'Investments'"
+            [columns]="investmentColumns"
+            [data]="investmentRows()"
+            [actionBar]="investmentActionBar"
+            [rowActions]="investmentRowActions"
+          />
+        </mat-card>
+
+        <mat-card appearance="outlined" class="crypto-detail-side__card">
+          <app-data-table
+            [title]="'Alerts'"
+            [columns]="alertColumns"
+            [data]="alertRows()"
+            [actionBar]="alertActionBar"
+            [rowActions]="alertRowActions"
+          />
+        </mat-card>
+      </aside>
+    </div>
   } @else {
     <div class="crypto-not-found card">
       <h2>Crypto not found</h2>
       <p>No crypto with id: <strong>{{ selectedId() }}</strong></p>
-      <a class="btn btn-primary" routerLink="/home">Go back</a>
+      <a class="btn btn-primary" routerLink="/markets">Go back</a>
     </div>
   }
-
 </div>

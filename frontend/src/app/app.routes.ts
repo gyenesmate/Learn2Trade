@@ -8,7 +8,7 @@ export const routes: Routes = [
     path: '',
     component: BaseLayoutComponent,
     children: [
-      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      { path: '', redirectTo: 'markets', pathMatch: 'full' },
       {
         path: 'dashboard',
         loadComponent: () =>
@@ -16,7 +16,7 @@ export const routes: Routes = [
         canActivate: [authGuard],
       },
       {
-        path: 'home',
+        path: 'markets',
         loadComponent: () =>
           import('@features/markets/markets.component').then((m) => m.MarketsComponent),
       },

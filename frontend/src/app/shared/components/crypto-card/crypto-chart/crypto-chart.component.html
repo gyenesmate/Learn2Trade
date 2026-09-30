@@ -1,0 +1,93 @@
+<div class="crypto-chart-panel">
+  <div class="crypto-chart-panel__header">
+    <div class="crypto-chart-panel__price-row">
+      <span class="crypto-chart-panel__price">${{ livePrice() | number: '1.2-6' }}</span>
+      @if (rangeChange() !== undefined) {
+        <span
+          class="crypto-chart-panel__change"
+          [class.up]="rangeChange()! > 0"
+          [class.down]="rangeChange()! < 0"
+        >
+          {{ rangeChange()! > 0 ? '+' : '' }}{{ rangeChange()! | number: '1.2-2' }}%
+          <span class="crypto-chart-panel__change-label">range</span>
+        </span>
+      }
+    </div>
+  </div>
+
+  <div class="crypto-chart-panel__controls chart-controls">
+    <mat-button-toggle-group
+      class="crypto-chart-panel__intervals"
+      [value]="interval()"
+      (change)="setInterval($event.value)"
+      hideSingleSelectionIndicator
+    >
+      @for (opt of intervals; track opt.value) {
+        <mat-button-toggle [value]="opt.value">{{ opt.label }}</mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+
+    <button
+      mat-stroked-button
+      type="button"
+      [matMenuTriggerFor]="indicatorsMenu"
+      class="crypto-chart-panel__indicators-btn"
+    >
+      Indicators
+      <mat-icon iconPositionEnd>arrow_drop_down</mat-icon>
+    </button>
+    <mat-menu #indicatorsMenu="matMenu">
+      @for (ind of indicatorDefs; track ind.id) {
+        <button mat-menu-item type="button" (click)="$event.stopPropagation()">
+          <mat-checkbox
+            [checked]="indicators()[ind.id]"
+            (change)="toggleIndicator(ind.id, $event.checked)"
+            (click)="$event.stopPropagation()"
+          >
+            {{ ind.label }}
+          </mat-checkbox>
+        </button>
+      }
+    </mat-menu>
+  </div>
+
+  <div class="crypto-chart-panel__host-wrap">
+    @if (ohlc(); as bar) {
+      <div class="crypto-chart-ohlc" aria-live="polite">
+        <span class="crypto-chart-ohlc__item crypto-chart-ohlc__item--open">
+          <span class="crypto-chart-ohlc__k">O</span>
+          <span class="crypto-chart-ohlc__v">{{ bar.open | number: '1.2-6' }}</span>
+        </span>
+        <span class="crypto-chart-ohlc__item crypto-chart-ohlc__item--high">
+          <span class="crypto-chart-ohlc__k">H</span>
+          <span class="crypto-chart-ohlc__v">{{ bar.high | number: '1.2-6' }}</span>
+        </span>
+        <span class="crypto-chart-ohlc__item crypto-chart-ohlc__item--low">
+          <span class="crypto-chart-ohlc__k">L</span>
+          <span class="crypto-chart-ohlc__v">{{ bar.low | number: '1.2-6' }}</span>
+        </span>
+        <span
+          class="crypto-chart-ohlc__item crypto-chart-ohlc__item--close"
+          [class.up]="bar.close >= bar.open"
+          [class.down]="bar.close < bar.open"
+        >
+          <span class="crypto-chart-ohlc__k">C</span>
+          <span class="crypto-chart-ohlc__v">{{ bar.close | number: '1.2-6' }}</span>
+        </span>
+        <span class="crypto-chart-ohlc__item crypto-chart-ohlc__item--vol">
+          <span class="crypto-chart-ohlc__k">Vol</span>
+          <span class="crypto-chart-ohlc__v">{{ formatVolume(bar.volume) }}</span>
+        </span>
+      </div>
+    }
+
+    @if (loading()) {
+      <div class="crypto-chart-panel__overlay" role="status">Loading chart…</div>
+    } @else if (loadError()) {
+      <div class="crypto-chart-panel__overlay crypto-chart-panel__overlay--error" role="alert">
+        Failed to load historical candles.
+      </div>
+    }
+    <div class="crypto-chart-panel__host" #chartHost></div>
+  </div>
+</div>

@@ -11,29 +11,56 @@ import {
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { map } from 'rxjs';
-import { CryptoCurrency, Investment } from '@core/models/models';
+import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { CryptoCurrency, Investment, PriceAlert } from '@core/models/models';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { CryptoCardComponent } from '@shared/components/crypto-card/crypto-card.component';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { DataTableComponent } from '@shared/components/data-table/data-table.component';
+import { DataTableRow, RowAction, TableAction } from '@shared/components/data-table/data-table.types';
 import { InvestDialogComponent } from '@features/trading/components/invest-dialog/invest-dialog.component';
 import { InvestDialogResult } from '@features/trading/components/invest-dialog/invest-dialog.types';
 import { AuthService } from '@core/services/auth.service';
 import { InvestmentsService } from '@core/services/investments.service';
 import { NotificationService } from '@core/services/notification.service';
-import { ActiveInvestmentComponent } from '@features/trading/components/active-investment/active-investment.component';
 import { SetPriceAlertDialogComponent } from '@features/trading/components/set-price-alert-dialog/set-price-alert-dialog.component';
 import { SetPriceAlertDialogResult } from '@features/trading/components/set-price-alert-dialog/set-price-alert-dialog.types';
 import { PriceAlertsService } from '@core/services/price-alerts.service';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
-import { PageHeaderAction } from '@shared/components/page-header/page-header.types';
-import { TRADING_HEADER_ACTIONS } from './trading.const';
+import {
+  TRADING_ALERT_COLUMNS,
+  TRADING_INVESTMENT_COLUMNS,
+  TRADING_TABLE_ACTIONS,
+} from './trading.const';
+
+type InvestmentRow = DataTableRow & {
+  amount: number;
+  buyingPrice: number;
+  currentPrice: number;
+  estPayout: number;
+  description: string;
+};
+
+type AlertRow = DataTableRow & {
+  type: string;
+  alertPrice: number;
+  description: string;
+  isActive: boolean;
+};
 
 @Component({
   selector: 'app-trading',
-  imports: [RouterModule, CryptoCardComponent, MatDialogModule, ActiveInvestmentComponent, PageHeaderComponent],
+  imports: [
+    RouterModule,
+    CryptoCardComponent,
+    MatDialogModule,
+    MatCardModule,
+    PageHeaderComponent,
+    DataTableComponent,
+  ],
   templateUrl: './trading.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./trading.component.scss']
+  styleUrls: ['./trading.component.scss'],
 })
 export class TradingComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -50,7 +77,7 @@ export class TradingComponent implements OnInit {
     { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', exchange_currency: 'USD', created_at: '', updated_at: '' },
     { id: 'cardano', name: 'Cardano', symbol: 'ADA', exchange_currency: 'USD', created_at: '', updated_at: '' },
     { id: 'binancecoin', name: 'Binance Coin', symbol: 'BNB', exchange_currency: 'USD', created_at: '', updated_at: '' },
-    { id: 'ripple', name: 'Ripple', symbol: 'XRP', exchange_currency: 'USD', created_at: '', updated_at: '' }
+    { id: 'ripple', name: 'Ripple', symbol: 'XRP', exchange_currency: 'USD', created_at: '', updated_at: '' },
   ];
 
   private readonly routeId = toSignal(
@@ -61,24 +88,70 @@ export class TradingComponent implements OnInit {
   readonly selectedId = computed(() => this.routeId());
   readonly selectedCrypto = signal<CryptoCurrency | null>(null);
   readonly activeInvestments = signal<Investment[]>([]);
+  readonly cryptoAlerts = signal<PriceAlert[]>([]);
   readonly investing = signal(false);
   readonly selling = signal(false);
+  /** Bumps when live price updates so investment rows recompute. */
+  readonly livePriceTick = signal(0);
 
   readonly pageTitle = computed(() => this.selectedCrypto()?.name ?? 'Crypto');
-  readonly headerActions = computed<PageHeaderAction[]>(() => {
-    if (!this.selectedCrypto()) return [];
-    return [
-      {
-        ...TRADING_HEADER_ACTIONS.invest,
-        disabled: this.investing(),
-        callback: () => this.openInvest(),
-      },
-      {
-        ...TRADING_HEADER_ACTIONS.setAlert,
-        callback: () => this.openSetAlert(),
-      },
-    ];
+
+  readonly investmentColumns = TRADING_INVESTMENT_COLUMNS;
+  readonly alertColumns = TRADING_ALERT_COLUMNS;
+
+  readonly investmentRows = computed<InvestmentRow[]>(() => {
+    void this.livePriceTick();
+    const price = Number(this.card()?.livePrice || 0);
+    return this.activeInvestments().map((inv) => {
+      const units = inv.buying_price > 0 ? inv.amount / inv.buying_price : 0;
+      return {
+        id: inv.id,
+        amount: inv.amount,
+        buyingPrice: inv.buying_price,
+        currentPrice: price,
+        estPayout: units * price,
+        description: inv.description ?? '',
+      };
+    });
   });
+
+  readonly alertRows = computed<AlertRow[]>(() =>
+    this.cryptoAlerts().map((a) => ({
+      id: a.id,
+      type: a.alert_type,
+      alertPrice: a.alert_price,
+      description: a.description ?? '',
+      isActive: a.is_active,
+    }))
+  );
+
+  readonly investmentActionBar: TableAction[] = [
+    {
+      ...TRADING_TABLE_ACTIONS.invest,
+      callback: () => this.openInvest(),
+    },
+  ];
+
+  readonly alertActionBar: TableAction[] = [
+    {
+      ...TRADING_TABLE_ACTIONS.setAlert,
+      callback: () => this.openSetAlert(),
+    },
+  ];
+
+  readonly investmentRowActions: RowAction<InvestmentRow>[] = [
+    {
+      ...TRADING_TABLE_ACTIONS.sell,
+      callback: (row) => void this.sellActiveInvestment(row.id),
+    },
+  ];
+
+  readonly alertRowActions: RowAction<AlertRow>[] = [
+    {
+      ...TRADING_TABLE_ACTIONS.deleteAlert,
+      callback: (row) => void this.deleteAlert(row.id),
+    },
+  ];
 
   readonly card = viewChild<CryptoCardComponent>('card');
 
@@ -88,10 +161,15 @@ export class TradingComponent implements OnInit {
     });
   }
 
+  onCardLivePrice(): void {
+    this.livePriceTick.update((n) => n + 1);
+  }
+
   private async loadSelectedCrypto(id: string | null): Promise<void> {
     if (!id) {
       this.selectedCrypto.set(null);
       this.activeInvestments.set([]);
+      this.cryptoAlerts.set([]);
       return;
     }
 
@@ -99,7 +177,7 @@ export class TradingComponent implements OnInit {
       const fromDb = await this.cryptoService.getById(id);
       if (fromDb) {
         this.selectedCrypto.set(fromDb);
-        await this.loadActiveInvestments();
+        await Promise.all([this.loadActiveInvestments(), this.loadCryptoAlerts()]);
         return;
       }
     } catch {
@@ -107,7 +185,7 @@ export class TradingComponent implements OnInit {
     }
 
     this.selectedCrypto.set(this.fallbackCryptocurrencies.find((c) => c.id === id) ?? null);
-    await this.loadActiveInvestments();
+    await Promise.all([this.loadActiveInvestments(), this.loadCryptoAlerts()]);
   }
 
   private async loadActiveInvestments(): Promise<void> {
@@ -126,12 +204,27 @@ export class TradingComponent implements OnInit {
     }
   }
 
+  private async loadCryptoAlerts(): Promise<void> {
+    try {
+      const user = this.auth.currentUser();
+      const crypto = this.selectedCrypto();
+      if (!user?.id || !crypto?.id) {
+        this.cryptoAlerts.set([]);
+        return;
+      }
+      const all = await this.priceAlerts.getByUserId(user.id);
+      this.cryptoAlerts.set(all.filter((a) => a.crypto_currency_id === crypto.id));
+    } catch {
+      this.cryptoAlerts.set([]);
+    }
+  }
+
   openInvest(): void {
     const crypto = this.selectedCrypto();
     if (!crypto) return;
     const currentPrice = Number(this.card()?.livePrice || 0);
     const ref = this.dialog.open(InvestDialogComponent, {
-      data: { crypto, currentPrice }
+      data: { crypto, currentPrice },
     });
 
     ref.afterClosed().subscribe((result: InvestDialogResult | null) => {
@@ -146,7 +239,7 @@ export class TradingComponent implements OnInit {
     const currentPrice = Number(this.card()?.livePrice || 0);
 
     const ref = this.dialog.open(SetPriceAlertDialogComponent, {
-      data: { crypto, currentPrice }
+      data: { crypto, currentPrice },
     });
 
     ref.afterClosed().subscribe((result: SetPriceAlertDialogResult | null) => {
@@ -180,13 +273,14 @@ export class TradingComponent implements OnInit {
         alert_price: alertPrice,
         description: String(result.description || ''),
         alert_type: alertType,
-        is_active: true
+        is_active: true,
       });
 
       this.notification.success('Alert created');
-    } catch (err: any) {
+      await this.loadCryptoAlerts();
+    } catch (err: unknown) {
       console.error('confirmSetAlert failed', err);
-      this.notification.error(err?.message || 'Failed to create alert');
+      this.notification.error((err as Error)?.message || 'Failed to create alert');
     }
   }
 
@@ -225,14 +319,14 @@ export class TradingComponent implements OnInit {
         crypto_currency_id: crypto.id,
         amount,
         buying_price: currentPrice,
-        description: result.description
+        description: result.description,
       });
 
       this.activeInvestments.update((list) => [...list, newInv]);
       this.notification.success('Investment created');
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('confirmInvest failed', err);
-      this.notification.error(err?.message || 'Failed to invest');
+      this.notification.error((err as Error)?.message || 'Failed to invest');
     } finally {
       this.investing.set(false);
     }
@@ -244,7 +338,9 @@ export class TradingComponent implements OnInit {
 
     try {
       const currentPrice = Number(this.card()?.livePrice || 0);
-      if (!Number.isFinite(currentPrice) || currentPrice <= 0) throw new Error('Current price unavailable');
+      if (!Number.isFinite(currentPrice) || currentPrice <= 0) {
+        throw new Error('Current price unavailable');
+      }
 
       const list = this.activeInvestments();
       let inv: Investment | undefined;
@@ -261,11 +357,22 @@ export class TradingComponent implements OnInit {
       await this.investments.sell(inv.id, currentPrice);
       this.notification.success('Investment sold');
       this.activeInvestments.update((items) => items.filter((i) => i.id !== inv!.id));
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('sellActiveInvestment failed', err);
-      this.notification.error(err?.message || 'Failed to sell');
+      this.notification.error((err as Error)?.message || 'Failed to sell');
     } finally {
       this.selling.set(false);
+    }
+  }
+
+  async deleteAlert(id: string): Promise<void> {
+    try {
+      await this.priceAlerts.deleteById(id);
+      this.cryptoAlerts.update((list) => list.filter((a) => a.id !== id));
+      this.notification.info('Alert deleted');
+    } catch (err: unknown) {
+      console.error('deleteAlert failed', err);
+      this.notification.error((err as Error)?.message || 'Failed to delete alert');
     }
   }
 }

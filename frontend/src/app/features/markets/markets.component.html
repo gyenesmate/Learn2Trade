@@ -4,14 +4,30 @@
   <main class="main-content">
     <section class="crypto-browser">
       <h2>Browse Cryptocurrencies</h2>
-      <div class="crypto-grid">
-        @for (crypto of cryptocurrencies(); track crypto) {
-          <div class="crypto-card-slot">
-            <app-crypto-card [state]="'compact'" [data]="crypto" [watchlistCryptoIds]="watchlistCryptoIds()"></app-crypto-card>
-            <a class="btn btn-primary crypto-card__action" [routerLink]="['/crypto', crypto.id]">View Chart</a>
-          </div>
-        }
-      </div>
+
+      @if (loading()) {
+        <div class="markets-status" role="status" aria-live="polite" aria-label="Loading">
+          <mat-progress-spinner
+            class="progress-spinner"
+            mode="indeterminate"
+            [diameter]="40"
+            [strokeWidth]="3"
+          />
+        </div>
+      } @else if (displayedCryptocurrencies().length === 0) {
+        <div class="markets-status markets-status--empty" role="status">
+          <p>{{ emptyMessage }}</p>
+        </div>
+      } @else {
+        <div class="crypto-grid">
+          @for (crypto of displayedCryptocurrencies(); track crypto.id) {
+            <div class="crypto-card-slot">
+              <app-crypto-card [state]="'compact'" [data]="crypto" [watchlistCryptoIds]="watchlistCryptoIds()"></app-crypto-card>
+              <a class="btn btn-primary crypto-card__action" [routerLink]="['/crypto', crypto.id]">View Chart</a>
+            </div>
+          }
+        </div>
+      }
     </section>
 
     <aside class="sidebar">
@@ -27,7 +43,7 @@
               </tr>
             </thead>
             <tbody>
-              @for (crypto of watchlistCryptos(); track crypto) {
+              @for (crypto of watchlistCryptos(); track crypto.id) {
                 <tr>
                   <td>{{ crypto.name }} ({{ crypto.symbol }})</td>
                   <td>{{ crypto.exchange_currency }}</td>
