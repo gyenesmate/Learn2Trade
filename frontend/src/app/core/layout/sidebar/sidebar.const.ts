@@ -36,6 +36,16 @@ export const SIDEBAR_LINKS: readonly SidebarLink[] = [
     priority: 10,
   },
   {
+    id: 'watchlist',
+    label: 'Watchlist',
+    icon: 'bookmark',
+    visibility: 'authenticated',
+    section: 'main',
+    keywords: ['watchlist', 'favorites', 'bookmarks'],
+    aliases: ['favorites'],
+    priority: 8,
+  },
+  {
     id: 'admin-users',
     label: 'Users',
     icon: 'group',

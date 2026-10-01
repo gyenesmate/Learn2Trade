@@ -10,11 +10,13 @@ import {
   signal,
 } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { AuthService } from '@core/services/auth.service';
+import { WatchlistDialogComponent } from '@features/watchlist/watchlist-dialog/watchlist-dialog.component';
 import { SidebarLink } from './sidebar-link.types';
 import { isSidebarLinkVisible } from './sidebar-link.utils';
 import { SIDEBAR_LINKS } from './sidebar.const';
@@ -32,6 +34,8 @@ import { SIDEBAR_LINKS } from './sidebar.const';
 export class SidebarComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly authService = inject(AuthService);
+  private readonly dialog = inject(MatDialog);
+  private watchlistDialogRef: MatDialogRef<WatchlistDialogComponent> | null = null;
 
   readonly collapsed = input(false);
   readonly navigated = output<void>();
@@ -73,6 +77,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.subscriptions.forEach((sub) => sub.unsubscribe());
+    this.watchlistDialogRef?.close();
+    this.watchlistDialogRef = null;
   }
 
   isActive(link: SidebarLink): boolean {
@@ -92,10 +98,35 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   navigateTo(link: SidebarLink): void {
-    if (this.isDisabled(link) || !link.route) {
+    if (this.isDisabled(link)) {
+      return;
+    }
+    if (link.id === 'watchlist') {
+      this.toggleWatchlistDialog();
+      this.navigated.emit();
+      return;
+    }
+    if (!link.route) {
       return;
     }
     void this.router.navigate([link.route]);
     this.navigated.emit();
+  }
+
+  private toggleWatchlistDialog(): void {
+    if (this.watchlistDialogRef) {
+      this.watchlistDialogRef.close();
+      this.watchlistDialogRef = null;
+      return;
+    }
+
+    this.watchlistDialogRef = this.dialog.open(WatchlistDialogComponent, {
+      width: '26rem',
+      maxHeight: '85vh',
+      autoFocus: 'dialog',
+    });
+    this.watchlistDialogRef.afterClosed().subscribe(() => {
+      this.watchlistDialogRef = null;
+    });
   }
 }

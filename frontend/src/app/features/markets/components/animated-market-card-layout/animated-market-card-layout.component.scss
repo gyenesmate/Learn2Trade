@@ -1,0 +1,78 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.market-card-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.55fr) minmax(0, 0.55fr);
+  grid-template-rows: minmax(220px, 1fr) minmax(220px, 1fr);
+  grid-template-areas:
+    'featured top-left top-right'
+    'featured bottom-left bottom-right';
+  gap: var(--space-md);
+  min-height: 28rem;
+}
+
+.market-card-layout__slot {
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+
+  // ponytail: CSS area swap only — sliding puzzle motion can replace this later.
+  transition: opacity 160ms ease;
+
+  &[data-position='featured'] {
+    grid-area: featured;
+  }
+
+  &[data-position='top-left'] {
+    grid-area: top-left;
+  }
+
+  &[data-position='top-right'] {
+    grid-area: top-right;
+  }
+
+  &[data-position='bottom-left'] {
+    grid-area: bottom-left;
+  }
+
+  &[data-position='bottom-right'] {
+    grid-area: bottom-right;
+  }
+
+  app-crypto-card {
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .market-card-layout {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    grid-template-areas:
+      'featured featured'
+      'top-left top-right'
+      'bottom-left bottom-right';
+    min-height: 0;
+  }
+
+  .market-card-layout__slot[data-position='featured'] {
+    min-height: 22rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .market-card-layout {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'featured'
+      'top-left'
+      'top-right'
+      'bottom-left'
+      'bottom-right';
+  }
+}

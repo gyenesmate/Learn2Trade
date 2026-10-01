@@ -1,28 +1,56 @@
-.home-page {
-  min-height: 100%;
+.markets-page {
   display: flex;
   flex-direction: column;
-}
-
-.main-content {
-  flex: 1;
-  display: flex;
-  gap: var(--space-lg);
-}
-
-.crypto-browser {
-  flex: 2;
-
-  h2 {
-    margin-bottom: var(--space-lg);
-    color: var(--color-text);
-  }
-}
-
-.crypto-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: var(--space-md);
+  min-height: 100%;
+}
+
+.markets-page__subtitle {
+  margin: calc(var(--space-sm) * -1) 0 var(--space-sm);
+  color: var(--color-muted);
+}
+
+.markets-page__body {
+  display: grid;
+  grid-template-columns: minmax(0, 3.2fr) minmax(16rem, 1fr);
+  gap: var(--space-lg);
+  align-items: start;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.markets-browser {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.markets-toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.markets-toolbar__search {
+  width: 100%;
+}
+
+.markets-toolbar__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.markets-toolbar__filters {
+  flex: 1 1 auto;
+}
+
+.markets-toolbar__sort {
+  width: 11rem;
+  margin: 0;
 }
 
 .markets-status {
@@ -37,102 +65,49 @@
   }
 }
 
-.crypto-card-slot {
-  transition: transform var(--transition-normal);
+.markets-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.markets-pagination__page {
+  min-width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: var(--radius-sm, 4px);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font-weight: 600;
 
   &:hover {
-    transform: translateY(-2px);
+    background: color-mix(in srgb, var(--color-primary) 12%, transparent);
   }
 
-  .crypto-card__action {
-    width: 100%;
-  }
-}
-
-.sidebar {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-}
-
-.watchlist,
-.notifications {
-  background-color: var(--color-surface);
-  padding: var(--space-lg);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-
-  h3 {
-    margin-bottom: var(--space-md);
-    color: var(--color-text);
+  &.is-active {
+    background: var(--color-primary);
+    color: var(--color-on-primary, #fff);
   }
 }
 
-.watchlist__list,
-.notifications__list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 var(--space-md) 0;
+.markets-aside {
+  min-width: 0;
+  position: sticky;
+  top: 0;
+  align-self: stretch;
+  max-height: calc(100vh - 8rem);
 }
 
-.watchlist__item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-sm) 0;
-  border-bottom: 1px solid var(--color-border);
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
-
-.notification {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: var(--space-sm) 0;
-  border-bottom: 1px solid var(--color-border);
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  &__content {
-    flex: 1;
-
-    p {
-      margin: 0 0 var(--space-xs) 0;
-    }
-
-    small {
-      color: var(--color-muted);
-    }
-  }
-
-  &__dismiss {
-    background: none;
-    border: none;
-    font-size: var(--font-size-lg);
-    color: var(--color-muted);
-    cursor: pointer;
-    padding: 0;
-    margin-left: var(--space-sm);
-  }
-}
-
-// Mobile responsive
-@media (max-width: 900px) {
-  .main-content {
-    flex-direction: column;
-  }
-
-  .sidebar {
-    order: -1;
-  }
-
-  .crypto-grid {
+@media (max-width: 1100px) {
+  .markets-page__body {
     grid-template-columns: 1fr;
+  }
+
+  .markets-aside {
+    position: static;
+    max-height: none;
   }
 }

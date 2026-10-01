@@ -38,6 +38,7 @@ src/
 │   │       ├── crypto-card/
 │   │       │   └── crypto-chart/   # detailed kline chart (colocated under card)
 │   │       ├── confirmation-dialog/
+│   │       ├── base-dialog/
 │   │       └── app-snackbar/   # stacked notifications (hosted by AppComponent)
 │   │
 │   └── features/
@@ -45,6 +46,7 @@ src/
 │       ├── markets/
 │       ├── trading/
 │       ├── portfolio/
+│       ├── watchlist/           # dialog + config route; API in core/services
 │       ├── auth/
 │       └── system/
 │
@@ -133,9 +135,10 @@ Future layouts (`auth-layout`, `fullscreen-layout`) only when routes truly need 
 | Feature | Role | Primary routes (URLs unchanged) |
 | --- | --- | --- |
 | `dashboard/` | Portfolio overview widgets | `/dashboard` |
-| `markets/` | Market list / admin crypto edit | `/markets`, `/admin/crypto-currencies/...` |
+| `markets/` | Market discovery (card browser + movers); admin crypto edit | `/markets`, `/admin/crypto-currencies/...` |
 | `trading/` | Asset detail, invest/alerts UI | `/crypto/:id` |
 | `portfolio/` | Profile / edit profile | `/profile`, `/edit-profile` |
+| `watchlist/` | Watchlist MatDialog + config placeholder | `/watchlist/config` (dialog has no route) |
 | `auth/` | Login, register, banned | `/login`, `/register`, `/banned` |
 | `system/` | Not found, testing ground | `**`, `/testing-ground` |
 
@@ -144,13 +147,28 @@ Future layouts (`auth-layout`, `fullscreen-layout`) only when routes truly need 
 Feature-local pieces go under the feature:
 
 ```text
+features/markets/
+├── markets.component.*
+├── markets.const.ts
+├── search/
+└── components/
+    ├── animated-market-card-layout/   # five-slot compact/intermediate swap
+    ├── market-movers/
+    └── crypto-currency-edit/
+
 features/trading/
 ├── trading.component.*
 └── components/
     ├── active-investment/
     ├── invest-dialog/
     └── set-price-alert-dialog/
+
+features/watchlist/
+├── watchlist-dialog/          # MatDialog + base-dialog; opened from sidebar
+└── watchlist-config/          # `/watchlist/config` placeholder
 ```
+
+Watchlist membership API + `ids` cache: `WatchlistSubscriptionsService` (`core/services/`). Dialog UI is feature-owned and opened via `MatDialog` from the sidebar (not a shell overlay host).
 
 ---
 

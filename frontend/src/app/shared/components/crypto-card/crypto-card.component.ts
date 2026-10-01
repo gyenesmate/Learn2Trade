@@ -11,17 +11,23 @@ import {
   inject,
   input,
   output,
+  signal,
   viewChild,
 } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import {
   ColorType,
+  CrosshairMode,
   IChartApi,
   ISeriesApi,
   LineSeries,
+  LineStyle,
+  MouseEventParams,
   UTCTimestamp,
   createChart,
 } from 'lightweight-charts';
@@ -37,8 +43,18 @@ import { MarketTicker } from '@core/binance/binance.types';
 import { WebSocketService } from '@core/websocket/websocket.service';
 import { CryptoChartComponent } from './crypto-chart/crypto-chart.component';
 
-/** Compact miniTicker sparkline always shows the last 24h. */
+/** Compact / intermediate miniTicker sparkline always shows the last 24h. */
 const COMPACT_VISIBLE_SECONDS = 24 * 60 * 60;
+/** Align live ticks with REST 5m kline buckets. */
+const COMPACT_BUCKET_SECONDS = 5 * 60;
+
+export type CryptoCardState = 'compact' | 'intermediate' | 'detailed';
+
+interface CompactHoverTooltip {
+  price: number;
+  x: number;
+  y: number;
+}
 
 @Component({
   selector: 'app-crypto-card',
@@ -46,13 +62,19 @@ const COMPACT_VISIBLE_SECONDS = 24 * 60 * 60;
     MatButtonModule,
     MatCardModule,
     MatIconModule,
+    MatTooltipModule,
     DecimalPipe,
+    RouterLink,
     CryptoChartComponent,
   ],
   providers: [DecimalPipe],
   templateUrl: './crypto-card.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./crypto-card.component.scss'],
+  host: {
+    '[class.crypto-card-host--detailed]': 'state() === "detailed"',
+    '[class.crypto-card-host--intermediate]': 'state() === "intermediate"',
+  },
 })
 export class CryptoCardComponent implements AfterViewInit, OnDestroy {
   private readonly ngZone = inject(NgZone);
@@ -64,25 +86,38 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
   private readonly binanceRest = inject(BinanceRestService);
   private readonly wsTransport = inject(WebSocketService);
 
-  readonly state = input<'detailed' | 'compact'>('compact');
+  readonly state = input<CryptoCardState>('compact');
   readonly data = input.required<CryptoCurrency>();
-  readonly watchlistCryptoIds = input<Set<string>>();
   readonly livePriceChange = output<number>();
+  /** Compact → promote into intermediate slot (Markets layout owns the swap). */
+  readonly expand = output<CryptoCurrency>();
 
   exchangeLabel = 'Binance';
   /** Public for Trading `#card.livePrice` (invest / alerts / sell). */
   livePrice = 0;
   change24h?: number;
+  absoluteChange24h?: number;
+  high24h?: number;
+  low24h?: number;
+  quoteVolume24h?: number;
   lastUpdated?: number;
 
   watchlistSaving = false;
-  isInWatchlist = false;
 
   readonly connectionState = this.wsTransport.state;
   readonly isLive = computed(() => this.connectionState() === 'connected');
   readonly isReconnecting = computed(() => this.connectionState() === 'reconnecting');
+  readonly isInWatchlist = computed(() => {
+    const id = this.data()?.id;
+    return !!id && this.watchlistSubscriptions.ids().has(id);
+  });
+  readonly usesSparkline = computed(() => {
+    const mode = this.state();
+    return mode === 'compact' || mode === 'intermediate';
+  });
 
   readonly chartEl = viewChild<ElementRef<HTMLDivElement>>('compactChart');
+  readonly hoverTooltip = signal<CompactHoverTooltip | null>(null);
 
   private chart: IChartApi | null = null;
   private lineSeries: ISeriesApi<'Line'> | null = null;
@@ -91,29 +126,14 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
   private watchedPair: string | null = null;
   private resizeObserver?: ResizeObserver;
   private chartReady = false;
+  private crosshairHandler: ((param: MouseEventParams) => void) | null = null;
   private readonly windowResizeHandler = () => this.resizeCompact();
 
   constructor() {
     effect(() => {
-      const watchlistCryptoIds = this.watchlistCryptoIds();
-      const data = this.data();
-      const user = this.auth.currentUser();
-
-      if (watchlistCryptoIds) {
-        this.isInWatchlist = !!data?.id && watchlistCryptoIds.has(data.id);
-        return;
-      }
-      if (!user?.id || !data?.id) {
-        this.isInWatchlist = false;
-        return;
-      }
-      void this.refreshWatchlistMembership(data.id);
-    });
-
-    effect(() => {
       const mode = this.state();
       const data = this.data();
-      if (mode === 'compact') {
+      if (mode === 'compact' || mode === 'intermediate') {
         this.syncMiniTickerWatch(data);
         if (this.chartReady) {
           void this.loadCompactHistory(data);
@@ -138,11 +158,19 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
     this.livePrice = price;
     this.lastUpdated = Date.now();
     this.change24h = undefined;
+    this.absoluteChange24h = undefined;
     this.livePriceChange.emit(price);
   }
 
+  onExpandClick(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const coin = this.data();
+    if (coin) this.expand.emit(coin);
+  }
+
   async ngAfterViewInit(): Promise<void> {
-    if (this.state() !== 'compact') return;
+    if (!this.usesSparkline()) return;
     await new Promise<void>((r) => requestAnimationFrame(() => r()));
     this.initCompactChart();
     window.addEventListener('resize', this.windowResizeHandler);
@@ -169,14 +197,13 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
         this.notification.warning('Please log in to save to watchlist');
         return;
       }
-      if (this.isInWatchlist) {
-        await this.watchlistSubscriptions.deleteByCryptoCurrencyId(this.data().id);
-        this.isInWatchlist = false;
+      const cryptoId = this.data().id;
+      if (this.isInWatchlist()) {
+        await this.watchlistSubscriptions.deleteByCryptoCurrencyId(cryptoId);
         this.notification.info('Removed from watchlist');
         return;
       }
-      await this.watchlistSubscriptions.create(this.data().id);
-      this.isInWatchlist = true;
+      await this.watchlistSubscriptions.create(cryptoId);
       this.notification.success('Saved to watchlist');
     } catch (err) {
       console.error('saveToWatchlist failed', err);
@@ -186,17 +213,8 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
     }
   }
 
-  private async refreshWatchlistMembership(cryptoId: string): Promise<void> {
-    try {
-      const subs = await this.watchlistSubscriptions.getMe();
-      this.isInWatchlist = !!subs.find((s) => s.crypto_currency_id === cryptoId);
-    } catch {
-      this.isInWatchlist = false;
-    }
-  }
-
   private syncMiniTickerWatch(coin: CryptoCurrency): void {
-    if (this.state() !== 'compact') {
+    if (!this.usesSparkline()) {
       this.releaseMiniTickerWatch();
       return;
     }
@@ -221,40 +239,71 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
     const price = ticker.price;
     if (!Number.isFinite(price)) return;
     const time = Math.floor((ticker.eventTime || Date.now()) / 1000);
+    const bucketTime =
+      Math.floor(time / COMPACT_BUCKET_SECONDS) * COMPACT_BUCKET_SECONDS;
 
     this.ngZone.run(() => {
       this.livePrice = price;
       this.exchangeLabel = 'Binance';
       this.lastUpdated = ticker.eventTime || Date.now();
       this.change24h = Number(ticker.change24hPct.toFixed(2));
+      this.absoluteChange24h = Number((price - ticker.open).toFixed(2));
+      this.high24h = ticker.high;
+      this.low24h = ticker.low;
+      this.quoteVolume24h = ticker.quoteVolume;
       this.livePriceChange.emit(price);
     });
 
     try {
       if (!this.lineSeries) return;
-      const point = { time, value: price };
       const cutoff = time - COMPACT_VISIBLE_SECONDS;
-      this.lineData = this.lineData.filter((p) => p.time >= cutoff);
+      const prevFirst = this.lineData[0]?.time;
+      const prevLen = this.lineData.length;
+      let data = this.lineData.filter((p) => p.time >= cutoff);
+      const prunedFront = data.length < prevLen || data[0]?.time !== prevFirst;
+      const last = data[data.length - 1];
 
-      if (this.lineData.length === 0) {
-        this.lineData.push(point);
-        this.lineSeries.setData([{ time: time as UTCTimestamp, value: price }]);
-      } else {
-        const last = this.lineData[this.lineData.length - 1];
-        if (last.time === time) {
-          last.value = price;
-          this.lineSeries.update({ time: time as UTCTimestamp, value: price });
-        } else if (time > last.time) {
-          this.lineData.push(point);
-          this.lineSeries.update({ time: time as UTCTimestamp, value: price });
-        }
-        // Re-seed if we pruned from the front so series stays in sync.
-        if (this.lineData[0]?.time !== cutoff && this.lineData.length > 1) {
+      if (!last) {
+        data = [{ time: bucketTime, value: price }];
+        this.lineData = data;
+        this.lineSeries.setData([
+          { time: bucketTime as UTCTimestamp, value: price },
+        ]);
+      } else if (last.time === bucketTime) {
+        last.value = price;
+        this.lineData = data;
+        if (prunedFront) {
           this.lineSeries.setData(
-            this.lineData.map((p) => ({ time: p.time as UTCTimestamp, value: p.value }))
+            data.map((p) => ({ time: p.time as UTCTimestamp, value: p.value }))
+          );
+        } else {
+          this.lineSeries.update({
+            time: bucketTime as UTCTimestamp,
+            value: price,
+          });
+        }
+      } else if (bucketTime > last.time) {
+        data = [...data, { time: bucketTime, value: price }];
+        this.lineData = data;
+        if (prunedFront) {
+          this.lineSeries.setData(
+            data.map((p) => ({ time: p.time as UTCTimestamp, value: p.value }))
+          );
+        } else {
+          this.lineSeries.update({
+            time: bucketTime as UTCTimestamp,
+            value: price,
+          });
+        }
+      } else {
+        this.lineData = data;
+        if (prunedFront) {
+          this.lineSeries.setData(
+            data.map((p) => ({ time: p.time as UTCTimestamp, value: p.value }))
           );
         }
       }
+
       this.applyCompact24hVisibleRange(time);
     } catch {
       /* ignore */
@@ -282,7 +331,17 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
       rightPriceScale: { visible: false },
       leftPriceScale: { visible: false },
       timeScale: { visible: false, borderVisible: false },
-      crosshair: { vertLine: { visible: false }, horzLine: { visible: false } },
+      crosshair: {
+        mode: CrosshairMode.Magnet,
+        vertLine: {
+          visible: true,
+          labelVisible: false,
+          width: 1,
+          color: 'rgba(41, 121, 255, 0.45)',
+          style: LineStyle.Dashed,
+        },
+        horzLine: { visible: false, labelVisible: false },
+      },
       handleScroll: false,
       handleScale: false,
     });
@@ -292,10 +351,47 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
       lineWidth: 2,
       priceLineVisible: false,
       lastValueVisible: false,
+      crosshairMarkerVisible: true,
+      crosshairMarkerRadius: 4,
     });
+
+    this.crosshairHandler = (param) => this.onCompactCrosshair(param);
+    this.chart.subscribeCrosshairMove(this.crosshairHandler);
 
     this.resizeObserver = new ResizeObserver(() => this.resizeCompact());
     this.resizeObserver.observe(el);
+  }
+
+  private onCompactCrosshair(param: MouseEventParams): void {
+    if (!this.lineSeries || !param.point || param.time === undefined) {
+      this.ngZone.run(() => this.hoverTooltip.set(null));
+      return;
+    }
+
+    const point = param.seriesData.get(this.lineSeries) as
+      | { value?: number; close?: number }
+      | undefined;
+    const price =
+      typeof point?.value === 'number'
+        ? point.value
+        : typeof point?.close === 'number'
+          ? point.close
+          : undefined;
+
+    if (price === undefined || !Number.isFinite(price)) {
+      this.ngZone.run(() => this.hoverTooltip.set(null));
+      return;
+    }
+
+    const el = this.chartEl()?.nativeElement;
+    const width = el?.clientWidth ?? 0;
+    const height = el?.clientHeight ?? 0;
+    const x = Math.min(Math.max(param.point.x, 8), Math.max(width - 8, 8));
+    const y = Math.min(Math.max(param.point.y, 8), Math.max(height - 8, 8));
+
+    this.ngZone.run(() => {
+      this.hoverTooltip.set({ price, x, y });
+    });
   }
 
   private resizeCompact(): void {
@@ -318,6 +414,15 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
     }
     this.resizeObserver = undefined;
     try {
+      if (this.chart && this.crosshairHandler) {
+        this.chart.unsubscribeCrosshairMove(this.crosshairHandler);
+      }
+    } catch {
+      /* ignore */
+    }
+    this.crosshairHandler = null;
+    this.hoverTooltip.set(null);
+    try {
       this.chart?.remove();
     } catch {
       /* ignore */
@@ -332,7 +437,6 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
     const pair = toBinancePair(coin?.symbol, coin?.exchange_currency);
     if (!pair || !this.lineSeries) return;
 
-    // Seed last ~24h of closes (5m × 288), then lock visible range to 24h.
     const history = await this.binanceRest.getKlines(pair, '5m', 288);
     const nowSec = Math.floor(Date.now() / 1000);
     const cutoff = nowSec - COMPACT_VISIBLE_SECONDS;

@@ -1,0 +1,41 @@
+<section class="market-movers" aria-label="Market movers">
+  <header class="market-movers__header">
+    <h2 class="market-movers__title">Market Movers</h2>
+    <mat-button-toggle-group
+      class="market-movers__toggles"
+      [value]="mode()"
+      (change)="setMode($event.value)"
+      hideSingleSelectionIndicator
+    >
+      <mat-button-toggle value="gainers">Gainers</mat-button-toggle>
+      <mat-button-toggle value="losers">Losers</mat-button-toggle>
+      <mat-button-toggle value="active">Active</mat-button-toggle>
+    </mat-button-toggle-group>
+  </header>
+
+  <ol class="market-movers__list">
+    @for (row of visibleRows(); track row.crypto.id; let i = $index) {
+      <li class="market-movers__item">
+        <a class="market-movers__link" [routerLink]="['/crypto', row.crypto.id]">
+          <span class="market-movers__rank">{{ i + 1 | number: '2.0-0' }}</span>
+          <span class="market-movers__identity">
+            <span class="market-movers__symbol">{{ row.crypto.symbol }}</span>
+            <span class="market-movers__name">{{ row.crypto.name }}</span>
+          </span>
+          <span class="market-movers__stats">
+            <span class="market-movers__price">${{ row.price | number: '1.2-2' }}</span>
+            <span
+              class="market-movers__change"
+              [class.up]="row.change24hPct > 0"
+              [class.down]="row.change24hPct < 0"
+            >
+              {{ row.change24hPct > 0 ? '+' : '' }}{{ row.change24hPct | number: '1.2-2' }}%
+            </span>
+          </span>
+        </a>
+      </li>
+    } @empty {
+      <li class="market-movers__empty">Waiting for live market data…</li>
+    }
+  </ol>
+</section>

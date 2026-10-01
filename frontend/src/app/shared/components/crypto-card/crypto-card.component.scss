@@ -1,22 +1,48 @@
 // Layout only — surface chrome comes from mat-card + global overrides
 :host {
 	display: block;
+	min-height: 0;
+}
+
+:host(.crypto-card-host--detailed),
+:host(.crypto-card-host--intermediate) {
 	height: 100%;
 	min-height: 0;
 }
 
 .crypto-card {
+	display: grid;
+	gap: var(--space-sm);
+	align-content: start;
 	padding: 1rem;
-	margin: 0.5rem 0;
 	min-width: 220px;
 }
 
+.crypto-card.compact {
+	grid-template-rows: auto auto auto auto;
+}
+
+.crypto-card.intermediate {
+	height: 100%;
+	margin: 0;
+	min-width: 0;
+	min-height: 0;
+	grid-template-rows: auto auto minmax(0, 1fr) auto auto;
+}
+
+.crypto-card.detailed {
+	height: 100%;
+	margin: 0;
+	min-width: 0;
+	min-height: 0;
+	grid-template-rows: auto minmax(0, 1fr);
+}
+
 .crypto-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-start;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	align-items: start;
 	gap: var(--space-sm);
-	margin-bottom: 0.5rem;
 }
 
 .crypto-header__identity {
@@ -97,19 +123,18 @@
 .watchlist-toggle {
 	width: 36px;
 	height: 36px;
-	border-radius: 50%;
-	background: rgba(59, 130, 246, 0.08);
+	background: transparent;
 	color: var(--color-primary);
-	transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+	transition: color var(--transition-fast);
 
 	&:hover:not(:disabled) {
-		background: rgba(59, 130, 246, 0.16);
-		transform: translateY(-1px);
+		background: transparent;
+		color: var(--color-primary-hover, var(--color-primary));
 	}
 
 	&.is-in-watchlist {
-		background: rgba(255, 193, 7, 0.18);
-		color: #d39e00;
+		background: transparent;
+		color: var(--color-primary);
 	}
 
 	&:disabled {
@@ -126,13 +151,28 @@
 	display: flex;
 	align-items: center;
 	gap: 1rem;
-	margin-bottom: 0.5rem;
+
+	&--intermediate {
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 0.35rem;
+	}
 }
 
 .crypto-price {
 	font-size: 1.2rem;
 	font-weight: bold;
 	color: var(--color-text);
+
+	&--lg {
+		font-size: 1.75rem;
+	}
+}
+
+.crypto-change-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.35rem 0.65rem;
 }
 
 .crypto-change.up {
@@ -143,9 +183,44 @@
 	color: var(--color-crypto-down, #dc3545);
 }
 
-.crypto-chart-placeholder {
-	margin-top: 1rem;
+.crypto-card__expand {
+	color: var(--color-muted);
 
+	&:hover {
+		color: var(--color-primary);
+	}
+}
+
+.crypto-stats {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: var(--space-sm);
+}
+
+.crypto-stats__item {
+	display: flex;
+	flex-direction: column;
+	gap: 0.15rem;
+	min-width: 0;
+}
+
+.crypto-stats__label {
+	font-size: 0.7rem;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--color-muted);
+}
+
+.crypto-stats__value {
+	font-weight: 600;
+	font-size: 0.9rem;
+	color: var(--color-text);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.crypto-chart-placeholder {
 	.chart-box {
 		width: 100%;
 		height: 120px;
@@ -160,41 +235,58 @@
 	}
 }
 
-.crypto-chart-compact {
-	margin-top: 0.5rem;
+.crypto-chart-compact-wrap {
+	position: relative;
 	width: 100%;
 	height: 80px;
-	border-radius: 6px;
-	position: relative;
-	overflow: hidden;
-}
 
-.crypto-card.compact {
-	.crypto-chart-compact {
-		border: none;
-		background: transparent;
+	&--intermediate {
+		height: 140px;
+		min-height: 100px;
 	}
 }
 
-.crypto-card.detailed {
+.crypto-chart-compact {
+	width: 100%;
 	height: 100%;
-	margin: 0;
-	min-width: 0;
-	display: flex;
-	flex-direction: column;
-	min-height: 0;
+	border-radius: 6px;
+	position: relative;
+	overflow: hidden;
+	border: none;
+	background: transparent;
+}
+
+.crypto-chart-compact__tooltip {
+	position: absolute;
+	z-index: 2;
+	pointer-events: none;
+	transform: translate(-50%, calc(-100% - 6px));
+	padding: 0.15rem 0.4rem;
+	font-size: 0.75rem;
+	font-weight: 600;
+	line-height: 1.2;
+	white-space: nowrap;
+	color: var(--color-text);
+	background: var(--color-surface);
+	border: 1px solid var(--color-border);
+	border-radius: 4px;
+	box-shadow: var(--shadow-sm);
 }
 
 .crypto-card__chart {
-	flex: 1 1 auto;
 	min-height: 0;
 	display: flex;
 	flex-direction: column;
+}
+
+.crypto-card__view-chart {
+	width: 100%;
+	text-align: center;
 }
 
 .crypto-card__unsupported {
 	color: var(--color-muted);
-	margin: var(--space-md) 0 0;
+	margin: 0;
 }
 
 body.theme-dark .crypto-chart-placeholder .chart-box {

@@ -1,59 +1,92 @@
-<div class="home-page">
-  <app-page-header [title]="pageTitle" [actions]="headerActions" />
+<div class="markets-page">
 
-  <main class="main-content">
-    <section class="crypto-browser">
-      <h2>Browse Cryptocurrencies</h2>
+  <div class="markets-page__body">
+    <section class="markets-browser" aria-label="Market card browser">
+      <div class="markets-toolbar">
+        <mat-form-field class="markets-toolbar__search" appearance="outline" subscriptSizing="dynamic">
+          <mat-label>Search markets</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            matInput
+            [ngModel]="search()"
+            (ngModelChange)="onSearchInput($event)"
+            placeholder="Search markets..."
+            autocomplete="off"
+          />
+        </mat-form-field>
+
+        <div class="markets-toolbar__row">
+          <mat-button-toggle-group
+            class="markets-toolbar__filters"
+            [value]="filter()"
+            (change)="setFilter($event.value)"
+            hideSingleSelectionIndicator
+          >
+            @for (item of filters; track item.id) {
+              <mat-button-toggle [value]="item.id">{{ item.label }}</mat-button-toggle>
+            }
+          </mat-button-toggle-group>
+
+          <mat-form-field class="markets-toolbar__sort" appearance="outline" subscriptSizing="dynamic">
+            <mat-label>Sort</mat-label>
+            <mat-select [ngModel]="sort()" (ngModelChange)="setSort($event)">
+              @for (opt of sortOptions; track opt.id) {
+                <mat-option [value]="opt.id">{{ opt.label }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
 
       @if (loading()) {
         <div class="markets-status" role="status" aria-live="polite" aria-label="Loading">
-          <mat-progress-spinner
-            class="progress-spinner"
-            mode="indeterminate"
-            [diameter]="40"
-            [strokeWidth]="3"
-          />
+          <mat-progress-spinner mode="indeterminate" [diameter]="40" [strokeWidth]="3" />
         </div>
-      } @else if (displayedCryptocurrencies().length === 0) {
+      } @else if (pageAssets().length === 0) {
         <div class="markets-status markets-status--empty" role="status">
           <p>{{ emptyMessage }}</p>
         </div>
       } @else {
-        <div class="crypto-grid">
-          @for (crypto of displayedCryptocurrencies(); track crypto.id) {
-            <div class="crypto-card-slot">
-              <app-crypto-card [state]="'compact'" [data]="crypto" [watchlistCryptoIds]="watchlistCryptoIds()"></app-crypto-card>
-              <a class="btn btn-primary crypto-card__action" [routerLink]="['/crypto', crypto.id]">View Chart</a>
-            </div>
+        <app-animated-market-card-layout [assets]="pageAssets()" />
+
+        <nav class="markets-pagination" aria-label="Markets pages">
+          <button
+            type="button"
+            mat-icon-button
+            aria-label="Previous page"
+            [disabled]="pageIndex() === 0"
+            (click)="prevPage()"
+          >
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+
+          @for (page of pageNumbers(); track page) {
+            <button
+              type="button"
+              class="markets-pagination__page"
+              [class.is-active]="page === pageIndex()"
+              [attr.aria-current]="page === pageIndex() ? 'page' : null"
+              (click)="goToPage(page)"
+            >
+              {{ page + 1 }}
+            </button>
           }
-        </div>
+
+          <button
+            type="button"
+            mat-icon-button
+            aria-label="Next page"
+            [disabled]="pageIndex() >= pageCount() - 1"
+            (click)="nextPage()"
+          >
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </nav>
       }
     </section>
 
-    <aside class="sidebar">
-      <section class="watchlist">
-        <h3>My Watchlist</h3>
-        <div class="watchlist-table">
-          <table class="simple-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Exchange</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (crypto of watchlistCryptos(); track crypto.id) {
-                <tr>
-                  <td>{{ crypto.name }} ({{ crypto.symbol }})</td>
-                  <td>{{ crypto.exchange_currency }}</td>
-                  <td><a class="btn btn-primary" [routerLink]="['/crypto', crypto.id]">View</a></td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      </section>
+    <aside class="markets-aside" aria-label="Market movers">
+      <app-market-movers [rows]="moverRows()" />
     </aside>
-  </main>
+  </div>
 </div>

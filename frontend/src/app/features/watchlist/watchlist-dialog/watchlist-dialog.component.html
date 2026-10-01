@@ -1,0 +1,70 @@
+<app-base-dialog class="watchlist-dialog">
+  <ng-container dialogTitle>Watchlist</ng-container>
+
+  <div class="watchlist-dialog__body">
+    @if (listState() === 'loading') {
+      <div class="watchlist-dialog__status" role="status">
+        <mat-progress-spinner mode="indeterminate" [diameter]="32" [strokeWidth]="3" />
+      </div>
+    } @else if (listState() === 'empty') {
+      <div class="watchlist-dialog__status watchlist-dialog__status--empty" role="status">
+        <p>No assets in your watchlist yet. Bookmark coins from Markets.</p>
+      </div>
+    } @else {
+      <ul class="watchlist-dialog__list">
+        @for (row of rows(); track row.crypto.id) {
+          <li class="watchlist-dialog__item">
+            <div class="watchlist-dialog__meta">
+              <span class="watchlist-dialog__symbol">{{ row.crypto.symbol }}</span>
+              <span class="watchlist-dialog__name">{{ row.crypto.name }}</span>
+            </div>
+            <div class="watchlist-dialog__stats">
+              @if (row.price !== undefined) {
+                <span class="watchlist-dialog__price"
+                  >${{ row.price | number: '1.2-2' }}</span
+                >
+              }
+              @if (row.change24hPct !== undefined) {
+                <span
+                  class="watchlist-dialog__change"
+                  [class.up]="row.change24hPct > 0"
+                  [class.down]="row.change24hPct < 0"
+                >
+                  {{ row.change24hPct > 0 ? '+' : ''
+                  }}{{ row.change24hPct | number: '1.2-2' }}%
+                </span>
+              }
+            </div>
+            <div class="watchlist-dialog__row-actions">
+              <button
+                type="button"
+                mat-icon-button
+                matTooltip="View market"
+                aria-label="View market"
+                (click)="view(row.crypto.id)"
+              >
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button
+                type="button"
+                mat-icon-button
+                matTooltip="Remove from watchlist"
+                aria-label="Remove from watchlist"
+                (click)="remove(row.crypto.id)"
+              >
+                <mat-icon>bookmark_remove</mat-icon>
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <ng-container dialogActions>
+    <button mat-button type="button" (click)="close()">Close</button>
+    <button mat-flat-button color="primary" type="button" (click)="configure()">
+      Configure watchlist
+    </button>
+  </ng-container>
+</app-base-dialog>

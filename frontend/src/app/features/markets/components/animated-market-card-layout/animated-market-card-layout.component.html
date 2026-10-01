@@ -1,0 +1,15 @@
+<div class="market-card-layout" role="list">
+  @for (slot of slotViews(); track slot.position) {
+    <div
+      class="market-card-layout__slot"
+      role="listitem"
+      [attr.data-position]="slot.position"
+    >
+      <app-crypto-card
+        [state]="slot.position === 'featured' ? 'intermediate' : 'compact'"
+        [data]="slot.asset"
+        (expand)="promote($event)"
+      />
+    </div>
+  }
+</div>

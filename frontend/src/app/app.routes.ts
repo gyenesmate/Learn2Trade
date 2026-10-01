@@ -35,6 +35,14 @@ export const routes: Routes = [
         canActivate: [authGuard],
       },
       {
+        path: 'watchlist/config',
+        loadComponent: () =>
+          import('@features/watchlist/watchlist-config/watchlist-config.component').then(
+            (m) => m.WatchlistConfigComponent
+          ),
+        canActivate: [authGuard],
+      },
+      {
         path: 'login',
         loadComponent: () =>
           import('@features/auth/login/login.component').then((m) => m.LoginComponent),
