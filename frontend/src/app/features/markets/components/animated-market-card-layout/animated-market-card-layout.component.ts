@@ -5,6 +5,8 @@ import {
   input,
   linkedSignal,
 } from '@angular/core';
+import { MarketTicker } from '@core/binance/binance.types';
+import { toBinancePair } from '@core/binance/binance.utils';
 import { CryptoCurrency } from '@core/models/models';
 import { CryptoCardComponent } from '@shared/components/crypto-card/crypto-card.component';
 import {
@@ -27,6 +29,8 @@ import {
 export class AnimatedMarketCardLayoutComponent {
   /** Up to five assets for the current page (order = featured first). */
   readonly assets = input.required<CryptoCurrency[]>();
+  /** Live miniTickers owned by Markets (cards do not open their own watches). */
+  readonly tickers = input<ReadonlyMap<string, MarketTicker>>(new Map());
 
   /** Slot map resets when the page asset set changes; writable for expand swaps. */
   readonly slots = linkedSignal<CryptoCurrency[], MarketCardSlot[]>({
@@ -40,12 +44,22 @@ export class AnimatedMarketCardLayoutComponent {
 
   readonly slotViews = computed(() => {
     const byId = new Map(this.assets().map((a) => [a.id, a]));
+    const tickers = this.tickers();
     return this.slots()
-      .map((slot) => ({
-        position: slot.position,
-        asset: byId.get(slot.assetId),
-      }))
-      .filter((s): s is { position: MarketCardPosition; asset: CryptoCurrency } => !!s.asset);
+      .map((slot) => {
+        const asset = byId.get(slot.assetId);
+        if (!asset) return null;
+        const pair = toBinancePair(asset.symbol, asset.exchange_currency);
+        return {
+          position: slot.position,
+          asset,
+          ticker: pair ? (tickers.get(pair) ?? null) : null,
+        };
+      })
+      .filter(
+        (s): s is { position: MarketCardPosition; asset: CryptoCurrency; ticker: MarketTicker | null } =>
+          !!s
+      );
   });
 
   promote(asset: CryptoCurrency): void {

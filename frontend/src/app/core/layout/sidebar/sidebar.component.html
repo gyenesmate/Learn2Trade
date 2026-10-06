@@ -6,22 +6,22 @@
 </div>
 
 <nav class="sidebar__nav" aria-label="Primary">
-  @for (link of mainLinks(); track link.id) {
+  @for (row of mainLinks(); track row.link.id) {
     <button
       type="button"
       class="sidebar__link"
-      [class.sidebar__link--active]="isActive(link)"
-      [class.sidebar__link--disabled]="isDisabled(link)"
-      [disabled]="isDisabled(link)"
-      [attr.aria-label]="link.label"
-      [attr.aria-current]="isActive(link) ? 'page' : null"
-      [matTooltip]="collapsed() ? link.label : ''"
+      [class.sidebar__link--active]="row.active"
+      [class.sidebar__link--disabled]="row.disabled"
+      [disabled]="row.disabled"
+      [attr.aria-label]="row.link.label"
+      [attr.aria-current]="row.active ? 'page' : null"
+      [matTooltip]="collapsed() ? row.link.label : ''"
       matTooltipPosition="right"
-      (click)="navigateTo(link)"
+      (click)="navigateTo(row.link)"
     >
-      <mat-icon class="sidebar__link-icon" aria-hidden="true">{{ link.icon }}</mat-icon>
+      <mat-icon class="sidebar__link-icon" aria-hidden="true">{{ row.link.icon }}</mat-icon>
       @if (!collapsed()) {
-        <span class="sidebar__link-label">{{ link.label }}</span>
+        <span class="sidebar__link-label">{{ row.link.label }}</span>
       }
     </button>
   }
@@ -32,22 +32,22 @@
     @if (!collapsed()) {
       <span class="sidebar__section-label">Admin</span>
     }
-    @for (link of adminLinks(); track link.id) {
+    @for (row of adminLinks(); track row.link.id) {
       <button
         type="button"
         class="sidebar__link"
-        [class.sidebar__link--active]="isActive(link)"
-        [class.sidebar__link--disabled]="isDisabled(link)"
-        [disabled]="isDisabled(link)"
-        [attr.aria-label]="link.label"
-        [attr.aria-current]="isActive(link) ? 'page' : null"
-        [matTooltip]="collapsed() ? link.label : ''"
+        [class.sidebar__link--active]="row.active"
+        [class.sidebar__link--disabled]="row.disabled"
+        [disabled]="row.disabled"
+        [attr.aria-label]="row.link.label"
+        [attr.aria-current]="row.active ? 'page' : null"
+        [matTooltip]="collapsed() ? row.link.label : ''"
         matTooltipPosition="right"
-        (click)="navigateTo(link)"
+        (click)="navigateTo(row.link)"
       >
-        <mat-icon class="sidebar__link-icon" aria-hidden="true">{{ link.icon }}</mat-icon>
+        <mat-icon class="sidebar__link-icon" aria-hidden="true">{{ row.link.icon }}</mat-icon>
         @if (!collapsed()) {
-          <span class="sidebar__link-label">{{ link.label }}</span>
+          <span class="sidebar__link-label">{{ row.link.label }}</span>
         }
       </button>
     }
@@ -56,22 +56,22 @@
 
 @if (footerLinks().length > 0) {
   <nav class="sidebar__footer" aria-label="Account">
-    @for (link of footerLinks(); track link.id) {
+    @for (row of footerLinks(); track row.link.id) {
       <button
         type="button"
         class="sidebar__link"
-        [class.sidebar__link--active]="isActive(link)"
-        [class.sidebar__link--disabled]="isDisabled(link)"
-        [disabled]="isDisabled(link)"
-        [attr.aria-label]="link.label"
-        [attr.aria-current]="isActive(link) ? 'page' : null"
-        [matTooltip]="collapsed() ? link.label : ''"
+        [class.sidebar__link--active]="row.active"
+        [class.sidebar__link--disabled]="row.disabled"
+        [disabled]="row.disabled"
+        [attr.aria-label]="row.link.label"
+        [attr.aria-current]="row.active ? 'page' : null"
+        [matTooltip]="collapsed() ? row.link.label : ''"
         matTooltipPosition="right"
-        (click)="navigateTo(link)"
+        (click)="navigateTo(row.link)"
       >
-        <mat-icon class="sidebar__link-icon" aria-hidden="true">{{ link.icon }}</mat-icon>
+        <mat-icon class="sidebar__link-icon" aria-hidden="true">{{ row.link.icon }}</mat-icon>
         @if (!collapsed()) {
-          <span class="sidebar__link-label">{{ link.label }}</span>
+          <span class="sidebar__link-label">{{ row.link.label }}</span>
         }
       </button>
     }

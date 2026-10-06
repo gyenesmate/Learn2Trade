@@ -15,6 +15,8 @@ const MOVER_LIMIT = 8;
 })
 export class MarketMoversComponent {
   readonly rows = input.required<MarketMoverRow[]>();
+  /** Shown when the list is empty (catalog empty vs waiting for tickers). */
+  readonly emptyMessage = input('Waiting for live market data…');
   readonly mode = signal<MarketMoverMode>('gainers');
 
   readonly visibleRows = computed(() => {

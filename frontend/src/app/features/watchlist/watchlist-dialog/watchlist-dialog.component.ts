@@ -88,11 +88,6 @@ export class WatchlistDialogComponent implements OnDestroy {
     this.dialogRef.close();
   }
 
-  configure(): void {
-    this.dialogRef.close();
-    void this.router.navigate(['/watchlist/config']);
-  }
-
   async remove(cryptoId: string): Promise<void> {
     try {
       await this.watchlist.deleteByCryptoCurrencyId(cryptoId);

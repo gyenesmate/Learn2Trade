@@ -5,11 +5,6 @@
   min-height: 100%;
 }
 
-.markets-page__subtitle {
-  margin: calc(var(--space-sm) * -1) 0 var(--space-sm);
-  color: var(--color-muted);
-}
-
 .markets-page__body {
   display: grid;
   grid-template-columns: minmax(0, 3.2fr) minmax(16rem, 1fr);
@@ -55,13 +50,21 @@
 
 .markets-status {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: var(--space-md);
   min-height: 12rem;
   color: var(--color-muted);
 
-  &--empty p {
+  &--empty p,
+  &--error p {
     margin: 0;
+    text-align: center;
+  }
+
+  &--error {
+    color: var(--color-text-primary);
   }
 }
 

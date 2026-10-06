@@ -51,6 +51,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   readonly currentRoute = signal('');
   readonly theme = signal<'light' | 'dark'>('dark');
   readonly isDark = computed(() => this.theme() === 'dark');
+  readonly activePaths = computed(() => {
+    const route = this.currentRoute();
+    const paths = ['/dashboard', '/markets', '/profile', '/login'];
+    return new Set(paths.filter((p) => route === p || route.startsWith(`${p}/`)));
+  });
 
   private readonly subscriptions: Subscription[] = [];
 
@@ -94,8 +99,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   isActive(path: string): boolean {
-    const route = this.currentRoute();
-    return route === path || route.startsWith(`${path}/`);
+    return this.activePaths().has(path);
   }
 
   navigateTo(route: string): void {

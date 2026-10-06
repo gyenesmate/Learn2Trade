@@ -16,3 +16,50 @@ export function toNumberOrNull(value: unknown): number | null {
   }
   return toNumber(value);
 }
+
+/** USD money for balances / P&L (always 2 fraction digits). */
+export function formatMoney(value: number, digits = 2): string {
+  if (!Number.isFinite(value)) return '—';
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(value);
+}
+
+/** Plain decimal (table `number` columns). */
+export function formatDecimal(value: number, minDigits = 2, maxDigits = 6): string {
+  if (!Number.isFinite(value)) return '—';
+  return new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: minDigits,
+    maximumFractionDigits: maxDigits,
+  }).format(value);
+}
+
+/** Spot price: more digits for sub-$1 alts. */
+export function formatPrice(value: number): string {
+  if (!Number.isFinite(value)) return '—';
+  const abs = Math.abs(value);
+  const digits = abs >= 1 ? 2 : abs >= 0.01 ? 4 : 6;
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
+  }).format(value);
+}
+
+/** Signed percent, e.g. `+1.25%` / `-0.40%` / `0.00%`. */
+export function formatPct(value: number, digits = 2): string {
+  if (!Number.isFinite(value)) return '—';
+  const sign = value > 0 ? '+' : '';
+  return `${sign}${value.toFixed(digits)}%`;
+}
+
+/** Signed money for P&L cells. */
+export function formatSignedMoney(value: number, digits = 2): string {
+  if (!Number.isFinite(value)) return '—';
+  const sign = value > 0 ? '+' : '';
+  return `${sign}${formatMoney(value, digits)}`;
+}

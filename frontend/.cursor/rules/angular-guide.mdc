@@ -1,9 +1,9 @@
 ---
-description: Angular 22+ expert standards — signals, inject, lifecycle, RxJS, templates
+description: Angular 22+ guide — signals, inject, lifecycle, RxJS, templates
 alwaysApply: true
 ---
 
-# Angular Expert (v22+)
+# Angular Guide (v22+)
 
 Target the Angular version in `frontend/package.json` (currently ^22). Prefer modern APIs that are stable in that version. Do not invent APIs or upgrade deps unless asked.
 

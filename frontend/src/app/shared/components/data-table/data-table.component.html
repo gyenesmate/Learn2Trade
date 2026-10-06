@@ -47,7 +47,7 @@
                 [checked]="isSelected(row)"
                 (click)="$event.stopPropagation()"
                 (change)="toggleRowSelection(row, $event.checked)"
-                [attr.aria-label]="'Select row'">
+                [attr.aria-label]="rowSelectLabel(row)">
               </mat-checkbox>
             </td>
           </ng-container>
@@ -76,7 +76,10 @@
                     <span>{{ element[column.key] | date:'short' }}</span>
                   }
                   @case ('currency') {
-                    <span>{{ element[column.key] | currency }}</span>
+                    <span class="tabular-nums">{{ formatCell(element, column) }}</span>
+                  }
+                  @case ('number') {
+                    <span class="tabular-nums">{{ formatCell(element, column) }}</span>
                   }
                   @case ('boolean') {
                     <span>
@@ -197,7 +200,7 @@
       </table>
     </div>
 
-    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Select"></mat-paginator>
+    <mat-paginator [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons aria-label="Rows per page"></mat-paginator>
   } @else {
     <div class="no-data">
       <p>No data available.</p>

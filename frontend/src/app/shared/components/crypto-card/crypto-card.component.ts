@@ -88,21 +88,26 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
 
   readonly state = input<CryptoCardState>('compact');
   readonly data = input.required<CryptoCurrency>();
+  /**
+   * When set (e.g. Markets page), apply this ticker and do not open a miniTicker watch.
+   * When null, the card owns its own `watchMiniTicker` (watchlist, testing-ground).
+   */
+  readonly externalTicker = input<MarketTicker | null>(null);
+  /** When false, hide watchlist toggle (Markets grid). */
+  readonly enableWatchlist = input(true);
   readonly livePriceChange = output<number>();
   /** Compact → promote into intermediate slot (Markets layout owns the swap). */
   readonly expand = output<CryptoCurrency>();
 
-  exchangeLabel = 'Binance';
-  /** Public for Trading `#card.livePrice` (invest / alerts / sell). */
-  livePrice = 0;
-  change24h?: number;
-  absoluteChange24h?: number;
-  high24h?: number;
-  low24h?: number;
-  quoteVolume24h?: number;
-  lastUpdated?: number;
-
-  watchlistSaving = false;
+  readonly exchangeLabel = signal('Binance');
+  readonly livePrice = signal(0);
+  readonly change24h = signal<number | undefined>(undefined);
+  readonly absoluteChange24h = signal<number | undefined>(undefined);
+  readonly high24h = signal<number | undefined>(undefined);
+  readonly low24h = signal<number | undefined>(undefined);
+  readonly quoteVolume24h = signal<number | undefined>(undefined);
+  readonly lastUpdated = signal<number | undefined>(undefined);
+  readonly watchlistSaving = signal(false);
 
   readonly connectionState = this.wsTransport.state;
   readonly isLive = computed(() => this.connectionState() === 'connected');
@@ -115,6 +120,9 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
     const mode = this.state();
     return mode === 'compact' || mode === 'intermediate';
   });
+  readonly binancePair = computed(() =>
+    toBinancePair(this.data()?.symbol, this.data()?.exchange_currency)
+  );
 
   readonly chartEl = viewChild<ElementRef<HTMLDivElement>>('compactChart');
   readonly hoverTooltip = signal<CompactHoverTooltip | null>(null);
@@ -133,14 +141,26 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
     effect(() => {
       const mode = this.state();
       const data = this.data();
+      const external = this.externalTicker();
       if (mode === 'compact' || mode === 'intermediate') {
-        this.syncMiniTickerWatch(data);
-        if (this.chartReady) {
-          void this.loadCompactHistory(data);
+        if (external) {
+          this.releaseMiniTickerWatch();
+          this.applyTicker(external);
+        } else {
+          this.syncMiniTickerWatch(data);
         }
       } else {
         this.releaseMiniTickerWatch();
         this.destroyCompactChart();
+      }
+    });
+
+    effect(() => {
+      const mode = this.state();
+      const data = this.data();
+      // chartReady is set after view init; untracked so ticker input churn does not reload REST.
+      if ((mode === 'compact' || mode === 'intermediate') && this.chartReady) {
+        void this.loadCompactHistory(data);
       }
     });
 
@@ -150,15 +170,11 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  get binancePair(): string | null {
-    return toBinancePair(this.data()?.symbol, this.data()?.exchange_currency);
-  }
-
   onChartLivePrice(price: number): void {
-    this.livePrice = price;
-    this.lastUpdated = Date.now();
-    this.change24h = undefined;
-    this.absoluteChange24h = undefined;
+    this.livePrice.set(price);
+    this.lastUpdated.set(Date.now());
+    this.change24h.set(undefined);
+    this.absoluteChange24h.set(undefined);
     this.livePriceChange.emit(price);
   }
 
@@ -167,6 +183,24 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
     event.stopPropagation();
     const coin = this.data();
     if (coin) this.expand.emit(coin);
+  }
+
+  onCompactFocus(): void {
+    const last = this.lineData[this.lineData.length - 1];
+    const price = last?.value ?? this.livePrice();
+    if (!Number.isFinite(price) || price <= 0) return;
+    const el = this.chartEl()?.nativeElement;
+    const width = el?.clientWidth ?? 0;
+    const height = el?.clientHeight ?? 0;
+    this.hoverTooltip.set({
+      price,
+      x: Math.max(width / 2, 8),
+      y: Math.max(height / 2, 8),
+    });
+  }
+
+  onCompactBlur(): void {
+    this.hoverTooltip.set(null);
   }
 
   async ngAfterViewInit(): Promise<void> {
@@ -189,8 +223,8 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
   }
 
   async saveToWatchlist(): Promise<void> {
-    if (!this.data()?.id || this.watchlistSaving) return;
-    this.watchlistSaving = true;
+    if (!this.enableWatchlist() || !this.data()?.id || this.watchlistSaving()) return;
+    this.watchlistSaving.set(true);
     try {
       const user = this.auth.currentUser();
       if (!user?.id) {
@@ -209,7 +243,7 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
       console.error('saveToWatchlist failed', err);
       this.notification.error('Failed to save to watchlist');
     } finally {
-      this.watchlistSaving = false;
+      this.watchlistSaving.set(false);
     }
   }
 
@@ -243,14 +277,14 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
       Math.floor(time / COMPACT_BUCKET_SECONDS) * COMPACT_BUCKET_SECONDS;
 
     this.ngZone.run(() => {
-      this.livePrice = price;
-      this.exchangeLabel = 'Binance';
-      this.lastUpdated = ticker.eventTime || Date.now();
-      this.change24h = Number(ticker.change24hPct.toFixed(2));
-      this.absoluteChange24h = Number((price - ticker.open).toFixed(2));
-      this.high24h = ticker.high;
-      this.low24h = ticker.low;
-      this.quoteVolume24h = ticker.quoteVolume;
+      this.livePrice.set(price);
+      this.exchangeLabel.set('Binance');
+      this.lastUpdated.set(ticker.eventTime || Date.now());
+      this.change24h.set(Number(ticker.change24hPct.toFixed(2)));
+      this.absoluteChange24h.set(Number((price - ticker.open).toFixed(2)));
+      this.high24h.set(ticker.high);
+      this.low24h.set(ticker.low);
+      this.quoteVolume24h.set(ticker.quoteVolume);
       this.livePriceChange.emit(price);
     });
 
@@ -456,9 +490,9 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
     const last = points[points.length - 1];
     if (last) {
       this.ngZone.run(() => {
-        this.livePrice = last.value;
-        this.lastUpdated = Date.now();
-        this.livePriceChange.emit(this.livePrice);
+        this.livePrice.set(last.value);
+        this.lastUpdated.set(Date.now());
+        this.livePriceChange.emit(last.value);
       });
     }
   }

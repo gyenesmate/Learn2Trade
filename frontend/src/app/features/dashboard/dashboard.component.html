@@ -2,45 +2,82 @@
   <app-page-header [title]="pageTitle" [actions]="headerActions" />
 
   <div class="dashboard-content">
-    @if (portfolio(); as portfolio) {
-      <section class="portfolio-overview card">
-        <h2>Portfolio Overview</h2>
-        <div class="overview-grid">
-          <div class="overview-item">
-            <label>Total Value</label>
-            <span class="value">${{ portfolio.totalValue }}</span>
-            <span class="change tabular-nums" [class]="portfolio.totalChange > 0 ? 'price-up' : 'price-down'">
-              {{ portfolio.totalChange }}%
-            </span>
+    @if (isLoading()) {
+      <div class="dashboard-status" role="status" aria-live="polite" aria-label="Loading">
+        <mat-progress-spinner mode="indeterminate" [diameter]="40" [strokeWidth]="3" />
+      </div>
+    } @else {
+      @if (portfolio(); as portfolio) {
+        <section class="app-panel">
+          <header class="app-panel__header">Portfolio Overview</header>
+          <div class="app-panel__body">
+            <div class="overview-grid">
+              <div class="overview-item">
+                <label>Total Value</label>
+                <span class="value tabular-nums">${{ portfolio.totalValue }}</span>
+                <span
+                  class="change tabular-nums"
+                  [class.price-up]="portfolio.totalChange > 0"
+                  [class.price-down]="portfolio.totalChange < 0"
+                >
+                  {{ portfolio.totalChange > 0 ? '+' : '' }}{{ portfolio.totalChange }}%
+                </span>
+              </div>
+              <div class="overview-item">
+                <label>Total Invested</label>
+                <span class="value tabular-nums">${{ portfolio.totalInvested }}</span>
+              </div>
+              <div class="overview-item">
+                <label>Total Profit/Loss</label>
+                <span
+                  class="value tabular-nums"
+                  [class.price-up]="portfolio.totalPnL > 0"
+                  [class.price-down]="portfolio.totalPnL < 0"
+                >
+                  {{ portfolio.totalPnL > 0 ? '+' : '' }}${{ portfolio.totalPnL }}
+                </span>
+              </div>
+              <div class="overview-item">
+                <label>Best Performer</label>
+                <span class="value">{{ portfolio.bestPerformer.name }}</span>
+                <span
+                  class="change tabular-nums"
+                  [class.price-up]="portfolio.bestPerformer.change > 0"
+                  [class.price-down]="portfolio.bestPerformer.change < 0"
+                >
+                  {{ portfolio.bestPerformer.change > 0 ? '+' : '' }}{{ portfolio.bestPerformer.change }}%
+                </span>
+              </div>
+            </div>
           </div>
-          <div class="overview-item">
-            <label>Total Invested</label>
-            <span class="value">${{ portfolio.totalInvested }}</span>
-          </div>
-          <div class="overview-item">
-            <label>Total Profit/Loss</label>
-            <span class="value" [class]="portfolio.totalPnL > 0 ? 'profit' : 'loss'">
-              ${{ portfolio.totalPnL }}
-            </span>
-          </div>
-          <div class="overview-item">
-            <label>Best Performer</label>
-            <span class="value">{{ portfolio.bestPerformer.name }}</span>
-            <span class="change price-up">{{ portfolio.bestPerformer.change }}%</span>
-          </div>
-        </div>
-      </section>
-    }
+        </section>
+      } @else {
+        <section class="dashboard-status dashboard-status--empty" role="status">
+          <p>No open positions yet. Browse markets to start a practice investment.</p>
+        </section>
+      }
 
-    @if (investments().length) {
-      <section class="analytics-section card">
-        <h2>Analytics</h2>
-        <div class="analytics-grid">
-          <app-analytics-card [state]="'best'" [investments]="investments()"></app-analytics-card>
-          <app-analytics-card [state]="'average'" [investments]="investments()"></app-analytics-card>
-          <app-analytics-card [state]="'timeline'" [investments]="investments()"></app-analytics-card>
-        </div>
-      </section>
+      @if (holdings().length) {
+        <section class="app-panel">
+          <header class="app-panel__header">Holdings</header>
+          <div class="app-panel__body app-panel__body--flush">
+            <app-data-table [columns]="holdingsColumns" [data]="holdings()" />
+          </div>
+        </section>
+      }
+
+      @if (investments().length) {
+        <section class="app-panel">
+          <header class="app-panel__header">Analytics</header>
+          <div class="app-panel__body">
+            <div class="analytics-grid">
+              <app-analytics-card [state]="'best'" [investments]="investments()" />
+              <app-analytics-card [state]="'average'" [investments]="investments()" />
+              <app-analytics-card [state]="'timeline'" [investments]="investments()" />
+            </div>
+          </div>
+        </section>
+      }
     }
   </div>
 </div>

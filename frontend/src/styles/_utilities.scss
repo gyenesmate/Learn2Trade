@@ -371,27 +371,4 @@
   .price-neutral {
     color: var(--color-crypto-neutral);
   }
-
-  .trading-workspace {
-    display: grid;
-    gap: var(--space-md);
-    min-width: 0;
-    min-height: 0;
-  }
-
-  .trading-workspace--lg {
-    grid-template-columns: minmax(0, 1fr) 280px 280px;
-  }
-
-  @media (max-width: 1439px) {
-    .trading-workspace--lg {
-      grid-template-columns: minmax(0, 1fr) minmax(240px, 280px);
-    }
-  }
-
-  @media (max-width: 1023px) {
-    .trading-workspace--lg {
-      grid-template-columns: 1fr;
-    }
-  }
 }

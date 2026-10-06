@@ -76,11 +76,11 @@
   font-size: 0.8rem;
   color: var(--color-muted);
 
-  &.up {
+  &.price-up {
     color: var(--color-crypto-up, #198754);
   }
 
-  &.down {
+  &.price-down {
     color: var(--color-crypto-down, #dc3545);
   }
 }

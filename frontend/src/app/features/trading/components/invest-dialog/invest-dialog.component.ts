@@ -1,6 +1,10 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,7 +15,7 @@ import { InvestDialogData, InvestDialogResult } from './invest-dialog.types';
 @Component({
   selector: 'app-invest-dialog',
   imports: [
-    FormsModule,
+    ReactiveFormsModule,
     MatDialogModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -21,22 +25,29 @@ import { InvestDialogData, InvestDialogResult } from './invest-dialog.types';
   ],
   templateUrl: './invest-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./invest-dialog.component.scss']
+  styleUrls: ['./invest-dialog.component.scss'],
 })
 export class InvestDialogComponent {
-  private readonly dialogRef = inject<MatDialogRef<InvestDialogComponent, InvestDialogResult | null>>(MatDialogRef);
+  private readonly dialogRef =
+    inject<MatDialogRef<InvestDialogComponent, InvestDialogResult | null>>(MatDialogRef);
+  private readonly fb = inject(FormBuilder);
   readonly data = inject<InvestDialogData>(MAT_DIALOG_DATA);
 
-  amount = 0;
-  description = '';
+  readonly form = this.fb.nonNullable.group({
+    amount: [0 as number, [Validators.required, Validators.min(0.01)]],
+    description: [''],
+  });
 
   cancel(): void {
     this.dialogRef.close(null);
   }
 
   confirm(): void {
-    const amount = Number(this.amount);
-    if (!Number.isFinite(amount) || amount <= 0) return;
-    this.dialogRef.close({ amount, description: String(this.description || '') });
+    this.form.markAllAsTouched();
+    if (this.form.invalid) return;
+    const { amount, description } = this.form.getRawValue();
+    const n = Number(amount);
+    if (!Number.isFinite(n) || n <= 0) return;
+    this.dialogRef.close({ amount: n, description: String(description || '') });
   }
 }

@@ -27,8 +27,8 @@
               @if (row.change24hPct !== undefined) {
                 <span
                   class="watchlist-dialog__change"
-                  [class.up]="row.change24hPct > 0"
-                  [class.down]="row.change24hPct < 0"
+                  [class.price-up]="row.change24hPct > 0"
+                  [class.price-down]="row.change24hPct < 0"
                 >
                   {{ row.change24hPct > 0 ? '+' : ''
                   }}{{ row.change24hPct | number: '1.2-2' }}%
@@ -63,8 +63,5 @@
 
   <ng-container dialogActions>
     <button mat-button type="button" (click)="close()">Close</button>
-    <button mat-flat-button color="primary" type="button" (click)="configure()">
-      Configure watchlist
-    </button>
   </ng-container>
 </app-base-dialog>

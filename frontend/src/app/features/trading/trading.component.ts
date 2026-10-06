@@ -1,21 +1,21 @@
 import {
   Component,
-  OnInit,
   ChangeDetectionStrategy,
-  DestroyRef,
   computed,
+  effect,
   inject,
   signal,
-  viewChild,
+  untracked,
 } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, RouterModule } from '@angular/router';
-import { map } from 'rxjs';
-import { MatCardModule } from '@angular/material/card';
+import { firstValueFrom, map } from 'rxjs';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CryptoCurrency, Investment, PriceAlert } from '@core/models/models';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { CryptoCardComponent } from '@shared/components/crypto-card/crypto-card.component';
+import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
 import { DataTableComponent } from '@shared/components/data-table/data-table.component';
 import { DataTableRow, RowAction, TableAction } from '@shared/components/data-table/data-table.types';
 import { InvestDialogComponent } from '@features/trading/components/invest-dialog/invest-dialog.component';
@@ -30,6 +30,7 @@ import { PageHeaderComponent } from '@shared/components/page-header/page-header.
 import {
   TRADING_ALERT_COLUMNS,
   TRADING_INVESTMENT_COLUMNS,
+  TRADING_PAGE_TITLE_FALLBACK,
   TRADING_TABLE_ACTIONS,
 } from './trading.const';
 
@@ -54,7 +55,7 @@ type AlertRow = DataTableRow & {
     RouterModule,
     CryptoCardComponent,
     MatDialogModule,
-    MatCardModule,
+    MatButtonModule,
     PageHeaderComponent,
     DataTableComponent,
   ],
@@ -62,7 +63,7 @@ type AlertRow = DataTableRow & {
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./trading.component.scss'],
 })
-export class TradingComponent implements OnInit {
+export class TradingComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly cryptoService = inject(CryptoCurrenciesService);
   private readonly dialog = inject(MatDialog);
@@ -70,15 +71,6 @@ export class TradingComponent implements OnInit {
   private readonly investments = inject(InvestmentsService);
   private readonly priceAlerts = inject(PriceAlertsService);
   private readonly notification = inject(NotificationService);
-  private readonly destroyRef = inject(DestroyRef);
-
-  private readonly fallbackCryptocurrencies: CryptoCurrency[] = [
-    { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', exchange_currency: 'USD', created_at: '', updated_at: '' },
-    { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', exchange_currency: 'USD', created_at: '', updated_at: '' },
-    { id: 'cardano', name: 'Cardano', symbol: 'ADA', exchange_currency: 'USD', created_at: '', updated_at: '' },
-    { id: 'binancecoin', name: 'Binance Coin', symbol: 'BNB', exchange_currency: 'USD', created_at: '', updated_at: '' },
-    { id: 'ripple', name: 'Ripple', symbol: 'XRP', exchange_currency: 'USD', created_at: '', updated_at: '' },
-  ];
 
   private readonly routeId = toSignal(
     this.route.paramMap.pipe(map((params) => params.get('id'))),
@@ -91,17 +83,18 @@ export class TradingComponent implements OnInit {
   readonly cryptoAlerts = signal<PriceAlert[]>([]);
   readonly investing = signal(false);
   readonly selling = signal(false);
-  /** Bumps when live price updates so investment rows recompute. */
-  readonly livePriceTick = signal(0);
+  /** Latest price from the detailed card chart (via livePriceChange). */
+  readonly livePrice = signal(0);
 
-  readonly pageTitle = computed(() => this.selectedCrypto()?.name ?? 'Crypto');
+  readonly pageTitle = computed(
+    () => this.selectedCrypto()?.name ?? TRADING_PAGE_TITLE_FALLBACK
+  );
 
   readonly investmentColumns = TRADING_INVESTMENT_COLUMNS;
   readonly alertColumns = TRADING_ALERT_COLUMNS;
 
   readonly investmentRows = computed<InvestmentRow[]>(() => {
-    void this.livePriceTick();
-    const price = Number(this.card()?.livePrice || 0);
+    const price = this.livePrice();
     return this.activeInvestments().map((inv) => {
       const units = inv.buying_price > 0 ? inv.amount / inv.buying_price : 0;
       return {
@@ -153,16 +146,15 @@ export class TradingComponent implements OnInit {
     },
   ];
 
-  readonly card = viewChild<CryptoCardComponent>('card');
-
-  ngOnInit(): void {
-    this.route.paramMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      void this.loadSelectedCrypto(params.get('id'));
+  constructor() {
+    effect(() => {
+      const id = this.routeId();
+      untracked(() => void this.loadSelectedCrypto(id));
     });
   }
 
-  onCardLivePrice(): void {
-    this.livePriceTick.update((n) => n + 1);
+  onCardLivePrice(price: number): void {
+    this.livePrice.set(Number.isFinite(price) ? price : 0);
   }
 
   private async loadSelectedCrypto(id: string | null): Promise<void> {
@@ -170,8 +162,11 @@ export class TradingComponent implements OnInit {
       this.selectedCrypto.set(null);
       this.activeInvestments.set([]);
       this.cryptoAlerts.set([]);
+      this.livePrice.set(0);
       return;
     }
+
+    this.livePrice.set(0);
 
     try {
       const fromDb = await this.cryptoService.getById(id);
@@ -181,11 +176,12 @@ export class TradingComponent implements OnInit {
         return;
       }
     } catch {
-      // ignore and fall back
+      // fall through to not-found
     }
 
-    this.selectedCrypto.set(this.fallbackCryptocurrencies.find((c) => c.id === id) ?? null);
-    await Promise.all([this.loadActiveInvestments(), this.loadCryptoAlerts()]);
+    this.selectedCrypto.set(null);
+    this.activeInvestments.set([]);
+    this.cryptoAlerts.set([]);
   }
 
   private async loadActiveInvestments(): Promise<void> {
@@ -222,9 +218,13 @@ export class TradingComponent implements OnInit {
   openInvest(): void {
     const crypto = this.selectedCrypto();
     if (!crypto) return;
-    const currentPrice = Number(this.card()?.livePrice || 0);
+    const currentPrice = this.livePrice();
     const ref = this.dialog.open(InvestDialogComponent, {
-      data: { crypto, currentPrice },
+      data: {
+        crypto,
+        currentPrice,
+        availableBalance: Number(this.auth.currentUser()?.balance || 0),
+      },
     });
 
     ref.afterClosed().subscribe((result: InvestDialogResult | null) => {
@@ -236,7 +236,7 @@ export class TradingComponent implements OnInit {
   openSetAlert(): void {
     const crypto = this.selectedCrypto();
     if (!crypto) return;
-    const currentPrice = Number(this.card()?.livePrice || 0);
+    const currentPrice = this.livePrice();
 
     const ref = this.dialog.open(SetPriceAlertDialogComponent, {
       data: { crypto, currentPrice },
@@ -265,7 +265,7 @@ export class TradingComponent implements OnInit {
         return;
       }
 
-      const currentPrice = Number(this.card()?.livePrice || 0);
+      const currentPrice = this.livePrice();
       const alertType: 'above' | 'below' = alertPrice < currentPrice ? 'below' : 'above';
 
       await this.priceAlerts.create({
@@ -309,7 +309,7 @@ export class TradingComponent implements OnInit {
         return;
       }
 
-      const currentPrice = Number(this.card()?.livePrice || 0);
+      const currentPrice = this.livePrice();
       if (!Number.isFinite(currentPrice) || currentPrice <= 0) {
         this.notification.error('Current price unavailable');
         return;
@@ -334,10 +334,25 @@ export class TradingComponent implements OnInit {
 
   async sellActiveInvestment(investmentId?: string): Promise<void> {
     if (this.selling()) return;
+
+    const confirmed = await firstValueFrom(
+      this.dialog
+        .open(ConfirmationDialogComponent, {
+          data: {
+            title: 'Sell investment',
+            message: 'Sell this investment at the current market price?',
+            confirmText: 'Sell',
+            cancelText: 'Cancel',
+          },
+        })
+        .afterClosed()
+    );
+    if (!confirmed) return;
+
     this.selling.set(true);
 
     try {
-      const currentPrice = Number(this.card()?.livePrice || 0);
+      const currentPrice = this.livePrice();
       if (!Number.isFinite(currentPrice) || currentPrice <= 0) {
         throw new Error('Current price unavailable');
       }

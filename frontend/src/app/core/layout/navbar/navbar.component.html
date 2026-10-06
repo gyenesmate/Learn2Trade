@@ -66,6 +66,7 @@
         class="nav-item"
         (click)="navigateTo('/dashboard')"
         [class.active]="isActive('/dashboard')"
+        [attr.aria-current]="isActive('/dashboard') ? 'page' : null"
       >
         <mat-icon>dashboard</mat-icon>
         <span>Dashboard</span>
@@ -76,8 +77,9 @@
       class="nav-item"
       (click)="navigateTo('/markets')"
       [class.active]="isActive('/markets')"
+      [attr.aria-current]="isActive('/markets') ? 'page' : null"
     >
-      <mat-icon>home</mat-icon>
+      <mat-icon>show_chart</mat-icon>
       <span>Markets</span>
     </button>
     @if (isLoggedIn()) {
@@ -86,6 +88,7 @@
         class="nav-item"
         (click)="navigateTo('/profile')"
         [class.active]="isActive('/profile')"
+        [attr.aria-current]="isActive('/profile') ? 'page' : null"
       >
         <mat-icon>account_balance_wallet</mat-icon>
         <span>Portfolio</span>
@@ -96,6 +99,7 @@
         class="nav-item"
         (click)="navigateTo('/login')"
         [class.active]="isActive('/login')"
+        [attr.aria-current]="isActive('/login') ? 'page' : null"
       >
         <mat-icon>login</mat-icon>
         <span>Login</span>

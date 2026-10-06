@@ -42,12 +42,17 @@
         <div class="markets-status" role="status" aria-live="polite" aria-label="Loading">
           <mat-progress-spinner mode="indeterminate" [diameter]="40" [strokeWidth]="3" />
         </div>
+      } @else if (loadError()) {
+        <div class="markets-status markets-status--error" role="alert">
+          <p>{{ loadErrorMessage }}</p>
+          <button type="button" mat-stroked-button (click)="retryLoad()">Retry</button>
+        </div>
       } @else if (pageAssets().length === 0) {
         <div class="markets-status markets-status--empty" role="status">
           <p>{{ emptyMessage }}</p>
         </div>
       } @else {
-        <app-animated-market-card-layout [assets]="pageAssets()" />
+        <app-animated-market-card-layout [assets]="pageAssets()" [tickers]="tickers()" />
 
         <nav class="markets-pagination" aria-label="Markets pages">
           <button
@@ -86,7 +91,14 @@
     </section>
 
     <aside class="markets-aside" aria-label="Market movers">
-      <app-market-movers [rows]="moverRows()" />
+      <app-market-movers
+        [rows]="moverRows()"
+        [emptyMessage]="
+          cryptocurrencies().length === 0
+            ? 'No markets available.'
+            : 'Waiting for live market data…'
+        "
+      />
     </aside>
   </div>
 </div>

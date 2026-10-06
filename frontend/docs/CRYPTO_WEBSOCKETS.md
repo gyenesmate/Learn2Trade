@@ -55,7 +55,7 @@ When leaving Markets, targets and miniTicker consumers dropped to zero. `Binance
 4. Desired set empty → **socket stays open** (this phase).
 5. Unexpected close → transport reconnects with backoff; market-data clears wire set and re-SUBSCRIBEs the desired set once connected.
 
-Markets still calls `setMiniTickerTargets` for first-N pairs and clears targets on destroy (logical cleanup only).
+Markets calls `setMiniTickerTargets` for the **full catalog** so movers/sort stay accurate, reads prices from `BinanceMarketDataService.latestTickers`, and passes tickers into cards as `externalTicker` (cards do **not** open a second miniTicker watch on Markets). Clears targets on destroy (logical cleanup only).
 
 ---
 
@@ -152,23 +152,23 @@ None for prices, preferences, or `exchangeInfo`.
 
 ## Routing
 
-Canonical markets URL: `/markets`. Legacy `/home` redirects.
+Canonical markets URL: `/markets` (empty path redirects there).
 
 ---
 
 ## Markets display
 
-`MARKETS_CARD_LIMIT` (default 5). Loading spinner / empty state when no cryptos.
+`MARKETS_PAGE_SIZE` (default 5) controls card slots. Markets owns full-catalog `setMiniTickerTargets` so movers stay accurate; cards receive `externalTicker` and do not open their own watches. Loading spinner / empty / error+Retry when catalog load fails.
 
 ---
 
 ## Out of scope / future work
 
-- Idle socket disconnect timeout
+- Idle socket disconnect timeout — **deferred (WS-02):** keep no-idle while Markets/Trading subscribe sets settle; only add a 60–120s empty-desired disconnect after profiling confirms route gaps no longer thrash reconnects.
 - Real Binance trading / user streams
 - MACD, Bollinger, drawing tools
 - Persistent chart preferences
-- Dashboard / price-alerts REST ticker → WS migration
+- Dashboard / price-alerts REST ticker → WS migration (alerts already on miniTicker)
 
 ---
 

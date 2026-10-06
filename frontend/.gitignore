@@ -43,3 +43,6 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# 3rd party skills
+/skills

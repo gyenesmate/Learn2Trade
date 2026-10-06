@@ -10,7 +10,7 @@ Use this rule as the map of the frontend. Prefer the smallest change that matche
 **File placement source of truth:** [`docs/FILE_STRUCTURES.md`](../../docs/FILE_STRUCTURES.md)  
 **UI/UX source of truth:** [`docs/TRADING_UI_CONTEXT.md`](../../docs/TRADING_UI_CONTEXT.md)
 
-Also follow `angular-expert.mdc`, `material-expert.mdc`, and `agents.md`.
+Also follow `angular-guide.mdc`, `material-guide.mdc`, and `agents.md`.
 
 ## Architecture (summary)
 
@@ -85,6 +85,6 @@ Visual direction: dark-first trading terminal. Semantic tokens only. Layout via 
 4. Preserve auth/guard behavior and route URLs.
 5. Reuse `shared/components` and `core/services` before inventing new abstractions.
 6. Feature-specific dialogs/components stay under the feature.
-7. Page chrome: use `app-page-header` for title + actions; do not reinvent per-feature headers.
+7. Page chrome: use `app-page-header` for title + actions on pages that need that chrome; do not reinvent per-feature headers. Dense browse surfaces (e.g. Markets) may omit it when a header would waste vertical space.
 8. Styles: tokens + Material overrides globally; layout via flex/grid utilities; local SCSS for brand/surface only.
 9. Validate with `npm run build` / `npm run test:unit` when practical.

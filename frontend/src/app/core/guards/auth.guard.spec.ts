@@ -25,6 +25,7 @@ describe('authGuard', () => {
           useValue: {
             currentUser,
             isSessionExpired: () => false,
+            clearClientSession: vi.fn(),
           },
         },
       ],

@@ -8,6 +8,8 @@
       <app-crypto-card
         [state]="slot.position === 'featured' ? 'intermediate' : 'compact'"
         [data]="slot.asset"
+        [externalTicker]="slot.ticker"
+        [enableWatchlist]="false"
         (expand)="promote($event)"
       />
     </div>

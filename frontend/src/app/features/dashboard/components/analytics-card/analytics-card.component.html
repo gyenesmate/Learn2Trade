@@ -5,13 +5,13 @@
         <h3>Best Investment</h3>
         @if (bestInvestment(); as best) {
           <div>
-            <div><b>Crypto:</b> {{ best.crypto_currency_id }}</div>
-            <div><b>Profit:</b> ${{ profit(best) | number:'1.2-2' }}</div>
-            <div><b>ROI:</b> {{ roiPercent(best) | number:'1.2-2' }}%</div>
-            <div><b>Amount:</b> {{ best.amount | number:'1.2-8' }}</div>
-            <div><b>Bought at:</b> ${{ best.buying_price | number:'1.2-2' }}</div>
-            <div><b>Sold at:</b> ${{ best.selling_price | number:'1.2-2' }}</div>
-            <div><b>Date:</b> {{ soldDate(best) | date:'mediumDate' }}</div>
+            <div><b>Crypto:</b> {{ best.inv.crypto_currency_id }}</div>
+            <div><b>Profit:</b> ${{ best.profit | number:'1.2-2' }}</div>
+            <div><b>ROI:</b> {{ best.roiPercent | number:'1.2-2' }}%</div>
+            <div><b>Amount:</b> {{ best.inv.amount | number:'1.2-8' }}</div>
+            <div><b>Bought at:</b> ${{ best.inv.buying_price | number:'1.2-2' }}</div>
+            <div><b>Sold at:</b> ${{ best.inv.selling_price | number:'1.2-2' }}</div>
+            <div><b>Date:</b> {{ best.soldDate | date:'mediumDate' }}</div>
           </div>
         } @else {
           No sold investments.
@@ -33,10 +33,10 @@
         <h3>Investment Timeline</h3>
         @if (timeline().length) {
           <div>
-            @for (inv of timeline(); track inv.id) {
+            @for (row of timeline(); track row.inv.id) {
               <div class="chart-placeholder">
-                <div><b>{{ soldDate(inv) | date:'mediumDate' }}</b></div>
-                <div>{{ inv.crypto_currency_id }} — ${{ profit(inv) | number:'1.2-2' }} ({{ roiPercent(inv) | number:'1.2-2' }}%)</div>
+                <div><b>{{ row.soldDate | date:'mediumDate' }}</b></div>
+                <div>{{ row.inv.crypto_currency_id }} — ${{ row.profit | number:'1.2-2' }} ({{ row.roiPercent | number:'1.2-2' }}%)</div>
               </div>
             }
           </div>

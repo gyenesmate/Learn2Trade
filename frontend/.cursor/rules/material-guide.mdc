@@ -1,9 +1,9 @@
 ---
-description: Angular Material 22+ theming, tokens, and component usage standards
+description: Angular Material 22+ theming, tokens, and component usage guide
 alwaysApply: true
 ---
 
-# Material Expert (v22+)
+# Material Guide (v22+)
 
 Target `@angular/material` / `@angular/cdk` versions in `frontend/package.json` (currently ^22). Follow Material 3 token APIs. Do not style via private DOM/CSS.
 

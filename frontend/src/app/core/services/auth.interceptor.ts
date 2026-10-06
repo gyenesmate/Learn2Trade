@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '@core/env/environment';
+import { AuthService } from './auth.service';
 import { TokenStorageService } from './token-storage.service';
 
 function isAppApiRequest(url: string): boolean {
@@ -12,6 +13,7 @@ function isAppApiRequest(url: string): boolean {
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const tokenStorage = inject(TokenStorageService);
+  const auth = inject(AuthService);
   const router = inject(Router);
   const token = tokenStorage.getAccessToken();
 
@@ -28,12 +30,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return throwError(() => err);
       }
       if (err?.status === 401) {
-        tokenStorage.clear();
+        auth.clearClientSession();
         void router.navigate(['/login']);
       } else if (err?.status === 403) {
         const detail = String(err?.error?.detail ?? '').toLowerCase();
         if (detail.includes('banned')) {
-          tokenStorage.clear();
+          auth.clearClientSession();
           void router.navigate(['/banned']);
         }
       }

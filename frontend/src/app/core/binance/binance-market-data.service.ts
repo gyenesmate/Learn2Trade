@@ -1,4 +1,4 @@
-import { Injectable, effect, inject } from '@angular/core';
+import { Injectable, effect, inject, signal } from '@angular/core';
 import { Observable, Subject } from 'rxjs';
 import { WebSocketService } from '@core/websocket/websocket.service';
 import { BINANCE_WS_STREAM_URL } from './binance.const';
@@ -33,12 +33,16 @@ export class BinanceMarketDataService {
 
   private readonly tickerStreams = new Map<string, StreamEntry<MarketTicker>>();
   private readonly klineStreams = new Map<string, StreamEntry<ChartCandle>>();
-  /** Explicit page-level miniTicker targets (e.g. markets first-N). */
+  /** Explicit page-level miniTicker targets (e.g. Markets catalog for movers). */
   private readonly targetStreams = new Set<string>();
   /** Streams currently subscribed on the open socket. */
   private readonly wiredStreams = new Set<string>();
   private nextRequestId = 1;
   private lastConnectionState = this.ws.state();
+
+  /** Latest miniTicker by lowercase pair — updated for any targeted/watched stream. */
+  private readonly latestTickersInternal = signal(new Map<string, MarketTicker>());
+  readonly latestTickers = this.latestTickersInternal.asReadonly();
 
   constructor() {
     this.ws.messages$.subscribe((raw) => this.onMessage(raw));
@@ -266,6 +270,11 @@ export class BinanceMarketDataService {
       if (entry && !entry.subject.closed) {
         entry.subject.next(ticker);
       }
+      const next = new Map(this.latestTickersInternal());
+      next.set(ticker.pair, ticker);
+      // ponytail: Map clone per tick is fine until Markets catalog shrinks; profile
+      // marketRows/movers before introducing a per-pair signal map (PERF-01).
+      this.latestTickersInternal.set(next);
     }
   }
 

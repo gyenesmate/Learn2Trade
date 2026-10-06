@@ -33,10 +33,6 @@
 
 .market-movers__toggles {
   width: 100%;
-
-  ::ng-deep .mat-button-toggle {
-    flex: 1 1 0;
-  }
 }
 
 .market-movers__list {
@@ -108,11 +104,11 @@
   font-size: 0.8rem;
   color: var(--color-muted);
 
-  &.up {
+  &.price-up {
     color: var(--color-crypto-up, #198754);
   }
 
-  &.down {
+  &.price-down {
     color: var(--color-crypto-down, #dc3545);
   }
 }

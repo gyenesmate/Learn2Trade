@@ -32,9 +32,7 @@ src/
 │   │
 │   ├── shared/
 │   │   └── components/
-│   │       ├── panel/
 │   │       ├── data-table/
-│   │       ├── status-chip/
 │   │       ├── crypto-card/
 │   │       │   └── crypto-chart/   # detailed kline chart (colocated under card)
 │   │       ├── confirmation-dialog/
@@ -70,6 +68,8 @@ Path aliases (`tsconfig.json`):
 | `@shared/*` | `./src/app/shared/*` |
 | `@features/*` | `./src/app/features/*` |
 | `@styles/*` | `./src/styles/*` |
+
+**Imports:** use concrete file paths under the aliases (`@core/services/auth.service`, `@shared/components/data-table/data-table.component`). Do not grow or rely on barrel `index.ts` re-exports. Same-folder `./` imports may stay relative.
 
 ---
 
@@ -138,7 +138,7 @@ Future layouts (`auth-layout`, `fullscreen-layout`) only when routes truly need 
 | `markets/` | Market discovery (card browser + movers); admin crypto edit | `/markets`, `/admin/crypto-currencies/...` |
 | `trading/` | Asset detail, invest/alerts UI | `/crypto/:id` |
 | `portfolio/` | Profile / edit profile | `/profile`, `/edit-profile` |
-| `watchlist/` | Watchlist MatDialog + config placeholder | `/watchlist/config` (dialog has no route) |
+| `watchlist/` | Watchlist MatDialog (sidebar) | dialog only — no config route |
 | `auth/` | Login, register, banned | `/login`, `/register`, `/banned` |
 | `system/` | Not found, testing ground | `**`, `/testing-ground` |
 
@@ -159,13 +159,11 @@ features/markets/
 features/trading/
 ├── trading.component.*
 └── components/
-    ├── active-investment/
     ├── invest-dialog/
     └── set-price-alert-dialog/
 
 features/watchlist/
-├── watchlist-dialog/          # MatDialog + base-dialog; opened from sidebar
-└── watchlist-config/          # `/watchlist/config` placeholder
+└── watchlist-dialog/          # MatDialog + base-dialog; opened from sidebar
 ```
 
 Watchlist membership API + `ids` cache: `WatchlistSubscriptionsService` (`core/services/`). Dialog UI is feature-owned and opened via `MatDialog` from the sidebar (not a shell overlay host).
@@ -201,7 +199,7 @@ Examples:
 
 Feature-owned search contributions (e.g. market provider) live under `features/<feature>/search/` and register via `GLOBAL_SEARCH_PROVIDERS` at the application root so the always-visible navbar can use them before lazy routes load.
 
-Examples in `core/services/`: `auth`, `users`, `crypto-currencies`, `investments`, `price-alerts`, `watchlist-subscriptions`, `notification`, `api`, `token-storage.services`, `auth.interceptor`.
+Examples in `core/services/`: `auth`, `users`, `crypto-currencies`, `investments`, `price-alerts`, `watchlist-subscriptions`, `notification`, `api`, `token-storage`, `auth.interceptor`.
 
 Do not move a service into `core` only because one other feature might use it later.
 

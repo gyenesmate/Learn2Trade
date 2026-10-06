@@ -10,7 +10,7 @@ import {
   viewChild,
   computed,
 } from '@angular/core';
-import { DatePipe, CurrencyPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -19,6 +19,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { formatDecimal, formatMoney, toNumber } from '@core/utils/number.util';
+import { TABLE_COMPACT_MAX_PX } from '@core/layout/layout-breakpoints';
 import { TableColumn, TableAction, RowAction } from './data-table.types';
 
 @Component({
@@ -33,16 +35,14 @@ import { TableColumn, TableAction, RowAction } from './data-table.types';
     MatCheckboxModule,
     MatProgressSpinnerModule,
     DatePipe,
-    CurrencyPipe,
   ],
-  providers: [DatePipe, CurrencyPipe],
+  providers: [DatePipe],
   templateUrl: './data-table.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './data-table.component.scss',
 })
 export class DataTableComponent<T> {
   private readonly datePipe = inject(DatePipe);
-  private readonly currencyPipe = inject(CurrencyPipe);
 
   readonly columns = input<TableColumn<T>[]>([]);
   readonly title = input<string | undefined>(undefined);
@@ -73,7 +73,7 @@ export class DataTableComponent<T> {
     const actions = this.rowActions();
     const select = this.multiSelect() ? (['select'] as string[]) : [];
 
-    if (this.innerWidth() < 600) {
+    if (this.innerWidth() < TABLE_COMPACT_MAX_PX) {
       const result: string[] = [...select];
       if (cols[0]) result.push(String(cols[0].key));
       if (!result.includes('expand')) result.push('expand');
@@ -96,6 +96,8 @@ export class DataTableComponent<T> {
   readonly hasFilterRow = computed(
     () => this.multiSelect() || this.columns().some((c) => c.filterable === true)
   );
+
+  readonly isMobile = computed(() => this.innerWidth() < TABLE_COMPACT_MAX_PX);
 
   @HostListener('window:resize', ['$event'])
   onResize(event: UIEvent): void {
@@ -136,10 +138,6 @@ export class DataTableComponent<T> {
       // Re-apply column filters whenever the map changes.
       this.dataSource.filter = JSON.stringify(this.columnFilters());
     });
-  }
-
-  isMobile(): boolean {
-    return this.innerWidth() < 600;
   }
 
   resolveRowId(row: T): string {
@@ -199,7 +197,7 @@ export class DataTableComponent<T> {
   }
 
   formatRowTooltip(row: Record<string, unknown>): string {
-    if (!row || this.innerWidth() > 600) return '';
+    if (!row || this.innerWidth() > TABLE_COMPACT_MAX_PX) return '';
     try {
       const keys = Object.keys(row).filter((k) => k !== 'id');
       const parts = keys.slice(0, 2).map((k) => `${k}: ${row[k]}`);
@@ -218,6 +216,13 @@ export class DataTableComponent<T> {
     return this.expandedRow() === row;
   }
 
+  rowSelectLabel(row: T): string {
+    const record = row as Record<string, unknown>;
+    const label =
+      record['symbol'] ?? record['name'] ?? record['type'] ?? this.resolveRowId(row) ?? 'row';
+    return `Select ${label}`;
+  }
+
   formatCell(row: Record<string, unknown>, column: TableColumn<T>): string {
     if (!row || !column) return '';
     const value = row[column.key as string];
@@ -225,7 +230,9 @@ export class DataTableComponent<T> {
       case 'date':
         return this.datePipe.transform(value as string | number | Date, 'short') ?? '';
       case 'currency':
-        return this.currencyPipe.transform(value as number) ?? '';
+        return formatMoney(toNumber(value));
+      case 'number':
+        return formatDecimal(toNumber(value));
       case 'boolean':
         return value ? 'Yes' : 'No';
       default:

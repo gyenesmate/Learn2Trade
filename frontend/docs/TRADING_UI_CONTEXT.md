@@ -75,6 +75,7 @@ The same tokens must work in dark and light themes.
 --color-primary-hover: #2563eb;
 --color-primary-active: #1d4ed8;
 
+/* Reserved / unused — do not introduce purple accents in UI. Prefer primary blue. */
 --color-secondary: #8b5cf6;
 
 --color-success: #10b981;
@@ -88,6 +89,8 @@ The same tokens must work in dark and light themes.
 
 --color-info: #38bdf8;
 ```
+
+**Preferred aliases (use these in new code):** `--color-text-primary` (not bare `--color-text` alone when both exist), `--color-muted` / `--color-text-muted`, `--space-*` scale, `--radius-md`, `--color-primary`, `--color-success` / `--color-danger` (or `.price-up` / `.price-down`). Do not add new purple secondary usages.
 
 | Token role | Usage |
 | --- | --- |
@@ -303,13 +306,17 @@ Breakpoints guidance:
 
 ## 12. Panels
 
-Reuse `app-panel` / `<app-panel>`:
+Reuse the global `.app-panel` CSS primitives from `_components.scss` (class markup):
 
 - shared surface, border, radius, header (~44–48px), title ~13–14px/600
 - header: title | actions/tabs
 - body scrolls independently when needed
 
-Do not reinvent card styling per feature.
+Do not reinvent card styling per feature. There is no Angular `<app-panel>` component — use the CSS classes (or introduce a thin wrapper only when multiple features need the same projected API).
+
+### Page headers
+
+Use `<app-page-header>` for pages that need a title + action row (dashboard, portfolio, trading, forms). Dense browse surfaces such as **Markets** may omit it when the header would waste vertical space; do not invent a one-off substitute header on those pages.
 
 ---
 

@@ -3,6 +3,7 @@ import {
   BINANCE_EXCHANGE_INFO_PATH,
   BINANCE_KLINES_PATH,
   BINANCE_REST_BASE_URL,
+  BINANCE_TICKER_PRICE_PATH,
 } from './binance.const';
 import {
   BinanceExchangeInfoResponse,
@@ -14,7 +15,7 @@ import { restKlineToCandle } from './binance.utils';
 /**
  * Public Binance Spot REST helpers.
  * Uses `fetch` (not HttpClient) so auth interceptors / XHR credentials never
- * hit third-party URLs — same pattern as dashboard & price-alerts.
+ * hit third-party URLs.
  */
 @Injectable({ providedIn: 'root' })
 export class BinanceRestService {
@@ -66,6 +67,23 @@ export class BinanceRestService {
         .filter((c): c is ChartCandle => c !== null);
     } catch {
       return [];
+    }
+  }
+
+  /** Latest spot price for a Binance pair (e.g. `btcusdt`). Returns NaN on failure. */
+  async getTickerPrice(pair: string): Promise<number> {
+    try {
+      const symbol = pair.trim().toUpperCase();
+      if (!symbol) return NaN;
+      const params = new URLSearchParams({ symbol });
+      const url = `${BINANCE_REST_BASE_URL}${BINANCE_TICKER_PRICE_PATH}?${params.toString()}`;
+      const res = await fetch(url);
+      if (!res.ok) return NaN;
+      const data = (await res.json()) as { price?: string };
+      const price = Number(data?.price);
+      return Number.isFinite(price) ? price : NaN;
+    } catch {
+      return NaN;
     }
   }
 }

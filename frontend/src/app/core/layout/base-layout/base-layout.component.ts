@@ -8,6 +8,7 @@ import {
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { SHELL_MOBILE_MAX_PX } from '../layout-breakpoints';
 
 /** Persistent shell for main application routes. */
 @Component({
@@ -34,7 +35,7 @@ export class BaseLayoutComponent implements OnInit, OnDestroy {
   }
 
   checkScreenSize(): void {
-    const mobile = window.innerWidth <= 768;
+    const mobile = window.innerWidth <= SHELL_MOBILE_MAX_PX;
     this.isMobile.set(mobile);
     if (mobile) {
       this.sidebarExpanded.set(false);

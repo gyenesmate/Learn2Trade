@@ -25,9 +25,9 @@
           <span class="market-movers__stats">
             <span class="market-movers__price">${{ row.price | number: '1.2-2' }}</span>
             <span
-              class="market-movers__change"
-              [class.up]="row.change24hPct > 0"
-              [class.down]="row.change24hPct < 0"
+              class="market-movers__change tabular-nums"
+              [class.price-up]="row.change24hPct > 0"
+              [class.price-down]="row.change24hPct < 0"
             >
               {{ row.change24hPct > 0 ? '+' : '' }}{{ row.change24hPct | number: '1.2-2' }}%
             </span>
@@ -35,7 +35,7 @@
         </a>
       </li>
     } @empty {
-      <li class="market-movers__empty">Waiting for live market data…</li>
+      <li class="market-movers__empty">{{ emptyMessage() }}</li>
     }
   </ol>
 </section>

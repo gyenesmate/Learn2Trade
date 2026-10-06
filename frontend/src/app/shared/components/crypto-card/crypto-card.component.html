@@ -9,7 +9,7 @@
     <div class="crypto-header">
       <div class="crypto-header__identity">
         <span class="crypto-name">{{ coin.name }} ({{ coin.symbol }})</span>
-        <span class="crypto-exchange">{{ exchangeLabel }} / {{ coin.exchange_currency }}</span>
+        <span class="crypto-exchange">{{ exchangeLabel() }} / {{ coin.exchange_currency }}</span>
       </div>
 
       <div class="crypto-header__actions">
@@ -44,30 +44,39 @@
           </button>
         }
 
-        <button
-          mat-icon-button
-          class="watchlist-toggle"
-          [class.is-in-watchlist]="isInWatchlist()"
-          (click)="saveToWatchlist()"
-          [disabled]="watchlistSaving"
-          [attr.aria-label]="isInWatchlist() ? 'Remove from watchlist' : 'Save to watchlist'"
-          [matTooltip]="isInWatchlist() ? 'In watchlist' : (watchlistSaving ? 'Saving...' : 'Save to watchlist')"
-        >
-          <mat-icon>{{ isInWatchlist() ? 'bookmark' : 'bookmark_border' }}</mat-icon>
-        </button>
+        @if (enableWatchlist()) {
+          <button
+            mat-icon-button
+            class="watchlist-toggle"
+            [class.is-in-watchlist]="isInWatchlist()"
+            (click)="saveToWatchlist()"
+            [disabled]="watchlistSaving()"
+            [attr.aria-label]="isInWatchlist() ? 'Remove from watchlist' : 'Save to watchlist'"
+            [matTooltip]="isInWatchlist() ? 'In watchlist' : (watchlistSaving() ? 'Saving...' : 'Save to watchlist')"
+          >
+            <mat-icon>{{ isInWatchlist() ? 'bookmark' : 'bookmark_border' }}</mat-icon>
+          </button>
+        }
       </div>
     </div>
 
     @if (state() === 'compact') {
       <div class="crypto-info">
-        <span class="crypto-price">${{ livePrice | number: '1.2-2' }}</span>
-        @if (change24h !== undefined) {
-          <span class="crypto-change" [class.up]="change24h > 0" [class.down]="change24h < 0">
-            {{ change24h > 0 ? '+' : '' }}{{ change24h | number: '1.2-2' }}%
+        <span class="crypto-price">${{ livePrice() | number: '1.2-2' }}</span>
+        @if (change24h(); as pct) {
+          <span class="crypto-change tabular-nums" [class.price-up]="pct > 0" [class.price-down]="pct < 0">
+            {{ pct > 0 ? '+' : '' }}{{ pct | number: '1.2-2' }}%
           </span>
         }
       </div>
-      <div class="crypto-chart-compact-wrap">
+      <div
+        class="crypto-chart-compact-wrap"
+        tabindex="0"
+        role="img"
+        [attr.aria-label]="'Sparkline, last price $' + (livePrice() | number: '1.2-2')"
+        (focus)="onCompactFocus()"
+        (blur)="onCompactBlur()"
+      >
         <div class="crypto-chart-compact" #compactChart></div>
         @if (hoverTooltip(); as tip) {
           <div
@@ -78,32 +87,48 @@
             ${{ tip.price | number: '1.2-2' }}
           </div>
         }
+        <span class="sr-only" aria-live="polite">
+          @if (hoverTooltip(); as tip) {
+            ${{ tip.price | number: '1.2-2' }}
+          }
+        </span>
       </div>
       <a class="btn btn-primary crypto-card__view-chart" [routerLink]="['/crypto', coin.id]">
         View Chart
       </a>
     } @else if (state() === 'intermediate') {
       <div class="crypto-info crypto-info--intermediate">
-        <span class="crypto-price crypto-price--lg">${{ livePrice | number: '1.2-2' }}</span>
+        <span class="crypto-price crypto-price--lg">${{ livePrice() | number: '1.2-2' }}</span>
         <div class="crypto-change-row">
-          @if (absoluteChange24h !== undefined) {
+          @if (absoluteChange24h(); as abs) {
             <span
-              class="crypto-change"
-              [class.up]="absoluteChange24h > 0"
-              [class.down]="absoluteChange24h < 0"
+              class="crypto-change tabular-nums"
+              [class.price-up]="abs > 0"
+              [class.price-down]="abs < 0"
             >
-              {{ absoluteChange24h > 0 ? '+' : '' }}${{ absoluteChange24h | number: '1.2-2' }}
+              {{ abs > 0 ? '+' : '' }}${{ abs | number: '1.2-2' }}
             </span>
           }
-          @if (change24h !== undefined) {
-            <span class="crypto-change" [class.up]="change24h > 0" [class.down]="change24h < 0">
-              ({{ change24h > 0 ? '+' : '' }}{{ change24h | number: '1.2-2' }}%)
+          @if (change24h(); as pct) {
+            <span
+              class="crypto-change tabular-nums"
+              [class.price-up]="pct > 0"
+              [class.price-down]="pct < 0"
+            >
+              ({{ pct > 0 ? '+' : '' }}{{ pct | number: '1.2-2' }}%)
             </span>
           }
         </div>
       </div>
 
-      <div class="crypto-chart-compact-wrap crypto-chart-compact-wrap--intermediate">
+      <div
+        class="crypto-chart-compact-wrap crypto-chart-compact-wrap--intermediate"
+        tabindex="0"
+        role="img"
+        [attr.aria-label]="'Sparkline, last price $' + (livePrice() | number: '1.2-2')"
+        (focus)="onCompactFocus()"
+        (blur)="onCompactBlur()"
+      >
         <div class="crypto-chart-compact" #compactChart></div>
         @if (hoverTooltip(); as tip) {
           <div
@@ -114,14 +139,19 @@
             ${{ tip.price | number: '1.2-2' }}
           </div>
         }
+        <span class="sr-only" aria-live="polite">
+          @if (hoverTooltip(); as tip) {
+            ${{ tip.price | number: '1.2-2' }}
+          }
+        </span>
       </div>
 
       <div class="crypto-stats">
         <div class="crypto-stats__item">
           <span class="crypto-stats__label">24h Volume</span>
           <span class="crypto-stats__value">
-            @if (quoteVolume24h !== undefined) {
-              ${{ quoteVolume24h | number: '1.0-0' }}
+            @if (quoteVolume24h(); as vol) {
+              ${{ vol | number: '1.0-0' }}
             } @else {
               —
             }
@@ -130,8 +160,8 @@
         <div class="crypto-stats__item">
           <span class="crypto-stats__label">24h High</span>
           <span class="crypto-stats__value">
-            @if (high24h !== undefined) {
-              ${{ high24h | number: '1.2-2' }}
+            @if (high24h(); as high) {
+              ${{ high | number: '1.2-2' }}
             } @else {
               —
             }
@@ -140,8 +170,8 @@
         <div class="crypto-stats__item">
           <span class="crypto-stats__label">24h Low</span>
           <span class="crypto-stats__value">
-            @if (low24h !== undefined) {
-              ${{ low24h | number: '1.2-2' }}
+            @if (low24h(); as low) {
+              ${{ low | number: '1.2-2' }}
             } @else {
               —
             }
@@ -153,7 +183,7 @@
       <a class="btn btn-primary crypto-card__view-chart" [routerLink]="['/crypto', coin.id]">
         View market →
       </a>
-    } @else if (binancePair; as pair) {
+    } @else if (binancePair(); as pair) {
       <div class="crypto-card__chart">
         <app-crypto-chart [pair]="pair" (livePriceChange)="onChartLivePrice($event)" />
       </div>

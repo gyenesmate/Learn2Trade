@@ -1,10 +1,12 @@
 import { Injectable, effect, inject, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Subscription, firstValueFrom, timer } from 'rxjs';
+import { Subscription, firstValueFrom } from 'rxjs';
 import { CryptoCurrency, PriceAlert } from '@core/models/models';
 import { ApiService } from '@core/services/api.service';
 import { toNumber } from '@core/utils/number.util';
+import { BinanceMarketDataService } from '@core/binance/binance-market-data.service';
+import { toBinancePair } from '@core/binance/binance.utils';
 import { AuthService } from './auth.service';
 import { CryptoCurrenciesService } from './crypto-currencies.service';
 import { NotificationService } from './notification.service';
@@ -15,6 +17,7 @@ export class PriceAlertsService {
   private readonly api = inject(ApiService);
   private readonly auth = inject(AuthService);
   private readonly cryptos = inject(CryptoCurrenciesService);
+  private readonly marketData = inject(BinanceMarketDataService);
   private readonly notification = inject(NotificationService);
   private readonly router = inject(Router);
 
@@ -22,9 +25,12 @@ export class PriceAlertsService {
   readonly firedAlerts = signal<PriceAlert[]>([]);
 
   private started = false;
-  private pollSub?: Subscription;
   private currentUserId: string | null = null;
   private readonly cryptoCache = new Map<string, CryptoCurrency>();
+  /** Active miniTicker watches keyed by Binance pair. */
+  private readonly tickerSubs = new Map<string, Subscription>();
+  /** pair → crypto ids that have active alerts on that pair */
+  private readonly pairToCryptoIds = new Map<string, Set<string>>();
 
   constructor() {
     effect(() => {
@@ -40,7 +46,7 @@ export class PriceAlertsService {
       this.firedAlerts.set([]);
 
       if (!uid) {
-        this.stopPollingOnly();
+        this.clearTickerWatches();
         return;
       }
 
@@ -68,7 +74,7 @@ export class PriceAlertsService {
     this.firedAlerts.set([]);
 
     if (!uid) {
-      this.stopPollingOnly();
+      this.clearTickerWatches();
       return;
     }
 
@@ -77,43 +83,10 @@ export class PriceAlertsService {
 
   stop(): void {
     this.started = false;
-    this.stopPollingOnly();
+    this.clearTickerWatches();
     this.currentUserId = null;
     this.alerts.set([]);
     this.firedAlerts.set([]);
-  }
-
-  private stopPollingOnly(): void {
-    try {
-      this.pollSub?.unsubscribe();
-    } catch {
-      /* ignore */
-    }
-    this.pollSub = undefined;
-  }
-
-  private startPollingOnly(): void {
-    this.stopPollingOnly();
-    this.pollSub = timer(0, 15000).subscribe(() => {
-      void this.tick();
-    });
-  }
-
-  private ensurePollingState(): void {
-    if (!this.currentUserId) {
-      this.stopPollingOnly();
-      return;
-    }
-
-    const hasActive = this.alerts().some((a) => !!a.is_active);
-    if (!hasActive) {
-      this.stopPollingOnly();
-      return;
-    }
-
-    if (!this.pollSub) {
-      this.startPollingOnly();
-    }
   }
 
   async getByUserId(_userId?: string): Promise<PriceAlert[]> {
@@ -142,7 +115,7 @@ export class PriceAlertsService {
     const normalized = this.normalize(created);
     if (this.currentUserId && normalized.user_id === this.currentUserId) {
       this.alerts.update((list) => [normalized, ...list]);
-      this.ensurePollingState();
+      void this.syncTickerWatches();
     }
     return normalized;
   }
@@ -171,13 +144,12 @@ export class PriceAlertsService {
     await firstValueFrom(this.http.delete(this.api.url(`/price-alerts/${id}`)));
     this.alerts.update((list) => list.filter((a) => a.id !== id));
     this.firedAlerts.update((list) => list.filter((a) => a.id !== id));
-    this.ensurePollingState();
+    void this.syncTickerWatches();
   }
 
   async deactivate(id: string): Promise<void> {
     await this.updateById(id, { is_active: false });
     this.firedAlerts.update((list) => list.filter((a) => a.id !== id));
-    this.ensurePollingState();
   }
 
   async reloadUserAlerts(): Promise<void> {
@@ -185,6 +157,7 @@ export class PriceAlertsService {
     if (!uid) {
       this.alerts.set([]);
       this.firedAlerts.set([]);
+      this.clearTickerWatches();
       return;
     }
     try {
@@ -197,91 +170,126 @@ export class PriceAlertsService {
       this.alerts.set(sorted);
       const activeIds = new Set(sorted.filter((a) => a.is_active).map((a) => a.id));
       this.firedAlerts.update((list) => list.filter((a) => activeIds.has(a.id)));
-      this.ensurePollingState();
+      await this.syncTickerWatches();
     } catch (err) {
       console.error('PriceAlertsService.reloadUserAlerts failed', err);
       this.alerts.set([]);
       this.firedAlerts.set([]);
-      this.ensurePollingState();
+      this.clearTickerWatches();
     }
   }
 
-  private async tick(): Promise<void> {
-    if (!this.currentUserId) return;
-
-    await this.reloadUserAlerts();
-
-    const activeAlerts = this.alerts().filter((a) => a.is_active);
-    if (!activeAlerts.length) {
-      this.ensurePollingState();
+  private async syncTickerWatches(): Promise<void> {
+    if (!this.currentUserId) {
+      this.clearTickerWatches();
       return;
     }
 
-    const uniqueCryptoIds = Array.from(
-      new Set(activeAlerts.map((a) => a.crypto_currency_id))
-    );
-    const pricesByCryptoId = new Map<string, number>();
+    const activeAlerts = this.alerts().filter((a) => !!a.is_active);
+    if (!activeAlerts.length) {
+      this.clearTickerWatches();
+      return;
+    }
 
-    await Promise.all(
-      uniqueCryptoIds.map(async (cryptoId) => {
-        const crypto = await this.getCryptoCached(cryptoId);
-        if (!crypto) return;
-        const pair = this.mapSymbolToBinancePair(crypto);
-        if (!pair) return;
-        const p = await this.fetchBinanceSpotPrice(pair);
-        if (Number.isFinite(p) && p > 0) pricesByCryptoId.set(cryptoId, p);
-      })
-    );
+    const nextPairToCryptoIds = new Map<string, Set<string>>();
+    for (const alert of activeAlerts) {
+      const crypto = await this.getCryptoCached(alert.crypto_currency_id);
+      if (!crypto) continue;
+      const pair = toBinancePair(crypto.symbol, crypto.exchange_currency);
+      if (!pair) continue;
+      let set = nextPairToCryptoIds.get(pair);
+      if (!set) {
+        set = new Set();
+        nextPairToCryptoIds.set(pair, set);
+      }
+      set.add(alert.crypto_currency_id);
+    }
 
-    if (!pricesByCryptoId.size) return;
+    this.pairToCryptoIds.clear();
+    for (const [pair, ids] of nextPairToCryptoIds) {
+      this.pairToCryptoIds.set(pair, ids);
+    }
+
+    const needed = new Set(nextPairToCryptoIds.keys());
+
+    for (const [pair, sub] of this.tickerSubs) {
+      if (!needed.has(pair)) {
+        sub.unsubscribe();
+        this.tickerSubs.delete(pair);
+      }
+    }
+
+    for (const pair of needed) {
+      if (this.tickerSubs.has(pair)) continue;
+      const sub = this.marketData.watchMiniTicker(pair).subscribe((ticker) => {
+        void this.onTickerPrice(pair, ticker.price);
+      });
+      this.tickerSubs.set(pair, sub);
+    }
+  }
+
+  private clearTickerWatches(): void {
+    for (const sub of this.tickerSubs.values()) {
+      sub.unsubscribe();
+    }
+    this.tickerSubs.clear();
+    this.pairToCryptoIds.clear();
+  }
+
+  private async onTickerPrice(pair: string, price: number): Promise<void> {
+    if (!Number.isFinite(price) || price <= 0) return;
+
+    const cryptoIds = this.pairToCryptoIds.get(pair);
+    if (!cryptoIds?.size) return;
+
+    const activeAlerts = this.alerts().filter(
+      (a) => a.is_active && cryptoIds.has(a.crypto_currency_id)
+    );
+    if (!activeAlerts.length) return;
 
     const firedIds = new Set(this.firedAlerts().map((a) => a.id));
     const newlyFired: PriceAlert[] = [];
 
     for (const alert of activeAlerts) {
-      const price = pricesByCryptoId.get(alert.crypto_currency_id);
-      if (!price) continue;
-
       const target = Number(alert.alert_price);
       if (!Number.isFinite(target)) continue;
 
       const hit =
         alert.alert_type === 'above' ? price >= target : price <= target;
-      if (!hit) continue;
-      if (firedIds.has(alert.id)) continue;
+      if (!hit || firedIds.has(alert.id)) continue;
 
       newlyFired.push(alert);
       firedIds.add(alert.id);
     }
 
-    if (newlyFired.length) {
-      this.firedAlerts.update((list) => [...newlyFired, ...list]);
-      for (const a of newlyFired) {
-        const crypto = await this.getCryptoCached(a.crypto_currency_id);
-        const label = crypto
-          ? `${crypto.name}${crypto.symbol ? ` (${crypto.symbol})` : ''}${
-              crypto.exchange_currency ? ` / ${crypto.exchange_currency}` : ''
-            }`
-          : a.crypto_currency_id;
-        const message = `${a.alert_type === 'above' ? '≥' : '≤'} ${a.alert_price}${
-          a.description ? ` — ${a.description}` : ''
-        }`;
+    if (!newlyFired.length) return;
 
-        this.notification.alert(message, label, [
-          {
-            label: 'View',
-            run: () => {
-              void this.router.navigate(['/crypto', a.crypto_currency_id]);
-            },
+    this.firedAlerts.update((list) => [...newlyFired, ...list]);
+    for (const a of newlyFired) {
+      const crypto = await this.getCryptoCached(a.crypto_currency_id);
+      const label = crypto
+        ? `${crypto.name}${crypto.symbol ? ` (${crypto.symbol})` : ''}${
+            crypto.exchange_currency ? ` / ${crypto.exchange_currency}` : ''
+          }`
+        : a.crypto_currency_id;
+      const message = `${a.alert_type === 'above' ? '≥' : '≤'} ${a.alert_price}${
+        a.description ? ` — ${a.description}` : ''
+      }`;
+
+      this.notification.alert(message, label, [
+        {
+          label: 'View',
+          run: () => {
+            void this.router.navigate(['/crypto', a.crypto_currency_id]);
           },
-          {
-            label: 'Stop',
-            run: () => {
-              void this.deactivate(a.id);
-            },
+        },
+        {
+          label: 'Stop',
+          run: () => {
+            void this.deactivate(a.id);
           },
-        ]);
-      }
+        },
+      ]);
     }
   }
 
@@ -293,35 +301,6 @@ export class PriceAlertsService {
       return crypto;
     } catch {
       return null;
-    }
-  }
-
-  private mapSymbolToBinancePair(coin?: CryptoCurrency): string | null {
-    if (!coin?.symbol) return null;
-    const base = String(coin.symbol).trim().toLowerCase();
-    if (!base) return null;
-
-    const quoteRaw = String(coin.exchange_currency ?? '')
-      .trim()
-      .toLowerCase();
-    const quote = quoteRaw === 'usd' ? 'usdt' : quoteRaw || 'usdt';
-
-    const safeBase = base.replace(/[^a-z0-9]/g, '');
-    const safeQuote = quote.replace(/[^a-z0-9]/g, '');
-    if (!safeBase || !safeQuote) return null;
-    return `${safeBase}${safeQuote}`;
-  }
-
-  private async fetchBinanceSpotPrice(pair: string): Promise<number> {
-    try {
-      const url = `https://api.binance.com/api/v3/ticker/price?symbol=${encodeURIComponent(
-        pair.toUpperCase()
-      )}`;
-      const data = await fetch(url).then((r) => r.json());
-      const price = Number(data?.price);
-      return Number.isFinite(price) ? price : NaN;
-    } catch {
-      return NaN;
     }
   }
 }

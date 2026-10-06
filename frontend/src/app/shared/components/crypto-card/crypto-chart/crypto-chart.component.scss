@@ -41,11 +41,11 @@
   font-variant-numeric: tabular-nums;
   color: var(--color-muted);
 
-  &.up {
+  &.price-up {
     color: var(--color-crypto-up);
   }
 
-  &.down {
+  &.price-down {
     color: var(--color-crypto-down);
   }
 }
@@ -138,11 +138,11 @@
   color: var(--color-crypto-down);
 }
 
-.crypto-chart-ohlc__item--close.up .crypto-chart-ohlc__v {
+.crypto-chart-ohlc__item--close.price-up .crypto-chart-ohlc__v {
   color: var(--color-crypto-up);
 }
 
-.crypto-chart-ohlc__item--close.down .crypto-chart-ohlc__v {
+.crypto-chart-ohlc__item--close.price-down .crypto-chart-ohlc__v {
   color: var(--color-crypto-down);
 }
 
@@ -155,14 +155,20 @@
   inset: 0;
   z-index: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: var(--space-sm);
   background: color-mix(in srgb, var(--color-surface) 80%, transparent);
   color: var(--color-muted);
-  pointer-events: none;
 
   &--error {
     color: var(--color-error);
+    pointer-events: auto;
+  }
+
+  p {
+    margin: 0;
   }
 }
 

@@ -2,95 +2,105 @@
   <app-page-header [title]="pageTitle" [actions]="headerActions" />
 
   <div class="profile-content">
-    <section class="personal-info card">
-      <h2>Personal Information</h2>
-      @if (user(); as user) {
-        <div class="info-grid">
-          <div class="avatar-section">
-            <div class="avatar-container">
-              @if (user.avatar_url) {
-                <img [src]="user.avatar_url" alt="Avatar" class="avatar-image">
-              }
-              @if (!user.avatar_url) {
-                <div class="avatar-placeholder">
-                  {{ user.username.charAt(0).toUpperCase() }}
-                </div>
-              }
+    <section class="app-panel">
+      <header class="app-panel__header">Personal Information</header>
+      <div class="app-panel__body">
+        @if (user(); as user) {
+          <div class="info-grid">
+            <div class="avatar-section">
+              <div class="avatar-container">
+                @if (user.avatar_url) {
+                  <img [src]="user.avatar_url" alt="Avatar" class="avatar-image" />
+                }
+                @if (!user.avatar_url) {
+                  <div class="avatar-placeholder">
+                    {{ user.username.charAt(0).toUpperCase() }}
+                  </div>
+                }
+              </div>
+            </div>
+            <div class="info-item">
+              <label>Name:</label>
+              <span>{{ user.username }}</span>
+            </div>
+            <div class="info-item">
+              <label>Email:</label>
+              <span>{{ user.email }}</span>
+            </div>
+            <div class="info-item">
+              <label>Theme:</label>
+              <span>{{ user.theme }}</span>
+            </div>
+            <div class="info-item">
+              <label>Account Balance:</label>
+              <span class="balance tabular-nums">{{ formatBalance(user.balance) }}</span>
             </div>
           </div>
-          <div class="info-item">
-            <label>Name:</label>
-            <span>{{ user.username }}</span>
-          </div>
-          <div class="info-item">
-            <label>Email:</label>
-            <span>{{ user.email }}</span>
-          </div>
-          <div class="info-item">
-            <label>Theme:</label>
-            <span>{{ user.theme }}</span>
-          </div>
-          <div class="info-item">
-            <label>Account Balance:</label>
-            <span class="balance">${{ user.balance }}</span>
-          </div>
-        </div>
-      }
+        }
+      </div>
     </section>
 
-    <section class="add-currency card">
-      <h2>Add Currency to Account</h2>
-      <form class="currency-form" (ngSubmit)="addCurrency()">
-        <div class="form-group">
-          <label for="amount" class="form-label">Amount ($)</label>
-          <input
-            type="number"
-            id="amount"
-            class="input"
-            placeholder="Enter amount"
-            min="1"
-            step="0.01"
-            [(ngModel)]="addAmount"
-            name="amount"
-            required
-            >
-          </div>
-          <button type="submit" class="btn btn-primary" [disabled]="addAmount <= 0">Add Funds</button>
+    <section class="app-panel">
+      <header class="app-panel__header">Add Currency to Account</header>
+      <div class="app-panel__body">
+        <form class="currency-form" [formGroup]="fundsForm" (ngSubmit)="addCurrency()">
+          <mat-form-field appearance="outline" class="currency-form__field">
+            <mat-label>Amount ($)</mat-label>
+            <input matInput type="number" min="1" step="0.01" formControlName="amount" />
+            @if (fundsForm.controls.amount.touched && fundsForm.controls.amount.invalid) {
+              <mat-error>Enter an amount of at least 1</mat-error>
+            }
+          </mat-form-field>
+          <button
+            type="submit"
+            mat-flat-button
+            [disabled]="fundsForm.invalid"
+          >
+            Add Funds
+          </button>
         </form>
-      </section>
+      </div>
+    </section>
 
-      <section class="watchlist-management card" id="watchlist">
+    <section class="app-panel" id="watchlist">
+      <div class="app-panel__body app-panel__body--flush">
         <app-data-table
           [title]="'My watchlist'"
           [columns]="watchlistColumns"
           [data]="watchlistRows()"
           [actionBar]="[]"
-          [rowActions]="watchlistRowActions">
-        </app-data-table>
-      </section>
+          [rowActions]="watchlistRowActions"
+        />
+      </div>
+    </section>
 
-      <section class="watchlist-management card" id="investments">
+    <section class="app-panel" id="investments">
+      <div class="app-panel__body app-panel__body--flush">
         <app-data-table
           [title]="'My investments'"
           [columns]="investmentsColumns"
           [data]="investmentsRows()"
           [actionBar]="[]"
-          [rowActions]="investmentsRowActions">
-        </app-data-table>
-      </section>
+          [rowActions]="investmentsRowActions"
+        />
+      </div>
+    </section>
 
-      <section class="alerts-management card">
+    <section class="app-panel">
+      <div class="app-panel__body app-panel__body--flush">
         <app-data-table
           [title]="'My alerts'"
           [columns]="alertsColumns"
           [data]="alertsRows()"
           [actionBar]="[]"
-          [rowActions]="alertsRowActions">
-        </app-data-table>
-      </section>
+          [rowActions]="alertsRowActions"
+        />
+      </div>
+    </section>
 
-      @if (isAdmin()) {
-        <section class="admin-management card">
+    @if (isAdmin()) {
+      <section class="app-panel">
+        <div class="app-panel__body app-panel__body--flush">
           <app-data-table
             [title]="'Crypto currencies'"
             [columns]="cryptoColumns"
@@ -98,19 +108,22 @@
             [actionBar]="cryptoActionBar"
             [rowActions]="cryptoRowActions"
             [multiSelect]="true"
-            [loading]="adminLoading()">
-          </app-data-table>
-        </section>
-        <section class="admin-management card">
+            [loading]="adminLoading()"
+          />
+        </div>
+      </section>
+      <section class="app-panel">
+        <div class="app-panel__body app-panel__body--flush">
           <app-data-table
             [title]="'Users'"
             [columns]="userColumns"
             [data]="users()"
             [actionBar]="[]"
             [rowActions]="userRowActions"
-            [loading]="adminLoading()">
-          </app-data-table>
-        </section>
-      }
-    </div>
+            [loading]="adminLoading()"
+          />
+        </div>
+      </section>
+    }
   </div>
+</div>

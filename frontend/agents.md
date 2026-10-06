@@ -7,8 +7,8 @@ These instructions apply to every AI agent working in the **Learn2Trade frontend
 | Location | Use for |
 | --- | --- |
 | [`.cursor/rules/learn2trade.mdc`](./.cursor/rules/learn2trade.mdc) | Project map, where code/docs live |
-| [`.cursor/rules/angular-expert.mdc`](./.cursor/rules/angular-expert.mdc) | Angular 22+ patterns (signals, inject, RxJS, templates) |
-| [`.cursor/rules/material-expert.mdc`](./.cursor/rules/material-expert.mdc) | Angular Material theming and components |
+| [`.cursor/rules/angular-guide.mdc`](./.cursor/rules/angular-guide.mdc) | Angular 22+ patterns (signals, inject, RxJS, templates) |
+| [`.cursor/rules/material-guide.mdc`](./.cursor/rules/material-guide.mdc) | Angular Material theming and components |
 | [`docs/FILE_STRUCTURES.md`](./docs/FILE_STRUCTURES.md) | Folder layout and file-placement rules |
 | [`docs/TRADING_UI_CONTEXT.md`](./docs/TRADING_UI_CONTEXT.md) | Trading UI design system |
 | [`.cursor/commands/code-review.md`](./.cursor/commands/code-review.md) | Branch review against the expert rules |

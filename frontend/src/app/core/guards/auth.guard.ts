@@ -18,6 +18,7 @@ export const authGuard: CanActivateFn = (route) => {
       const isLoggedIn = user != null;
 
       if (isLoggedIn && authService.isSessionExpired()) {
+        authService.clearClientSession();
         return router.createUrlTree(['/login']);
       }
 

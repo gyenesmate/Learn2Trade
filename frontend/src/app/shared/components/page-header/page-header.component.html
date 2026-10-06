@@ -16,18 +16,29 @@
   @if (actions().length) {
     <div class="page-header__actions">
       @for (action of actions(); track action.label) {
-        <button
-          type="button"
-          class="btn"
-          [class.btn-primary]="(action.variant ?? 'primary') === 'primary'"
-          [class.btn-secondary]="action.variant === 'secondary'"
-          [disabled]="action.disabled === true"
-          (click)="action.callback()">
-          @if (action.icon) {
-            <mat-icon>{{ action.icon }}</mat-icon>
-          }
-          {{ action.label }}
-        </button>
+        @if ((action.variant ?? 'primary') === 'secondary') {
+          <button
+            type="button"
+            mat-stroked-button
+            [disabled]="action.disabled === true"
+            (click)="action.callback()">
+            @if (action.icon) {
+              <mat-icon>{{ action.icon }}</mat-icon>
+            }
+            {{ action.label }}
+          </button>
+        } @else {
+          <button
+            type="button"
+            mat-flat-button
+            [disabled]="action.disabled === true"
+            (click)="action.callback()">
+            @if (action.icon) {
+              <mat-icon>{{ action.icon }}</mat-icon>
+            }
+            {{ action.label }}
+          </button>
+        }
       }
     </div>
   }

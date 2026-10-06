@@ -120,6 +120,18 @@
 	}
 }
 
+@media (prefers-reduced-motion: reduce) {
+	.crypto-live.live .crypto-live__dot,
+	.crypto-live.reconnecting .crypto-live__dot {
+		animation: none;
+		box-shadow: none;
+	}
+
+	.watchlist-toggle {
+		transition: none;
+	}
+}
+
 .watchlist-toggle {
 	width: 36px;
 	height: 36px;
@@ -175,11 +187,11 @@
 	gap: 0.35rem 0.65rem;
 }
 
-.crypto-change.up {
+.crypto-change.price-up {
 	color: var(--color-crypto-up, #198754);
 }
 
-.crypto-change.down {
+.crypto-change.price-down {
 	color: var(--color-crypto-down, #dc3545);
 }
 

@@ -5,8 +5,8 @@
       @if (rangeChange() !== undefined) {
         <span
           class="crypto-chart-panel__change"
-          [class.up]="rangeChange()! > 0"
-          [class.down]="rangeChange()! < 0"
+          [class.price-up]="rangeChange()! > 0"
+          [class.price-down]="rangeChange()! < 0"
         >
           {{ rangeChange()! > 0 ? '+' : '' }}{{ rangeChange()! | number: '1.2-2' }}%
           <span class="crypto-chart-panel__change-label">range</span>
@@ -68,8 +68,8 @@
         </span>
         <span
           class="crypto-chart-ohlc__item crypto-chart-ohlc__item--close"
-          [class.up]="bar.close >= bar.open"
-          [class.down]="bar.close < bar.open"
+          [class.price-up]="bar.close >= bar.open"
+          [class.price-down]="bar.close < bar.open"
         >
           <span class="crypto-chart-ohlc__k">C</span>
           <span class="crypto-chart-ohlc__v">{{ bar.close | number: '1.2-6' }}</span>
@@ -85,7 +85,8 @@
       <div class="crypto-chart-panel__overlay" role="status">Loading chart…</div>
     } @else if (loadError()) {
       <div class="crypto-chart-panel__overlay crypto-chart-panel__overlay--error" role="alert">
-        Failed to load historical candles.
+        <p>Failed to load historical candles.</p>
+        <button mat-stroked-button type="button" (click)="retryLoad()">Retry</button>
       </div>
     }
     <div class="crypto-chart-panel__host" #chartHost></div>

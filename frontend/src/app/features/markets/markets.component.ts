@@ -17,11 +17,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
-import { Subscription } from 'rxjs';
 import { CryptoCurrency } from '@core/models/models';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { BinanceMarketDataService } from '@core/binance/binance-market-data.service';
-import { MarketTicker } from '@core/binance/binance.types';
 import { toBinancePair } from '@core/binance/binance.utils';
 import { AnimatedMarketCardLayoutComponent } from './components/animated-market-card-layout/animated-market-card-layout.component';
 import { MarketMoversComponent } from './components/market-movers/market-movers.component';
@@ -29,9 +27,8 @@ import { MarketMoverRow } from './components/market-movers/market-movers.types';
 import {
   MARKETS_EMPTY_MESSAGE,
   MARKETS_FILTERS,
+  MARKETS_LOAD_ERROR,
   MARKETS_PAGE_SIZE,
-  MARKETS_PAGE_SUBTITLE,
-  MARKETS_PAGE_TITLE,
   MARKETS_SORT_OPTIONS,
   MarketsFilter,
   MarketsSort,
@@ -67,22 +64,22 @@ export class MarketsComponent implements OnInit, OnDestroy {
   private readonly cryptoService = inject(CryptoCurrenciesService);
   private readonly marketData = inject(BinanceMarketDataService);
 
-  readonly pageTitle = MARKETS_PAGE_TITLE;
-  readonly pageSubtitle = MARKETS_PAGE_SUBTITLE;
   readonly emptyMessage = MARKETS_EMPTY_MESSAGE;
+  readonly loadErrorMessage = MARKETS_LOAD_ERROR;
   readonly filters = MARKETS_FILTERS;
   readonly sortOptions = MARKETS_SORT_OPTIONS;
   readonly pageSize = MARKETS_PAGE_SIZE;
 
   readonly loading = signal(true);
+  readonly loadError = signal(false);
   readonly cryptocurrencies = signal<CryptoCurrency[]>([]);
-  readonly tickers = signal(new Map<string, MarketTicker>());
   readonly search = signal('');
   readonly filter = signal<MarketsFilter>('all');
   readonly sort = signal<MarketsSort>('volume');
   readonly pageIndex = signal(0);
 
-  private tickerSubs: Subscription[] = [];
+  /** Shared WS cache — page owns targets; cards receive tickers as inputs. */
+  readonly tickers = this.marketData.latestTickers;
 
   readonly marketRows = computed<MarketRow[]>(() => {
     const tickers = this.tickers();
@@ -165,11 +162,10 @@ export class MarketsComponent implements OnInit, OnDestroy {
   constructor() {
     effect(() => {
       const cryptos = this.cryptocurrencies();
-      untracked(() => this.wireAllTickers(cryptos));
+      untracked(() => this.syncTickerTargets(cryptos));
     });
 
     effect(() => {
-      // Clamp page when filters shrink the result set.
       const count = this.pageCount();
       const index = this.pageIndex();
       if (index > count - 1) {
@@ -178,21 +174,16 @@ export class MarketsComponent implements OnInit, OnDestroy {
     });
   }
 
-  async ngOnInit(): Promise<void> {
-    this.loading.set(true);
-    try {
-      const fromDb = await this.cryptoService.getAll();
-      this.cryptocurrencies.set(Array.isArray(fromDb) ? fromDb : []);
-    } catch {
-      this.cryptocurrencies.set([]);
-    } finally {
-      this.loading.set(false);
-    }
+  ngOnInit(): void {
+    void this.loadMarkets();
   }
 
   ngOnDestroy(): void {
-    this.releaseTickers();
     this.marketData.setMiniTickerTargets([]);
+  }
+
+  retryLoad(): void {
+    void this.loadMarkets();
   }
 
   onSearchInput(value: string): void {
@@ -223,27 +214,28 @@ export class MarketsComponent implements OnInit, OnDestroy {
     this.goToPage(this.pageIndex() + 1);
   }
 
-  private wireAllTickers(cryptos: CryptoCurrency[]): void {
-    this.releaseTickers();
+  private async loadMarkets(): Promise<void> {
+    this.loading.set(true);
+    this.loadError.set(false);
+    try {
+      const fromDb = await this.cryptoService.getAll();
+      this.cryptocurrencies.set(Array.isArray(fromDb) ? fromDb : []);
+    } catch {
+      this.cryptocurrencies.set([]);
+      this.loadError.set(true);
+    } finally {
+      this.loading.set(false);
+    }
+  }
+
+  /**
+   * Markets owns miniTicker targets for the full catalog so movers/sort stay accurate.
+   * Cards do not open their own watches — they receive tickers via inputs (ARCH-02).
+   */
+  private syncTickerTargets(cryptos: CryptoCurrency[]): void {
     const pairs = cryptos
       .map((c) => toBinancePair(c.symbol, c.exchange_currency))
       .filter((p): p is string => !!p);
     this.marketData.setMiniTickerTargets(pairs);
-
-    for (const pair of pairs) {
-      const sub = this.marketData.watchMiniTicker(pair).subscribe((ticker) => {
-        const next = new Map(this.tickers());
-        next.set(pair, ticker);
-        this.tickers.set(next);
-      });
-      this.tickerSubs.push(sub);
-    }
-  }
-
-  private releaseTickers(): void {
-    for (const sub of this.tickerSubs) {
-      sub.unsubscribe();
-    }
-    this.tickerSubs = [];
   }
 }

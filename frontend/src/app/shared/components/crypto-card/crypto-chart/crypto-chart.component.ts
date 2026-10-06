@@ -205,6 +205,10 @@ export class CryptoChartComponent implements AfterViewInit, OnDestroy {
     this.indicators.update((m) => ({ ...m, [id]: checked }));
   }
 
+  retryLoad(): void {
+    this.intervalReload$.next();
+  }
+
   private async initChart(): Promise<void> {
     const host = this.chartHost()?.nativeElement;
     if (!host) return;

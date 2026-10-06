@@ -1,10 +1,8 @@
-export const MARKETS_PAGE_TITLE = 'Markets';
-export const MARKETS_PAGE_SUBTITLE = 'Discover and explore cryptocurrency markets';
-
 /** Visible cards per Markets page (1 intermediate + 4 compact). */
 export const MARKETS_PAGE_SIZE = 5;
 
 export const MARKETS_EMPTY_MESSAGE = 'No cryptocurrencies available.';
+export const MARKETS_LOAD_ERROR = 'Could not load markets. Check your connection and try again.';
 
 export type MarketsFilter = 'all' | 'gainers' | 'losers';
 export type MarketsSort = 'volume' | 'price' | 'change' | 'name';

@@ -9,6 +9,25 @@
   gap: var(--space-lg);
 }
 
+.dashboard-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-md);
+  min-height: 12rem;
+  color: var(--color-muted);
+
+  &--empty p {
+    margin: 0;
+    text-align: center;
+  }
+}
+
+.holdings-section {
+  padding: var(--space-lg);
+}
+
 .portfolio-overview {
   grid-column: 1 / -1;
   padding: var(--space-lg);

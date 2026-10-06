@@ -10,8 +10,8 @@ Review the **latest changes on the current branch** against the Learn2Trade fron
    - If the branch has no commits ahead of base, review the current working-tree diff.
 2. Focus on `frontend/` changes. Mention out-of-scope repo changes only if they affect the frontend.
 3. Read and apply:
-   - `.cursor/rules/angular-expert.mdc`
-   - `.cursor/rules/material-expert.mdc`
+   - `.cursor/rules/angular-guide.mdc`
+   - `.cursor/rules/material-guide.mdc`
    - `.cursor/rules/learn2trade.mdc`
    - `agents.md` when relevant
 4. Inspect changed files fully enough to judge behavior, not only the hunk headers. Trace nearby templates, styles, services, guards, and tests when the diff depends on them.

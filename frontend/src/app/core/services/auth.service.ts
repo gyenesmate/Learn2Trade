@@ -29,8 +29,7 @@ export class AuthService {
     }
 
     if (this.isSessionExpired()) {
-      this.clearSession();
-      this.currentUser.set(null);
+      this.clearClientSession();
       return;
     }
 
@@ -38,8 +37,7 @@ export class AuthService {
       await this.refreshUserData();
       this.startSessionTimer();
     } catch {
-      this.clearSession();
-      this.currentUser.set(null);
+      this.clearClientSession();
     }
   }
 
@@ -69,8 +67,7 @@ export class AuthService {
       const httpErr = err as { status?: number; error?: { detail?: string } };
       const detail = String(httpErr?.error?.detail ?? '');
       if (httpErr?.status === 403 && detail.toLowerCase().includes('banned')) {
-        this.clearSession();
-        this.currentUser.set(null);
+        this.clearClientSession();
         throw { code: 'auth/banned', message: 'User is banned' };
       }
       throw err;
@@ -105,13 +102,14 @@ export class AuthService {
     } catch {
       // Stateless JWT logout; ignore network errors when clearing client session.
     }
-    this.clearSession();
-    this.currentUser.set(null);
+    this.clearClientSession();
   }
 
-  private clearSession(): void {
+  /** Clear token, session timer, and user signal without calling the logout API. */
+  clearClientSession(): void {
     this.tokenStorage.clear();
     this.clearSessionTimer();
+    this.currentUser.set(null);
   }
 
   private startSessionTimer(): void {
@@ -134,16 +132,13 @@ export class AuthService {
     }
   }
 
+  /** Pure check — callers decide whether to clear the session. */
   isSessionExpired(): boolean {
     const loginTime = this.tokenStorage.getLoginTime();
     if (loginTime === null) {
       return !this.tokenStorage.getAccessToken();
     }
-    const expired = Date.now() - loginTime > SESSION_TIMEOUT_MS;
-    if (expired) {
-      void this.logout();
-    }
-    return expired;
+    return Date.now() - loginTime > SESSION_TIMEOUT_MS;
   }
 
   getCurrentUserData(): UserMe | null | undefined {

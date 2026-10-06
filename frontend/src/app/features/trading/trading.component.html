@@ -5,40 +5,45 @@
     <div class="crypto-detail-layout">
       <div class="crypto-detail-chart">
         <app-crypto-card
-          #card
           [state]="'detailed'"
           [data]="selectedCrypto"
-          (livePriceChange)="onCardLivePrice()"
+          (livePriceChange)="onCardLivePrice($event)"
         />
       </div>
 
       <aside class="crypto-detail-side">
-        <mat-card appearance="outlined" class="crypto-detail-side__card">
-          <app-data-table
-            [title]="'Investments'"
-            [columns]="investmentColumns"
-            [data]="investmentRows()"
-            [actionBar]="investmentActionBar"
-            [rowActions]="investmentRowActions"
-          />
-        </mat-card>
+        <div class="app-panel crypto-detail-side__panel">
+          <div class="app-panel__body app-panel__body--flush">
+            <app-data-table
+              [title]="'Investments'"
+              [columns]="investmentColumns"
+              [data]="investmentRows()"
+              [actionBar]="investmentActionBar"
+              [rowActions]="investmentRowActions"
+            />
+          </div>
+        </div>
 
-        <mat-card appearance="outlined" class="crypto-detail-side__card">
-          <app-data-table
-            [title]="'Alerts'"
-            [columns]="alertColumns"
-            [data]="alertRows()"
-            [actionBar]="alertActionBar"
-            [rowActions]="alertRowActions"
-          />
-        </mat-card>
+        <div class="app-panel crypto-detail-side__panel">
+          <div class="app-panel__body app-panel__body--flush">
+            <app-data-table
+              [title]="'Alerts'"
+              [columns]="alertColumns"
+              [data]="alertRows()"
+              [actionBar]="alertActionBar"
+              [rowActions]="alertRowActions"
+            />
+          </div>
+        </div>
       </aside>
     </div>
   } @else {
-    <div class="crypto-not-found card">
-      <h2>Crypto not found</h2>
-      <p>No crypto with id: <strong>{{ selectedId() }}</strong></p>
-      <a class="btn btn-primary" routerLink="/markets">Go back</a>
+    <div class="app-panel crypto-not-found">
+      <div class="app-panel__body">
+        <h2 class="m-0">Crypto not found</h2>
+        <p>No crypto with id: <strong>{{ selectedId() }}</strong></p>
+        <a mat-flat-button routerLink="/markets">Go back</a>
+      </div>
     </div>
   }
 </div>

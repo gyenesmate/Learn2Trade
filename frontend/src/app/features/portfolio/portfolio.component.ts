@@ -7,9 +7,12 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '@core/services/auth.service';
 import { UsersService } from '@core/services/users.service';
 import { NotificationService } from '@core/services/notification.service';
@@ -24,14 +27,23 @@ import { PageHeaderAction } from '@shared/components/page-header/page-header.typ
 import { WatchlistSubscriptionsService } from '@core/services/watchlist-subscriptions.service';
 import { InvestmentsService } from '@core/services/investments.service';
 import { PriceAlertsService } from '@core/services/price-alerts.service';
+import { formatMoney } from '@core/utils/number.util';
 import { PORTFOLIO_HEADER_ACTIONS, PORTFOLIO_PAGE_TITLE, PORTFOLIO_TABLE_ACTIONS } from './portfolio.const';
 
 @Component({
   selector: 'app-portfolio',
-  imports: [FormsModule, MatDialogModule, DataTableComponent, PageHeaderComponent],
+  imports: [
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    DataTableComponent,
+    PageHeaderComponent,
+  ],
   templateUrl: './portfolio.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./portfolio.component.scss']
+  styleUrls: ['./portfolio.component.scss'],
 })
 export class PortfolioComponent {
   private readonly router = inject(Router);
@@ -43,6 +55,7 @@ export class PortfolioComponent {
   private readonly priceAlertsService = inject(PriceAlertsService);
   private readonly dialog = inject(MatDialog);
   private readonly notification = inject(NotificationService);
+  private readonly fb = inject(FormBuilder);
 
   readonly pageTitle = PORTFOLIO_PAGE_TITLE;
   readonly headerActions: PageHeaderAction[] = [
@@ -55,7 +68,9 @@ export class PortfolioComponent {
   readonly user = this.authService.currentUser;
   readonly isAdmin = computed(() => !!this.user()?.is_admin);
 
-  addAmount = 0;
+  readonly fundsForm = this.fb.nonNullable.group({
+    amount: [0 as number, [Validators.required, Validators.min(1)]],
+  });
 
   readonly cryptoCurrencies = signal<CryptoCurrency[]>([]);
   readonly users = signal<User[]>([]);
@@ -372,16 +387,22 @@ export class PortfolioComponent {
     }
   }
 
+  formatBalance(value: number): string {
+    return formatMoney(Number(value || 0));
+  }
+
   async addCurrency(): Promise<void> {
-    if (this.addAmount > 0) {
-      try {
-        await this.usersService.addCurrencyToBalance(this.addAmount);
-        this.addAmount = 0;
-        this.notification.success('Currency added successfully!');
-      } catch (error) {
-        console.error('Error adding currency:', error);
-        this.notification.error('Error adding currency. Please try again.');
-      }
+    this.fundsForm.markAllAsTouched();
+    if (this.fundsForm.invalid) return;
+    const amount = Number(this.fundsForm.controls.amount.value);
+    if (!Number.isFinite(amount) || amount <= 0) return;
+    try {
+      await this.usersService.addCurrencyToBalance(amount);
+      this.fundsForm.reset({ amount: 0 });
+      this.notification.success('Currency added successfully!');
+    } catch (error) {
+      console.error('Error adding currency:', error);
+      this.notification.error('Error adding currency. Please try again.');
     }
   }
 }

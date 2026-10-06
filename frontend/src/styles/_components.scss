@@ -30,15 +30,20 @@
       background var(--transition-fast),
       color var(--transition-fast),
       border-color var(--transition-fast);
-    outline: none;
     background: transparent;
     color: var(--color-text-primary);
   }
 
-  .btn:hover,
+  .btn:hover {
+    background: var(--color-surface-hover);
+    border-color: var(--color-border-strong);
+  }
+
   .btn:focus-visible {
     background: var(--color-surface-hover);
     border-color: var(--color-border-strong);
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
   }
 
   .btn:disabled {
@@ -189,6 +194,10 @@
     min-height: 0;
     padding: var(--space-md);
     overflow: auto;
+  }
+
+  .app-panel__body--flush {
+    padding: 0;
   }
 
   .input {

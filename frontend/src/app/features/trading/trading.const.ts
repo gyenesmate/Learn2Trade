@@ -1,4 +1,3 @@
-import { PageHeaderActionDef } from '@shared/components/page-header/page-header.types';
 import { TableAction, TableColumn, RowAction } from '@shared/components/data-table/data-table.types';
 
 export const TRADING_PAGE_TITLE_FALLBACK = 'Crypto';
@@ -23,20 +22,6 @@ export const TRADING_TABLE_ACTIONS = {
     label: 'Delete',
     icon: 'delete',
   } satisfies Omit<RowAction<unknown>, 'callback'>,
-} as const;
-
-/** @deprecated header actions removed — invest/alert live on side tables. Kept empty for type compat. */
-export const TRADING_HEADER_ACTIONS = {
-  invest: {
-    label: 'Invest',
-    icon: 'payments',
-    variant: 'primary',
-  } satisfies PageHeaderActionDef,
-  setAlert: {
-    label: 'Set alert',
-    icon: 'notifications',
-    variant: 'secondary',
-  } satisfies PageHeaderActionDef,
 } as const;
 
 export const TRADING_INVESTMENT_COLUMNS: TableColumn<Record<string, unknown>>[] = [

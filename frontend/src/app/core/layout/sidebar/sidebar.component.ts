@@ -45,15 +45,15 @@ export class SidebarComponent implements OnInit, OnDestroy {
   readonly currentRoute = signal('');
 
   readonly mainLinks = computed(() =>
-    this.visibleLinks().filter((link) => (link.section ?? 'main') === 'main')
+    this.linksWithState().filter((row) => (row.link.section ?? 'main') === 'main')
   );
 
   readonly adminLinks = computed(() =>
-    this.visibleLinks().filter((link) => link.section === 'admin')
+    this.linksWithState().filter((row) => row.link.section === 'admin')
   );
 
   readonly footerLinks = computed(() =>
-    this.visibleLinks().filter((link) => link.section === 'footer')
+    this.linksWithState().filter((row) => row.link.section === 'footer')
   );
 
   private readonly subscriptions: Subscription[] = [];
@@ -62,6 +62,18 @@ export class SidebarComponent implements OnInit, OnDestroy {
     const loggedIn = this.isLoggedIn();
     const admin = this.isAdmin();
     return SIDEBAR_LINKS.filter((link) => isSidebarLinkVisible(link, loggedIn, admin));
+  });
+
+  private readonly linksWithState = computed(() => {
+    const current = this.currentRoute();
+    const admin = this.isAdmin();
+    return this.visibleLinks().map((link) => {
+      const route = link.route;
+      const active = !!route && (current === route || current.startsWith(`${route}/`));
+      const disabled =
+        link.disabled === true || (link.visibility === 'admin' && !admin);
+      return { link, active, disabled };
+    });
   });
 
   ngOnInit(): void {
@@ -81,24 +93,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.watchlistDialogRef = null;
   }
 
-  isActive(link: SidebarLink): boolean {
-    const route = link.route;
-    if (!route) {
-      return false;
-    }
-    const current = this.currentRoute();
-    return current === route || current.startsWith(`${route}/`);
-  }
-
-  isDisabled(link: SidebarLink): boolean {
-    if (link.disabled === true) {
-      return true;
-    }
-    return link.visibility === 'admin' && !this.isAdmin();
-  }
-
   navigateTo(link: SidebarLink): void {
-    if (this.isDisabled(link)) {
+    const row = this.linksWithState().find((r) => r.link.id === link.id);
+    if (row?.disabled) {
       return;
     }
     if (link.id === 'watchlist') {
