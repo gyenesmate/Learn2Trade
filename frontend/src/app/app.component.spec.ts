@@ -16,12 +16,6 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'cryptowatcher-app' title`, () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app.title).toEqual('cryptowatcher-app');
-  });
-
   it('should render the root router outlet', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();

@@ -1,9 +1,34 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '@core/guards/auth.guard';
 import { adminGuard } from '@core/guards/admin.guard';
+import { AuthLayoutComponent } from '@core/layout/auth-layout/auth-layout.component';
 import { BaseLayoutComponent } from '@core/layout/base-layout/base-layout.component';
 
 export const routes: Routes = [
+  // Auth routes first so BaseLayout's `**` does not swallow /login|/register|/banned.
+  {
+    path: '',
+    component: AuthLayoutComponent,
+    children: [
+      {
+        path: 'login',
+        loadComponent: () =>
+          import('@features/auth/login/login.component').then((m) => m.LoginComponent),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'register',
+        loadComponent: () =>
+          import('@features/auth/register/register.component').then((m) => m.RegisterComponent),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'banned',
+        loadComponent: () =>
+          import('@features/auth/banned/banned.component').then((m) => m.BannedComponent),
+      },
+    ],
+  },
   {
     path: '',
     component: BaseLayoutComponent,
@@ -32,23 +57,6 @@ export const routes: Routes = [
           import('@features/portfolio/edit-profile/edit-profile.component').then(
             (m) => m.EditProfileComponent
           ),
-        canActivate: [authGuard],
-      },
-      {
-        path: 'login',
-        loadComponent: () =>
-          import('@features/auth/login/login.component').then((m) => m.LoginComponent),
-        canActivate: [authGuard],
-      },
-      {
-        path: 'banned',
-        loadComponent: () =>
-          import('@features/auth/banned/banned.component').then((m) => m.BannedComponent),
-      },
-      {
-        path: 'register',
-        loadComponent: () =>
-          import('@features/auth/register/register.component').then((m) => m.RegisterComponent),
         canActivate: [authGuard],
       },
       {

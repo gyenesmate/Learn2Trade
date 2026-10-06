@@ -18,6 +18,7 @@ src/
 │   ├── core/
 │   │   ├── layout/
 │   │   │   ├── base-layout/
+│   │   │   ├── auth-layout/
 │   │   │   ├── sidebar/
 │   │   │   └── navbar/
 │   │   │       └── global-search/   # search UI (mat-autocomplete); engine lives in core/search
@@ -78,24 +79,26 @@ Path aliases (`tsconfig.json`):
 ```text
 AppComponent
   → RouterOutlet
-       → BaseLayoutComponent
-            ├── NavbarComponent
-            ├── SidebarComponent
+       → BaseLayoutComponent | AuthLayoutComponent
+            ├── (BaseLayout) NavbarComponent + SidebarComponent
             └── RouterOutlet
-                 → Feature components (dashboard, markets, trading, …)
+                 → Feature components
 ```
 
 | Layer | Owns |
 | --- | --- |
-| **AppComponent** | Minimal root: top-level `RouterOutlet`, app-wide bootstrap (e.g. alert polling), and global hosts (e.g. notification stack) |
-| **BaseLayoutComponent** | Persistent trading shell: navbar + sidebar + content outlet |
+| **AppComponent** | Minimal root: top-level `RouterOutlet` and global hosts (e.g. notification stack) |
+| **BaseLayoutComponent** | Persistent trading shell: navbar + sidebar + content outlet (markets, dashboard, trading, …) |
+| **AuthLayoutComponent** | Minimal chrome-free shell for `/login`, `/register`, `/banned` |
 | **Feature** | Route content and feature-specific UI/logic |
 | **Shared components** | Reusable presentation primitives only |
 | **Core services/utils** | Cross-cutting business/infrastructure |
 
 Do **not** put Sidebar/Navbar into `AppComponent`.  
 Do **not** introduce nested “inner layouts” unless multiple routes share another persistent inner chrome.  
-Do **not** use `app-shell` naming — use `base-layout` / `BaseLayoutComponent`.
+Do **not** use `app-shell` naming — use `base-layout` / `BaseLayoutComponent` and `auth-layout` / `AuthLayoutComponent`.  
+List AuthLayout routes **before** BaseLayout in `app.routes.ts` so BaseLayout’s `**` does not swallow auth URLs.  
+Arm `PriceAlertsService` after `AuthService.bootstrap()` in `app.config.ts` — not from AppComponent or layout hosts.
 
 ---
 
@@ -122,11 +125,12 @@ Use a layout when **multiple routes share the same persistent UI**.
 
 Current:
 
-- `base-layout/` — main app shell
+- `base-layout/` — main trading shell
+- `auth-layout/` — chrome-free shell for login/register/banned
 - `sidebar/` — primary navigation, active route, collapse coordination via parent
 - `navbar/` — theme, user menu, balance, mobile bottom nav controls, centered global search UI (`navbar/global-search/`)
 
-Future layouts (`auth-layout`, `fullscreen-layout`) only when routes truly need a different shell. Do not create them speculatively.
+Additional layouts (e.g. `fullscreen-layout`) only when routes truly need a different shell. Do not create them speculatively.
 
 ---
 
@@ -175,7 +179,7 @@ Watchlist membership API + `ids` cache: `WatchlistSubscriptionsService` (`core/s
 - Routed feature components: **no `-page` suffix**  
   `MarketsComponent`, `TradingComponent`, `PortfolioComponent`, …
 - Selectors: `app-markets`, `app-trading`, `app-portfolio`, …
-- Layout: `BaseLayoutComponent` / `app-base-layout`
+- Layout: `BaseLayoutComponent` / `app-base-layout`, `AuthLayoutComponent` / `app-auth-layout`
 - Never `*PageComponent`, `*-page/`, or `app-shell`
 
 ---
@@ -320,7 +324,7 @@ Search split: engine → `core/search/`; autocomplete UI → `core/layout/navbar
 
 - Inspect nearby architecture before creating files.
 - Place by **ownership, persistence, and reuse** — not by file extension alone.
-- Keep `AppComponent` minimal; shell lives in `BaseLayoutComponent`.
+- Keep `AppComponent` minimal; shells live in `BaseLayoutComponent` / `AuthLayoutComponent`.
 - Sidebar nav → `SidebarComponent`; top bar → `NavbarComponent`.
 - Changing content → routed feature components (no unnecessary nested layouts).
 - Additional layouts only when multiple routes share another shell.

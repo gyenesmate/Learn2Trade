@@ -15,12 +15,10 @@ Also follow `angular-guide.mdc`, `material-guide.mdc`, and `agents.md`.
 ## Architecture (summary)
 
 ```text
-AppComponent (minimal root + global hosts)
-  └── RouterOutlet
-       └── BaseLayoutComponent
-            ├── NavbarComponent
-            ├── SidebarComponent
-            └── RouterOutlet → features/*
+AppComponent (root outlet + global hosts)
+  → RouterOutlet
+       → BaseLayoutComponent | AuthLayoutComponent
+            → feature RouterOutlet
 ```
 
 Do not put sidebar/navbar in `AppComponent`. Do not use `*-page` or `app-shell` naming. Details and placement rules: `docs/FILE_STRUCTURES.md`.
@@ -48,7 +46,7 @@ Same-folder `./` imports may stay relative.
 | Area | Path |
 | --- | --- |
 | App root / routes / config | `src/app/app.*` |
-| Shell | `src/app/core/layout/{base-layout,sidebar,navbar}/` |
+| Shell | `src/app/core/layout/{base-layout,auth-layout,sidebar,navbar}/` |
 | Services / utils / guards / models / env | `src/app/core/{services,utils,guards,models,env}/` |
 | Shared UI | `src/app/shared/components/` |
 | Features | `src/app/features/{dashboard,markets,trading,portfolio,auth,system}/` |

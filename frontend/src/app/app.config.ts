@@ -7,6 +7,7 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { routes } from './app.routes';
 import { authInterceptor } from '@core/services/auth.interceptor';
 import { AuthService } from '@core/services/auth.service';
+import { PriceAlertsService } from '@core/services/price-alerts.service';
 import { GLOBAL_SEARCH_PROVIDERS } from '@core/search/search.types';
 import { NavigationSearchProvider } from '@core/search/providers/navigation-search.provider';
 import { MarketSearchProvider } from '@features/markets/search/market-search.provider';
@@ -17,7 +18,13 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withXhr(), withInterceptors([authInterceptor])),
     provideAnimationsAsync(),
-    provideAppInitializer(() => inject(AuthService).bootstrap()),
+    provideAppInitializer(async () => {
+      // inject() must run before any await — the continuation is not an injection context.
+      const auth = inject(AuthService);
+      const priceAlerts = inject(PriceAlertsService);
+      await auth.bootstrap();
+      priceAlerts.start();
+    }),
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: { appearance: 'outline', subscriptSizing: 'always' },
