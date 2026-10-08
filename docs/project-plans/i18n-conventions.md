@@ -3,7 +3,7 @@
 **Status:** planning (checklists below)  
 **Modified:** 2026-10-08  
 
-Cross-cutting frontend project: introduce an application-wide internationalization subsystem (signals-based `TranslateService`, `translate` pipe, one JSON catalog per language), migrate hardcoded English UI copy, document conventions in [`docs/I18N_CONVENTIONS.md`](../I18N_CONVENTIONS.md), and expose a navbar language control.
+Cross-cutting frontend project: introduce application-wide i18n with **`@ngx-translate/core` (v18, Angular 18–22)** + HTTP loader, one JSON catalog per language, project conventions (`FEATURE.KEY`), navbar language control, and SoT docs in [`docs/I18N_CONVENTIONS.md`](../I18N_CONVENTIONS.md).
 
 **Related FE review:** [`frontend/docs/review/architecture/03-state-and-data.md`](../../frontend/docs/review/architecture/03-state-and-data.md) (signals / presentation state)  
 **Related project plan:** [`privileges-and-preferences.md`](./privileges-and-preferences.md) (future preferences can store locale; do not block i18n on that design)  
@@ -13,10 +13,11 @@ Cross-cutting frontend project: introduce an application-wide internationalizati
 
 ## Goals
 
-- Ship a small **custom** i18n core under `src/app/core/i18n/` (no ngx-translate / `@angular/localize` unless a later plan overturns this).
-- One JSON file per language under `public/i18n/` (`en.json`, `hu.json`, `de.json`); **not** split by feature file.
+- Depend on **`@ngx-translate/core`** and **`@ngx-translate/http-loader`** (v18.x for Angular 22). Configure via standalone `provideTranslateService` / `provideTranslateHttpLoader` — **not** legacy `TranslateModule.forRoot`.
+- Keep a thin project layer under `src/app/core/i18n/` for config, language persistence, and missing-key handling — **do not** reimplement a custom translate pipe/service.
+- One JSON file per language under `public/i18n/` (`en.json`, `hu.json`, `de.json`); **not** split by feature file. Served at `/i18n/{lang}.json` (Angular `public` asset root).
 - Keys follow `FEATURE.KEY` with `UPPER_SNAKE_CASE` leaf keys; avoid deep nesting and layout-based names.
-- Templates use `| translate` as the primary API; language changes update UI **reactively** without full reload.
+- Templates use ngx-translate’s `| translate` as the primary API; language changes update UI **without** full reload.
 - Business/domain services return **semantic state**, not translated sentences; presentation maps state → keys (+ interpolation params).
 - Locale-aware dates/numbers/percentages/currencies via `Intl` / Angular locale tools, with explicit exceptions for trading display consistency.
 - After implementation, **`docs/I18N_CONVENTIONS.md`** is the descriptive SoT for agents and humans.
@@ -27,6 +28,7 @@ Cross-cutting frontend project: introduce an application-wide internationalizati
 - A full ICU / CLDR pluralization engine (use the intentional `order(s)` convention for now).
 - Backend-stored locale preference (can later plug into privileges/preferences); start with client persistence.
 - Translating Material internal chrome beyond what we own (paginator intl can be phased).
+- A second custom translation API beside ngx-translate (no home-grown pipe that wraps the same thing).
 
 ---
 
@@ -34,23 +36,27 @@ Cross-cutting frontend project: introduce an application-wide internationalizati
 
 ### Core subsystem
 
-- [ ] Add `src/app/core/i18n/` with `translate.types.ts`, `i18n.config.ts`, `translate.service.ts`, `translate.pipe.ts` only (no directive unless a clear gap appears during implementation)
-- [ ] Serve catalogs from `public/i18n/en.json`, `hu.json`, `de.json` (seed `en` as complete baseline; `hu`/`de` may start partial with fallback)
-- [ ] `TranslateService`: current language signal, available languages, default/fallback (`en`), load JSON for selected language, resolve keys, interpolate `{{param}}`, persist language (e.g. `localStorage`), expose reactive updates
-- [ ] Missing-key fallback: selected language → fallback language → raw key + **dev-only** warning
-- [ ] Register providers in `app.config.ts`; set `document.documentElement.lang` when language changes
-- [ ] Pure pipe / signal-aware pipe so language switches refresh templates without reload
+- [ ] Add deps: `@ngx-translate/core@^18` and `@ngx-translate/http-loader@^18` (compatible with Angular 22)
+- [ ] Wire `provideTranslateService({ lang, fallbackLang: 'en', loader: provideTranslateHttpLoader({ prefix: '/i18n/', suffix: '.json' }) })` in `app.config.ts` (nest loader **inside** the config object per ngx-translate v18 rules)
+- [ ] Add `src/app/core/i18n/` with only what the project needs beyond the library:
+  - `i18n.config.ts` — available languages, default/fallback (`en`), storage key, loader path constants
+  - `i18n.types.ts` — `LanguageCode` union, etc.
+  - `language.persistence.ts` or small `app-language.service.ts` — read/write `localStorage`, call `TranslateService.use()`, set `document.documentElement.lang`, register `addLangs`
+  - optional `missing-translation.handler.ts` — selected → fallback already handled by ngx-translate; warn in `ngDevMode` when key still missing
+- [ ] Seed `public/i18n/en.json`, `hu.json`, `de.json` (`en` complete baseline; others may be partial)
+- [ ] Hydrate saved language on app start (before or with shell); do **not** `location.reload()` on switch
+- [ ] Import `TranslatePipe` (and directive only if needed) in standalone components that translate; prefer pipe as primary template API
 
 ### Shell UX
 
-- [ ] Add an **icon button** on the **navbar right** (near theme / user menu) to open language selection (menu or similar); switching language calls `TranslateService` and updates UI immediately
+- [ ] Add an **icon button** on the **navbar right** (near theme / user menu) to open language selection (menu or similar); switching language uses ngx-translate `TranslateService.use(lang)` (+ persistence helper) and updates UI immediately
 - [ ] Translate sidebar labels (`sidebar.const.ts`) and navbar duplicates (bottom nav / menu) from the same keys under e.g. `NAV.*` / `COMMON.*`
 - [ ] Translate global-search placeholder, empty/loading states, and search group labels (`search.utils.ts`)
 
 ### Migration (by area — convert literals to keys + JSON)
 
 - [ ] Shared: `confirmation-dialog` defaults, `data-table` empty/loading/filter/Yes|No, snackbar defaults / dismiss, crypto-card aria/tooltips that are app copy
-- [ ] `NotificationService` default titles (`Success`, `Error`, …) + migrate call-site message strings to keys (or key + params) at presentation sites
+- [ ] `NotificationService` default titles (`Success`, `Error`, …) + migrate call-site message strings to keys (or key + params) via `TranslateService.instant` / `get` at presentation sites
 - [ ] Auth: login / register / banned templates + validation messages
 - [ ] Markets: `markets.const.ts`, toolbar, movers empty copy, crypto admin form labels
 - [ ] Trading: `trading.const.ts`, invest / alert dialogs, confirm-sell dialog data, trading notifications
@@ -66,13 +72,13 @@ Cross-cutting frontend project: introduce an application-wide internationalizati
 
 ### Cleanup / SoT pointers
 
-- [ ] Prefer returning translation keys from component `computed()` for dynamic status text; ban `translate(a) + ' ' + x` sentence assembly
-- [ ] Update `learn2trade.mdc` / `FILE_STRUCTURES.md` to point at `core/i18n` and `docs/I18N_CONVENTIONS.md`
+- [ ] Prefer returning translation keys from component `computed()` for dynamic status text; ban `instant('A') + ' ' + x` sentence assembly
+- [ ] Update `learn2trade.mdc` / `FILE_STRUCTURES.md` to point at `core/i18n`, ngx-translate usage, and `docs/I18N_CONVENTIONS.md`
 - [ ] Link FE plans index “Related” to this project plan if useful
 
 ## Checklist — Documentation
 
-- [ ] Create [`docs/I18N_CONVENTIONS.md`](../I18N_CONVENTIONS.md) after the system works — SoT covering architecture, service/pipe, language switching, JSON location, `FEATURE.KEY` rules, nesting exceptions, interpolation, computed-text rules, pluralization convention, fallbacks, locale formatting, add-key / add-language how-tos, translate vs do-not-translate, correct/incorrect examples
+- [ ] Create [`docs/I18N_CONVENTIONS.md`](../I18N_CONVENTIONS.md) after the system works — SoT covering ngx-translate setup, project `core/i18n` helpers, pipe usage, language switching, JSON location, `FEATURE.KEY` rules, nesting exceptions, interpolation (`{{param}}`), computed-text rules, pluralization convention, fallbacks, locale formatting, add-key / add-language how-tos, translate vs do-not-translate, correct/incorrect examples
 - [ ] Core rule in that doc: *Business logic provides semantic data and state. The presentation layer selects translation keys and parameters. Translation JSON files own the final user-facing wording.*
 
 ---
@@ -80,33 +86,52 @@ Cross-cutting frontend project: introduce an application-wide internationalizati
 ## Target architecture
 
 ```text
+frontend/package.json
+  @ngx-translate/core ^18
+  @ngx-translate/http-loader ^18
+
 frontend/src/app/core/i18n/
-├── translate.service.ts   # language state, load JSON, resolve + interpolate
-├── translate.pipe.ts      # primary template API
-├── translate.types.ts     # LanguageCode, catalogs, params
-└── i18n.config.ts         # default/fallback language, available languages, storage key
+├── i18n.config.ts              # langs, fallback, storage key, /i18n/ prefix
+├── i18n.types.ts               # LanguageCode, …
+├── app-language.service.ts     # persist + use() + document.lang (thin wrapper)
+└── missing-translation.handler.ts  # optional; dev warning only
 
 frontend/public/i18n/
 ├── en.json
 ├── hu.json
 └── de.json
+
+frontend/src/app/app.config.ts
+  provideTranslateService({ … provideTranslateHttpLoader({ prefix: '/i18n/', suffix: '.json' }) … })
 ```
 
-Do not invent extra files (no directive, no feature JSON splits, no HTTP interceptor for i18n) unless implementation proves a hard need.
+Do **not** add a project-owned `translate.pipe.ts` / `translate.service.ts` that duplicates ngx-translate. Use library `TranslateService` + `TranslatePipe`.
 
 ```mermaid
 flowchart LR
   UI[Templates and computed keys]
-  Pipe[translate pipe]
-  Svc[TranslateService]
+  Pipe[TranslatePipe ngx-translate]
+  Lib[TranslateService ngx-translate]
+  AppLang[AppLanguageService]
   JSON[public/i18n/*.json]
   LS[localStorage language]
 
-  UI --> Pipe --> Svc
-  Svc --> JSON
-  Svc --> LS
-  Svc -->|lang signal| Pipe
+  UI --> Pipe --> Lib
+  AppLang -->|use lang| Lib
+  AppLang --> LS
+  Lib -->|HttpLoader| JSON
 ```
+
+---
+
+## ngx-translate integration notes (implementers)
+
+- Angular 22 → **ngx-translate v18**; standalone providers only (`TranslateModule` removed).
+- Always nest `loader: provideTranslateHttpLoader(...)` **inside** `provideTranslateService({...})`.
+- Import `TranslatePipe` on each standalone component that needs it (or a small shared imports pattern if the repo already has one — do not invent a barrel module).
+- Interpolation uses ngx-translate params: `'TRADING.ORDER_BUY_ASSET' | translate: { symbol: pair() }` with JSON `Buy {{symbol}}`.
+- Instant vs stream: templates → pipe; snackbars/dialogs in TS → `instant()` after lang is loaded, or `get().subscribe` when async is required.
+- Fallback language: configure `fallbackLang: 'en'`. Missing-key handler only for discovery noise in dev.
 
 ---
 
@@ -114,7 +139,7 @@ flowchart LR
 
 - Top-level object = feature/domain (`TRADING`, `PORTFOLIO`, `COMMON`, `NAV`, `AUTH`, …).
 - Inside each feature: flat semantic keys in `UPPER_SNAKE_CASE`.
-- Reference as `FEATURE.KEY` (e.g. `TRADING.ORDER_BUY`).
+- Reference as `FEATURE.KEY` (e.g. `TRADING.ORDER_BUY`) — ngx-translate nested object lookup with `.` separator.
 - Deeper nesting (`TRADING.ORDER.BUY`) only when a feature is large enough that it clearly helps; never layout-based keys (`RIGHT_PANEL_BUTTON`, `GREEN_BUTTON_LABEL`).
 - Shared chrome → `COMMON` / `NAV` rather than duplicating Cancel/Save per feature.
 
@@ -146,14 +171,14 @@ Example shape (illustrative):
 
 | Concern | Approach |
 | --- | --- |
-| Current language | `signal` on `TranslateService` (readonly for consumers) |
-| Available languages | Config list (`en`, `hu`, `de`) with display labels (also translated or fixed native names) |
-| Default / fallback | `en` |
-| Loading | `fetch` / `HttpClient` of `/i18n/{lang}.json` from `public/`; cache in memory |
-| Resolve | Split `FEATURE.KEY` (and optional one extra segment); walk JSON object |
-| Interpolation | Replace `{{name}}` from a params record |
-| Persist | `localStorage` (key in `i18n.config.ts`); hydrate on app start before or with shell |
-| Reactivity | Language signal invalidates pipe / computed views; no `location.reload()` |
+| Current language | ngx-translate `TranslateService` (+ thin `AppLanguageService` for app concerns) |
+| Available languages | `i18n.config.ts` + `addLangs(['en','hu','de'])` |
+| Default / fallback | `en` via `lang` / `fallbackLang` |
+| Loading | `@ngx-translate/http-loader` → `/i18n/{lang}.json` |
+| Resolve | ngx-translate nested JSON + `.` keys |
+| Interpolation | ngx-translate `{{param}}` / params object |
+| Persist | `localStorage` via `AppLanguageService` |
+| Reactivity | ngx-translate pipe/directive OnPush-safe language updates; no full reload |
 
 ---
 
@@ -166,15 +191,20 @@ Example shape (illustrative):
 [placeholder]="'SEARCH.PLACEHOLDER' | translate"
 ```
 
-With params (pipe API to define at implement time, e.g. second argument or object):
+With params:
 
 ```html
 {{ 'TRADING.ORDER_BUY_ASSET' | translate: { symbol: pair() } }}
 ```
 
-**Directive:** only if pipe cannot cover a real case; avoid a second overlapping API.
+**Directive:** use only if the pipe cannot cover a real case; do not invent a third API.
 
-**TS (rare):** `inject(TranslateService).t('KEY', params)` for snackbar titles/messages constructed outside templates — still keys, not English literals.
+**TS:**
+
+```ts
+private readonly translate = inject(TranslateService);
+this.translate.instant('COMMON.SAVE');
+```
 
 ---
 
@@ -193,7 +223,7 @@ readonly statusKey = computed(() =>
 {{ statusKey() | translate }}
 ```
 
-- Dynamic sentences use interpolation in JSON (`Buy {{symbol}}`), never `translate('BUY') + ' ' + symbol`.
+- Dynamic sentences use interpolation in JSON (`Buy {{symbol}}`), never `instant('BUY') + ' ' + symbol`.
 
 ---
 
@@ -218,11 +248,11 @@ Do **not** translate: `BTC/USDT`, coin symbols, technical IDs, raw API enum stri
 
 ## Missing keys
 
-Resolution order:
+Resolution order (ngx-translate + project handler):
 
 1. Selected language catalog  
-2. Fallback language (`en`)  
-3. Return the key string itself + `console.warn` in non-production (or `ngDevMode`)  
+2. Fallback language (`en` via `fallbackLang`)  
+3. Return the key string itself + `console.warn` in non-production (`MissingTranslationHandler` or equivalent)
 
 Never throw for a missing key in production UI.
 
@@ -236,15 +266,15 @@ Never throw for a missing key in production UI.
 | --- | --- | --- |
 | Sidebar / nav | `sidebar.const.ts`, `navbar.component.html` | Keys under `NAV.*`; single source for desktop + mobile |
 | Global search | `global-search.component.html`, `search.utils.ts` `GROUP_LABELS` | `SEARCH.*` |
-| Notifications | `notification.service.ts` defaults + ~50 call-site strings | Keys; params for dynamic bits |
+| Notifications | `notification.service.ts` defaults + ~50 call-site strings | Keys; `instant` / params for dynamic bits |
 | Price alerts UI chrome | `price-alerts.service.ts` `View` / `Stop` | Keys; prices/symbols as params |
 | Data table | empty/loading/filter, Yes/No | `COMMON` / `TABLE.*` |
-| Confirmation dialog | defaults + open() data | Pass keys or pre-translated via pipe at call site — prefer keys resolved at open time through service |
+| Confirmation dialog | defaults + open() data | Resolve via `TranslateService` at open time |
 | Auth / markets / trading / portfolio / dashboard / watchlist / system | feature templates + `*.const.ts` | Feature top-level JSON namespaces |
 | Number formatting | `number.util.ts` hardcoded `en-US` / USD | Locale threading + conventions doc |
 | Theme persistence | profile + navbar | Precedent for persisting language in `localStorage` first |
 
-**Preferences:** [`privileges-and-preferences.md`](./privileges-and-preferences.md) defers a preferences service. i18n must work with **localStorage language** now; later optionally sync `locale` as a preference without redesigning the translate core.
+**Preferences:** [`privileges-and-preferences.md`](./privileges-and-preferences.md) defers a preferences service. i18n must work with **localStorage language** now; later optionally sync `locale` as a preference without redesigning ngx-translate wiring.
 
 ---
 
@@ -252,12 +282,12 @@ Never throw for a missing key in production UI.
 
 Create [`docs/I18N_CONVENTIONS.md`](../I18N_CONVENTIONS.md) as the SoT. It must include:
 
-- Architecture (`core/i18n`, `public/i18n`)
-- Service responsibilities and pipe usage
-- Language switching + navbar control
+- Architecture (ngx-translate v18 providers, `core/i18n` helpers, `public/i18n`)
+- When to use `TranslatePipe` vs `TranslateService.instant` / `get`
+- Language switching + navbar control + persistence
 - JSON location and `FEATURE.KEY` naming (when deeper nesting is OK)
 - Interpolation, computed-text rules, pluralization convention
-- Fallback behavior
+- Fallback / missing-key behavior
 - Locale-aware formatting + trading exceptions
 - How to add a key / how to add a language
 - What to translate vs not
@@ -268,8 +298,8 @@ Create [`docs/I18N_CONVENTIONS.md`](../I18N_CONVENTIONS.md) as the SoT. It must 
 
 ## Best-practice notes
 
-- Prefer the smallest custom i18n surface that matches Angular 22 signals; do not add ngx-translate “just because.”
+- **Use ngx-translate** as the translation engine; project code only owns conventions, persistence, and catalogs.
 - Keep catalogs **one file per language** so agents and humans grep one place per locale.
 - Const files should hold **keys** (or key maps), not English sentences, after migration.
 - Material: phase `MatPaginatorIntl` (and similar) when tables are migrated; do not block core pipe on full Material i18n.
-- Ponytail: no translate directive, no per-feature JSON, no second formatting framework beyond `Intl` + existing `number.util` improvements.
+- Ponytail: no custom duplicate pipe/service, no per-feature JSON, no second formatting framework beyond `Intl` + existing `number.util` improvements.
