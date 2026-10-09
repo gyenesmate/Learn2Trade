@@ -10,7 +10,7 @@ These instructions apply to every AI agent working in the **Learn2Trade frontend
 | [`.cursor/rules/angular-guide.mdc`](./.cursor/rules/angular-guide.mdc) | Angular 22+ patterns (signals, inject, RxJS, templates) |
 | [`.cursor/rules/material-guide.mdc`](./.cursor/rules/material-guide.mdc) | Angular Material theming and components |
 | [`docs/FILE_STRUCTURES.md`](./docs/FILE_STRUCTURES.md) | Folder layout and file-placement rules |
-| [`docs/TRADING_UI_CONTEXT.md`](./docs/TRADING_UI_CONTEXT.md) | Trading UI design system |
+| [`docs/STYLING_GUIDELINES.md`](./docs/STYLING_GUIDELINES.md) | Styling + trading UI design system |
 | [`.cursor/commands/code-review.md`](./.cursor/commands/code-review.md) | Branch review against the expert rules |
 
 Always-on Cursor rules under `.cursor/rules/` apply automatically. Prefer them over inventing new conventions.

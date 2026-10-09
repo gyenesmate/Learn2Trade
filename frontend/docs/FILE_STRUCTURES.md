@@ -2,7 +2,7 @@
 
 Source of truth for Learn2Trade frontend folder layout, ownership, and where new files belong.
 
-Also see: `.cursor/rules/learn2trade.mdc`, `docs/TRADING_UI_CONTEXT.md`, `docs/CRYPTO_WEBSOCKETS.md`, `agents.md`.
+Also see: `.cursor/rules/learn2trade.mdc`, `docs/STYLING_GUIDELINES.md`, `docs/CRYPTO_WEBSOCKETS.md`, `agents.md`.
 
 ---
 
@@ -26,6 +26,7 @@ src/
 │   │   ├── websocket/               # single physical WS transport
 │   │   ├── binance/                 # market-data (miniTicker) + REST helpers
 │   │   ├── services/
+│   │   ├── initializers/            # provideAppInitializer factories (e.g. app.initializer)
 │   │   ├── utils/
 │   │   ├── guards/
 │   │   ├── models/
@@ -53,10 +54,10 @@ src/
     ├── _tokens.scss
     ├── _material-overrides.scss
     ├── _components.scss
-    ├── _utilities.scss
-    ├── tailwind.scss          # SCSS semantic helpers entry (not the Tailwind framework)
+    ├── tailwind.css           # real Tailwind v4 + @theme bridge to tokens
     ├── theme.scss
-    └── (primitives: _colors, _spacing, _radius, …)
+    ├── _base.scss / _fonts.scss
+    └── (private token maps: _colors, _spacing, _radius, …)
 ```
 
 Create subfolders (`services/`, `utils/`, `models/`, `components/`, `directives/`) **only when files exist**. Do not create empty directories.
@@ -79,7 +80,7 @@ Path aliases (`tsconfig.json`):
 ```text
 AppComponent
   → RouterOutlet
-       → BaseLayoutComponent | AuthLayoutComponent
+       → LandingLayout | AuthLayout | BaseLayout (/app) | LectureLayout (/learn)
             ├── (BaseLayout) NavbarComponent + SidebarComponent
             └── RouterOutlet
                  → Feature components
@@ -88,17 +89,18 @@ AppComponent
 | Layer | Owns |
 | --- | --- |
 | **AppComponent** | Minimal root: top-level `RouterOutlet` and global hosts (e.g. notification stack) |
-| **BaseLayoutComponent** | Persistent trading shell: navbar + sidebar + content outlet (markets, dashboard, trading, …) |
-| **AuthLayoutComponent** | Minimal chrome-free shell for `/login`, `/register`, `/banned` |
+| **LandingLayoutComponent** | Public home shell at `/` |
+| **AuthLayoutComponent** | Chrome-free shell for `/auth/login`, `/auth/register`, `/auth/banned` |
+| **BaseLayoutComponent** | Trading shell under `/app/*` (navbar + sidebar) |
+| **LectureLayoutComponent** | Learning shell under `/learn/*` |
 | **Feature** | Route content and feature-specific UI/logic |
 | **Shared components** | Reusable presentation primitives only |
 | **Core services/utils** | Cross-cutting business/infrastructure |
 
 Do **not** put Sidebar/Navbar into `AppComponent`.  
-Do **not** introduce nested “inner layouts” unless multiple routes share another persistent inner chrome.  
-Do **not** use `app-shell` naming — use `base-layout` / `BaseLayoutComponent` and `auth-layout` / `AuthLayoutComponent`.  
-List AuthLayout routes **before** BaseLayout in `app.routes.ts` so BaseLayout’s `**` does not swallow auth URLs.  
-Arm `PriceAlertsService` after `AuthService.bootstrap()` in `app.config.ts` — not from AppComponent or layout hosts.
+Do **not** use `app-shell` naming.  
+Use **prefixed** shells (`/auth`, `/app`, `/learn`) so empty-path parents do not fight.  
+Arm `PriceAlertsService` and `AuthRedirectorService` after `AuthService.bootstrap()` in `core/initializers/app.initializer.ts`.
 
 ---
 
@@ -125,26 +127,30 @@ Use a layout when **multiple routes share the same persistent UI**.
 
 Current:
 
-- `base-layout/` — main trading shell
-- `auth-layout/` — chrome-free shell for login/register/banned
-- `sidebar/` — primary navigation, active route, collapse coordination via parent
-- `navbar/` — theme, user menu, balance, mobile bottom nav controls, centered global search UI (`navbar/global-search/`)
+- `landing-layout/` — public home at `/`
+- `auth-layout/` — chrome-free shell for `/auth/*`
+- `base-layout/` — trading shell for `/app/*`
+- `lecture-layout/` — learning shell for `/learn/*`
+- `sidebar/` — primary navigation (BaseLayout)
+- `navbar/` — theme, user menu, balance, mobile bottom nav, global search
 
-Additional layouts (e.g. `fullscreen-layout`) only when routes truly need a different shell. Do not create them speculatively.
+Additional layouts only when routes truly need a different shell.
 
 ---
 
 ## 5. Features (`features/`)
 
-| Feature | Role | Primary routes (URLs unchanged) |
+| Feature | Role | Primary routes |
 | --- | --- | --- |
-| `dashboard/` | Portfolio overview widgets | `/dashboard` |
-| `markets/` | Market discovery (card browser + movers); admin crypto edit | `/markets`, `/admin/crypto-currencies/...` |
-| `trading/` | Asset detail, invest/alerts UI | `/crypto/:id` |
-| `portfolio/` | Profile / edit profile | `/profile`, `/edit-profile` |
+| `landing/` | Public home placeholder | `/` |
+| `learn/` | Lectures placeholder | `/learn` |
+| `dashboard/` | Portfolio overview widgets | `/app/dashboard` |
+| `markets/` | Market discovery; admin crypto edit | `/app/markets`, `/app/admin/crypto-currencies/...` |
+| `trading/` | Asset detail, invest/alerts UI | `/app/crypto/:id` |
+| `portfolio/` | Profile / edit profile | `/app/profile`, `/app/edit-profile` |
 | `watchlist/` | Watchlist MatDialog (sidebar) | dialog only — no config route |
-| `auth/` | Login, register, banned | `/login`, `/register`, `/banned` |
-| `system/` | Not found, testing ground | `**`, `/testing-ground` |
+| `auth/` | Login, register, banned | `/auth/login`, `/auth/register`, `/auth/banned` |
+| `system/` | Not found, testing ground | `/app/**`, `/app/testing-ground` |
 
 `orders/` may be added when an orders product surface exists — do not create empty placeholders.
 
@@ -295,9 +301,9 @@ Put feature-specific UI under the feature (`features/trading/components/...`), n
 | `_tokens.scss` | CSS variables from design tokens |
 | `theme.scss` | `mat.theme` + system overrides, dark/light |
 | `_material-overrides.scss` | Centralized `mat.*-overrides` |
-| `_components.scss` | Global non-Material primitives (buttons, panels, chips) |
-| `_utilities.scss` / `tailwind.scss` | Semantic layout/text helpers (SCSS; not Tailwind CSS) |
-| primitives | `_colors`, `_spacing`, `_radius`, `_typography`, … |
+| `_components.scss` | Global non-Material primitives (buttons, panels, chips, price-up/down) |
+| `tailwind.css` | Real Tailwind v4 utilities; `@theme` → token CSS vars |
+| private maps | `_colors`, `_spacing`, `_radius`, `_typography`, … (`@use` from tokens/theme only) |
 
 No global Material overrides inside feature SCSS. Prefer tokens over arbitrary hex.
 

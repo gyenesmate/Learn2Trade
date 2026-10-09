@@ -26,7 +26,7 @@ Loads the current subscription IDs and crypto catalog, derives watched rows, and
 ## Rules that apply
 
 - [`CRYPTO_WEBSOCKETS.md`](../../../CRYPTO_WEBSOCKETS.md) — use ref-counted market-data consumers and release them; never own the physical socket.
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — compact prices, 24-hour movement, and accessible actions.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — compact prices, 24-hour movement, and accessible actions.
 - [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md) — dialog lifecycle and feature placement.
 
 ## Notes / smells

@@ -25,7 +25,7 @@ Orchestrates the profile workspace. Reactive effects load tables after auth boot
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — outlined Material fields, validation, financial formatting, and dense tables.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — outlined Material fields, validation, financial formatting, and dense tables.
 - [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md) — reactive forms, signals/effects, dialogs, and service boundaries.
 
 ## Notes / smells

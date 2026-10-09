@@ -3,7 +3,6 @@
 @use './styles/material-overrides';
 @use './styles/base';
 @use './styles/components';
-@use './styles/tailwind';
 @use './styles/fonts';
 
 @include tokens.properties;
@@ -11,4 +10,3 @@
 @include material-overrides.overrides;
 @include base.reset;
 @include components.primitives;
-@include tailwind.helpers;

@@ -22,7 +22,7 @@ Existing SoT docs remain authoritative:
 | --- | --- |
 | `docs/FILE_STRUCTURES.md` | Folder ownership / placement |
 | `docs/CRYPTO_WEBSOCKETS.md` | WS / Binance market-data |
-| `docs/TRADING_UI_CONTEXT.md` | Trading UI / tokens |
+| `docs/STYLING_GUIDELINES.md` | Trading UI / tokens |
 | `.cursor/rules/*.mdc`, `agents.md` | Implementation standards |
 
 Review pages **thinly pointer** to these (`Approach B`). They must stay useful enough to cherry-pick, but must not duplicate full SoT content.
@@ -221,7 +221,7 @@ auth, api, token-storage, users, crypto-currencies, investments, price-alerts, w
 | --- | --- |
 | Folder placement | Pointer → `FILE_STRUCTURES.md` |
 | WS / Binance | Pointer → `CRYPTO_WEBSOCKETS.md` (+ thin connection diagram on review page if useful) |
-| Colors / panels / tokens | Pointer → `TRADING_UI_CONTEXT.md` |
+| Colors / panels / tokens | Pointer → `STYLING_GUIDELINES.md` |
 | Angular / Material patterns | Pointer → `angular-guide.mdc`, `material-guide.mdc` |
 | Project map | Pointer → `learn2trade.mdc`, `agents.md` |
 

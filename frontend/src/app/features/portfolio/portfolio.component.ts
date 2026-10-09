@@ -120,7 +120,7 @@ export class PortfolioComponent {
   ];
   readonly investmentsRows = signal<Array<{ id: string; cryptoCurrencyId: string; currencyName: string; exchange: string; amount: number; soldAt: any; createdAt: any }>>([]);
   investmentsRowActions: RowAction<any>[] = [
-    { ...PORTFOLIO_TABLE_ACTIONS.view, callback: (row) => this.router.navigate(['/crypto', row.cryptoCurrencyId]) }
+    { ...PORTFOLIO_TABLE_ACTIONS.view, callback: (row) => this.router.navigate(['/app/crypto', row.cryptoCurrencyId]) }
   ];
 
   alertsColumns: TableColumn<any>[] = [
@@ -324,15 +324,15 @@ export class PortfolioComponent {
   }
 
   editProfile(): void {
-    void this.router.navigate(['/edit-profile']);
+    void this.router.navigate(['/app/edit-profile']);
   }
 
   addCryptoCurrency(): void {
-    void this.router.navigate(['/admin/crypto-currencies/new']);
+    void this.router.navigate(['/app/admin/crypto-currencies/new']);
   }
 
   editCryptoCurrency(item: CryptoCurrency): void {
-    void this.router.navigate(['/admin/crypto-currencies', item.id, 'edit']);
+    void this.router.navigate(['/app/admin/crypto-currencies', item.id, 'edit']);
   }
 
   async deleteCryptoCurrency(item: CryptoCurrency): Promise<void> {

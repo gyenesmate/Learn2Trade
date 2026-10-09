@@ -24,13 +24,13 @@ describe('adminGuard', () => {
   const runGuard = () =>
     TestBed.runInInjectionContext(() => adminGuard({} as never, {} as never));
 
-  it('navigates to /markets when not admin', async () => {
+  it('navigates to /app/markets when not admin', async () => {
     isCurrentUserAdmin.mockResolvedValue(false);
 
     const allowed = await runGuard();
 
     expect(allowed).toBe(false);
-    expect(navigate).toHaveBeenCalledWith(['/markets']);
+    expect(navigate).toHaveBeenCalledWith(['/app/markets']);
   });
 
   it('allows navigation when admin', async () => {

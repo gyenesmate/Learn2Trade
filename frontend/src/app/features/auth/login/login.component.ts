@@ -49,11 +49,11 @@ export class LoginComponent {
     try {
       await this.authService.login(email ?? '', password ?? '');
       console.log('[LoginPage] login succeeded, navigating to dashboard');
-      void this.router.navigate(['/dashboard']);
+      void this.router.navigate(['/app/dashboard']);
     } catch (error) {
       console.error('[LoginPage] Login error:', error);
       if ((error as { code?: string })?.code === 'auth/banned') {
-        void this.router.navigate(['/banned']);
+        void this.router.navigate(['/auth/banned']);
         return;
       }
 

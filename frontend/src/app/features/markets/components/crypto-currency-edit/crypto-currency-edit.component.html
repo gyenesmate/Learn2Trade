@@ -7,7 +7,7 @@
 
   @if (!loading()) {
     <form class="edit-form" [formGroup]="form" (ngSubmit)="save()">
-      <mat-form-field class="full-width">
+      <mat-form-field class="w-full">
         <mat-label>Name</mat-label>
         <input matInput formControlName="name" />
         @if (form.controls.name.touched && form.controls.name.invalid) {
@@ -15,7 +15,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field class="full-width">
+      <mat-form-field class="w-full">
         <mat-label>Binance market</mat-label>
         <input
           matInput

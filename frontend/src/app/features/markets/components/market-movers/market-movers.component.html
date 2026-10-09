@@ -16,7 +16,7 @@
   <ol class="market-movers__list">
     @for (row of visibleRows(); track row.crypto.id; let i = $index) {
       <li class="market-movers__item">
-        <a class="market-movers__link" [routerLink]="['/crypto', row.crypto.id]">
+        <a class="market-movers__link" [routerLink]="['/app/crypto', row.crypto.id]">
           <span class="market-movers__rank">{{ i + 1 | number: '2.0-0' }}</span>
           <span class="market-movers__identity">
             <span class="market-movers__symbol">{{ row.crypto.symbol }}</span>

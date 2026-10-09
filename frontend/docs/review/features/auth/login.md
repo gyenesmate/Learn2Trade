@@ -25,7 +25,7 @@ Presents the Learn2Trade sign-in form and delegates session creation to `AuthSer
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — Material form treatment, touched validation, focus, and Learn2Trade visual language.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — Material form treatment, touched validation, focus, and Learn2Trade visual language.
 - [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md) — reactive forms and auth feature placement.
 
 ## Notes / smells

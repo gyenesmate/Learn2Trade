@@ -93,7 +93,7 @@
           }
         </span>
       </div>
-      <a class="btn btn-primary crypto-card__view-chart" [routerLink]="['/crypto', coin.id]">
+      <a class="btn btn-primary crypto-card__view-chart" [routerLink]="['/app/crypto', coin.id]">
         View Chart
       </a>
     } @else if (state() === 'intermediate') {
@@ -180,7 +180,7 @@
         <!-- ponytail: Binance miniTicker has no market cap; omit rather than invent. -->
       </div>
 
-      <a class="btn btn-primary crypto-card__view-chart" [routerLink]="['/crypto', coin.id]">
+      <a class="btn btn-primary crypto-card__view-chart" [routerLink]="['/app/crypto', coin.id]">
         View market →
       </a>
     } @else if (binancePair(); as pair) {

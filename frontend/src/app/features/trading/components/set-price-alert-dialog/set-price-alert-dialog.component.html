@@ -7,7 +7,7 @@
     </p>
 
     <form [formGroup]="form" (ngSubmit)="confirm()">
-      <mat-form-field class="full-width" appearance="outline">
+      <mat-form-field class="w-full" appearance="outline">
         <mat-label>Alert price</mat-label>
         <input
           matInput
@@ -21,7 +21,7 @@
         }
       </mat-form-field>
 
-      <mat-form-field class="full-width" appearance="outline">
+      <mat-form-field class="w-full" appearance="outline">
         <mat-label>Description (optional)</mat-label>
         <input matInput type="text" formControlName="description" />
       </mat-form-field>

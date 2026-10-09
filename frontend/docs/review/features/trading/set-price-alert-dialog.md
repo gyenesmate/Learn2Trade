@@ -24,7 +24,7 @@ Collects a positive target price and optional description for the selected crypt
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — price precision and alert action context.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — price precision and alert action context.
 - [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc) — reactive forms and typed dialog data.
 - [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md) — Material dialog reuse and feature ownership.
 

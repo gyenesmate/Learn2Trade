@@ -24,7 +24,7 @@ Ranks ticker-enriched markets in three local modes and renders at most eight lin
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — gain/loss semantics and dense rankings.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — gain/loss semantics and dense rankings.
 - [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc) — Material toggle behavior and accessible controls.
 - [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc) / [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md) — colocated feature component and stable detail route.
 

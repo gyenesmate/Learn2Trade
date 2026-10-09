@@ -323,4 +323,17 @@
     outline: 2px solid var(--color-primary);
     outline-offset: 3px;
   }
+
+  /* Price movement — kept as named classes for [class.price-up] bindings */
+  .price-up {
+    color: var(--color-crypto-up);
+  }
+
+  .price-down {
+    color: var(--color-crypto-down);
+  }
+
+  .price-neutral {
+    color: var(--color-crypto-neutral);
+  }
 }

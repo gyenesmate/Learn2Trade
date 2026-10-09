@@ -25,7 +25,7 @@ Builds presentation-ready metrics from sold investments. A shared sold view-mode
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — financial values and P&L must remain immediately distinguishable.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — financial values and P&L must remain immediately distinguishable.
 - [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md) — computed state and feature-local child placement.
 
 ## Notes / smells

@@ -30,5 +30,5 @@ flowchart LR
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — Material forms, compact tables, and financial formatting.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — Material forms, compact tables, and financial formatting.
 - [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md), [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`agents.md`](../../../../agents.md) — route-feature, service, and UI conventions.

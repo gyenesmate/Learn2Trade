@@ -43,7 +43,7 @@
             <mat-icon>account_circle</mat-icon>
           </button>
           <mat-menu #userMenu="matMenu">
-            <button mat-menu-item type="button" (click)="navigateTo('/profile')">
+            <button mat-menu-item type="button" (click)="navigateTo('/app/profile')">
               <mat-icon>person</mat-icon>
               Profile
             </button>
@@ -64,9 +64,9 @@
       <button
         type="button"
         class="nav-item"
-        (click)="navigateTo('/dashboard')"
-        [class.active]="isActive('/dashboard')"
-        [attr.aria-current]="isActive('/dashboard') ? 'page' : null"
+        (click)="navigateTo('/app/dashboard')"
+        [class.active]="isActive('/app/dashboard')"
+        [attr.aria-current]="isActive('/app/dashboard') ? 'page' : null"
       >
         <mat-icon>dashboard</mat-icon>
         <span>Dashboard</span>
@@ -75,9 +75,9 @@
     <button
       type="button"
       class="nav-item"
-      (click)="navigateTo('/markets')"
-      [class.active]="isActive('/markets')"
-      [attr.aria-current]="isActive('/markets') ? 'page' : null"
+      (click)="navigateTo('/app/markets')"
+      [class.active]="isActive('/app/markets')"
+      [attr.aria-current]="isActive('/app/markets') ? 'page' : null"
     >
       <mat-icon>show_chart</mat-icon>
       <span>Markets</span>
@@ -86,9 +86,9 @@
       <button
         type="button"
         class="nav-item"
-        (click)="navigateTo('/profile')"
-        [class.active]="isActive('/profile')"
-        [attr.aria-current]="isActive('/profile') ? 'page' : null"
+        (click)="navigateTo('/app/profile')"
+        [class.active]="isActive('/app/profile')"
+        [attr.aria-current]="isActive('/app/profile') ? 'page' : null"
       >
         <mat-icon>account_balance_wallet</mat-icon>
         <span>Portfolio</span>
@@ -97,9 +97,9 @@
       <button
         type="button"
         class="nav-item"
-        (click)="navigateTo('/login')"
-        [class.active]="isActive('/login')"
-        [attr.aria-current]="isActive('/login') ? 'page' : null"
+        (click)="navigateTo('/auth/login')"
+        [class.active]="isActive('/auth/login')"
+        [attr.aria-current]="isActive('/auth/login') ? 'page' : null"
       >
         <mat-icon>login</mat-icon>
         <span>Login</span>

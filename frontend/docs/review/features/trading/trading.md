@@ -49,7 +49,7 @@ sequenceDiagram
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) and [`CRYPTO_WEBSOCKETS.md`](../../../CRYPTO_WEBSOCKETS.md) — trading semantics and live-price ownership.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) and [`CRYPTO_WEBSOCKETS.md`](../../../CRYPTO_WEBSOCKETS.md) — trading semantics and live-price ownership.
 - [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), and [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc) — signals, dialogs, tables, and stable routing.
 
 ## Notes / smells

@@ -4,7 +4,7 @@ import { SidebarLink } from './sidebar-link.types';
 export const SIDEBAR_LINKS: readonly SidebarLink[] = [
   {
     id: 'dashboard',
-    route: '/dashboard',
+    route: '/app/dashboard',
     label: 'Dashboard',
     icon: 'dashboard',
     visibility: 'authenticated',
@@ -15,7 +15,7 @@ export const SIDEBAR_LINKS: readonly SidebarLink[] = [
   },
   {
     id: 'markets',
-    route: '/markets',
+    route: '/app/markets',
     label: 'Markets',
     icon: 'show_chart',
     visibility: 'always',
@@ -26,7 +26,7 @@ export const SIDEBAR_LINKS: readonly SidebarLink[] = [
   },
   {
     id: 'portfolio',
-    route: '/profile',
+    route: '/app/profile',
     label: 'Portfolio',
     icon: 'account_balance_wallet',
     visibility: 'authenticated',
@@ -47,7 +47,7 @@ export const SIDEBAR_LINKS: readonly SidebarLink[] = [
   },
   {
     id: 'admin-crypto',
-    route: '/admin/crypto-currencies/new',
+    route: '/app/admin/crypto-currencies/new',
     label: 'Crypto admin',
     icon: 'currency_bitcoin',
     visibility: 'admin',
@@ -56,7 +56,7 @@ export const SIDEBAR_LINKS: readonly SidebarLink[] = [
   },
   {
     id: 'login',
-    route: '/login',
+    route: '/auth/login',
     label: 'Login',
     icon: 'login',
     visibility: 'anonymous',
@@ -65,7 +65,7 @@ export const SIDEBAR_LINKS: readonly SidebarLink[] = [
   },
   {
     id: 'register',
-    route: '/register',
+    route: '/auth/register',
     label: 'Register',
     icon: 'person_add',
     visibility: 'anonymous',

@@ -22,4 +22,4 @@ Presentational row for one `SearchResult` inside a `mat-option`: optional leadin
 ## Rules that apply
 
 - [`angular-guide.mdc`](../../../.cursor/rules/angular-guide.mdc) — `input.required`, OnPush presentational component.
-- [`TRADING_UI_CONTEXT.md`](../../TRADING_UI_CONTEXT.md) — `text-muted` for secondary line.
+- [`STYLING_GUIDELINES.md`](../../STYLING_GUIDELINES.md) — `text-muted` for secondary line.

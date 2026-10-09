@@ -29,7 +29,7 @@ Shared market card with three presentation modes. `compact` and `intermediate` r
 ## Rules that apply
 
 - [`CRYPTO_WEBSOCKETS.md`](../../CRYPTO_WEBSOCKETS.md) — avoid duplicate stream ownership and release subscriptions.
-- [`TRADING_UI_CONTEXT.md`](../../TRADING_UI_CONTEXT.md) — mode responsibilities and Trading/Markets presentation.
+- [`STYLING_GUIDELINES.md`](../../STYLING_GUIDELINES.md) — mode responsibilities and Trading/Markets presentation.
 - [`angular-guide.mdc`](../../../.cursor/rules/angular-guide.mdc) — signal state, effects, OnPush, and cleanup.
 - [`material-guide.mdc`](../../../.cursor/rules/material-guide.mdc) and [`learn2trade.mdc`](../../../.cursor/rules/learn2trade.mdc) — Material controls, accessibility, shared placement, and project conventions.
 

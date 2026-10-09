@@ -27,7 +27,7 @@ Detailed Lightweight Charts view for one lowercase Binance pair. Each pair/inter
 ## Rules that apply
 
 - [`CRYPTO_WEBSOCKETS.md`](../../CRYPTO_WEBSOCKETS.md) — REST-before-live flow, shared transport, and subscription cleanup.
-- [`TRADING_UI_CONTEXT.md`](../../TRADING_UI_CONTEXT.md) — detailed trading chart behavior.
+- [`STYLING_GUIDELINES.md`](../../STYLING_GUIDELINES.md) — detailed trading chart behavior.
 - [`angular-guide.mdc`](../../../.cursor/rules/angular-guide.mdc) — switchMap cancellation, signals, OnPush, and destroy lifecycle.
 - [`material-guide.mdc`](../../../.cursor/rules/material-guide.mdc) — accessible toggles, menu controls, and loading/error feedback.
 

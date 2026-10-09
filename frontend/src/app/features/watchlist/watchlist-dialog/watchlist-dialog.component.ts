@@ -100,7 +100,7 @@ export class WatchlistDialogComponent implements OnDestroy {
 
   view(cryptoId: string): void {
     this.dialogRef.close();
-    void this.router.navigate(['/crypto', cryptoId]);
+    void this.router.navigate(['/app/crypto', cryptoId]);
   }
 
   private async bootstrap(): Promise<void> {

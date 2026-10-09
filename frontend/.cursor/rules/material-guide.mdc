@@ -52,14 +52,14 @@ html {
 - Keep dialogs as focused Material dialogs; reuse existing shared dialogs when possible.
 - Preserve accessibility: labels, `aria-*`, focus management, contrast against dark/light trading themes.
 - Align custom surfaces with Material system roles and app tokens (`--color-surface`, `--color-primary`, etc.).
-- Follow `docs/TRADING_UI_CONTEXT.md` for density, panels, tables, and buy/sell semantic actions.
+- Follow `docs/STYLING_GUIDELINES.md` for density, panels, tables, and buy/sell semantic actions.
 
 **Don't**
 
 - Override with `.mat-mdc-*` selectors, `::ng-deep`, `!important`, or private `--mat-*` component vars outside overrides APIs.
 - Depend on Material internal DOM structure or class names — they are not a public API.
 - Introduce a second UI kit or ad-hoc button/input system alongside Material.
-- Add purple-on-white / generic “AI default” palettes; keep the trading blue + semantic green/red system from `docs/TRADING_UI_CONTEXT.md`.
+- Add purple-on-white / generic “AI default” palettes; keep the trading blue + semantic green/red system from `docs/STYLING_GUIDELINES.md`.
 
 ## Components & patterns in this app
 

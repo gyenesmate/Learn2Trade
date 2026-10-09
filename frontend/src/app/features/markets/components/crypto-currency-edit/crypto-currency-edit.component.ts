@@ -160,7 +160,7 @@ export class CryptoCurrencyEditComponent implements OnInit {
       if (this.id) {
         if (!existing) {
           this.notification.error('Crypto currency not found');
-          void this.router.navigate(['/profile']);
+          void this.router.navigate(['/app/profile']);
           return;
         }
 
@@ -221,7 +221,7 @@ export class CryptoCurrencyEditComponent implements OnInit {
         await this.cryptoCurrencies.create(payload);
         this.notification.success('Crypto currency created');
       }
-      void this.router.navigate(['/profile']);
+      void this.router.navigate(['/app/profile']);
     } catch (err) {
       console.error('Error saving crypto currency:', err);
       this.notification.error('Error saving crypto currency');
@@ -231,7 +231,7 @@ export class CryptoCurrencyEditComponent implements OnInit {
   }
 
   cancel(): void {
-    void this.router.navigate(['/profile']);
+    void this.router.navigate(['/app/profile']);
   }
 
   private applyMarket(option: BinanceMarketOption): void {

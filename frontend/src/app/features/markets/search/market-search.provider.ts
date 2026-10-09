@@ -60,7 +60,7 @@ export class MarketSearchProvider implements SearchProvider {
       type: 'market',
       icon: 'currency_bitcoin',
       keywords: [item.name, item.symbol, item.exchange_currency, pair],
-      action: { type: 'route', route: `/crypto/${item.id}` },
+      action: { type: 'route', route: `/app/crypto/${item.id}` },
       priority: 5,
     };
   }

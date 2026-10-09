@@ -26,7 +26,7 @@ Progress = checked items ÷ total checklist items in that file. Use **abstract**
 
 | Improvements page | Status |
 | --- | --- |
-| [`architecture/01-app-shell-improvements.md`](./architecture/01-app-shell-improvements.md) | **6/7** (86%) |
-| [`architecture/02-routing-and-guards-improvements.md`](./architecture/02-routing-and-guards-improvements.md) | **0/5** (0%) |
+| [`architecture/01-app-shell-improvements.md`](./architecture/01-app-shell-improvements.md) | **7/7** (100%) |
+| [`architecture/02-routing-and-guards-improvements.md`](./architecture/02-routing-and-guards-improvements.md) | **4/8** (50%) |
 | [`architecture/03-state-and-data-improvements.md`](./architecture/03-state-and-data-improvements.md) | abstract |
-| [`architecture/04-styles-and-material-improvements.md`](./architecture/04-styles-and-material-improvements.md) | **0/10** (0%) |
+| [`architecture/04-styles-and-material-improvements.md`](./architecture/04-styles-and-material-improvements.md) | **8/10** (80%) |

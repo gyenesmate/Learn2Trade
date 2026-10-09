@@ -28,4 +28,4 @@ flowchart TD
 ## Rules that apply
 
 - [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md) — system feature owns non-product and fallback pages.
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md), [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`agents.md`](../../../../agents.md) — shared presentation and route conventions.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md), [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`agents.md`](../../../../agents.md) — shared presentation and route conventions.

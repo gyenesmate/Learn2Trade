@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Snapshot only — banner on every file; not a living SoT
-- Thin pointers to `FILE_STRUCTURES.md`, `CRYPTO_WEBSOCKETS.md`, `TRADING_UI_CONTEXT.md`, `angular-guide.mdc`, `material-guide.mdc`, `learn2trade.mdc`, `agents.md`
+- Thin pointers to `FILE_STRUCTURES.md`, `CRYPTO_WEBSOCKETS.md`, `STYLING_GUIDELINES.md`, `angular-guide.mdc`, `material-guide.mdc`, `learn2trade.mdc`, `agents.md`
 - Mermaid inline in the same `.md`; prefer one primary diagram per page; skip trivial leaves
 - One short page per component/service listed in the spec inventory
 - No changes to app runtime code, routes, or styles except docs under `frontend/docs/review/`
@@ -127,7 +127,7 @@ Read:
 - `frontend/src/app/app.config.ts`
 - `frontend/src/app/core/layout/base-layout/base-layout.component.ts`
 - `frontend/docs/FILE_STRUCTURES.md` (pointer only)
-- `frontend/docs/TRADING_UI_CONTEXT.md` (pointer only)
+- `frontend/docs/STYLING_GUIDELINES.md` (pointer only)
 - `frontend/.cursor/rules/material-guide.mdc` (pointer only)
 
 - [ ] **Step 2: Write `01-app-shell.md`**
@@ -144,7 +144,7 @@ Describe signals-in-services pattern, `toSignal`/`computed`, Binance ref-count +
 
 - [ ] **Step 5: Write `04-styles-and-material.md`**
 
-Tokens / `_material-overrides` / no private DOM. Pointer to TRADING_UI_CONTEXT + material-guide. Optional small relationship diagram of styles entrypoints.
+Tokens / `_material-overrides` / no private DOM. Pointer to STYLING_GUIDELINES + material-guide. Optional small relationship diagram of styles entrypoints.
 
 - [ ] **Step 6: Verify**
 

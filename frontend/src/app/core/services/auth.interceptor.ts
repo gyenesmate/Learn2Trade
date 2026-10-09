@@ -31,12 +31,12 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       }
       if (err?.status === 401) {
         auth.clearClientSession();
-        void router.navigate(['/login']);
+        // AuthRedirectorService navigates to /auth/login when session clears.
       } else if (err?.status === 403) {
         const detail = String(err?.error?.detail ?? '').toLowerCase();
         if (detail.includes('banned')) {
-          auth.clearClientSession();
-          void router.navigate(['/banned']);
+          // Land on banned first so AuthRedirector sees a public URL when session clears.
+          void router.navigateByUrl('/auth/banned').then(() => auth.clearClientSession());
         }
       }
       return throwError(() => err);

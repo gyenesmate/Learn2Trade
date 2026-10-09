@@ -24,7 +24,7 @@ Collects a dollar amount and optional description for an investment. The dialog 
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — investment amount, balance context, and action semantics.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — investment amount, balance context, and action semantics.
 - [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc) — reactive forms and injected dialog data.
 - [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md) — shared dialog shell and feature-local dialog placement.
 

@@ -26,5 +26,5 @@ Presents the Learn2Trade account-creation form, validates identity and password 
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — branded Material forms, accessible controls, and validation timing.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — branded Material forms, accessible controls, and validation timing.
 - [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md) — reactive validation and feature placement.

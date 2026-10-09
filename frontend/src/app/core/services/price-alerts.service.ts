@@ -280,7 +280,7 @@ export class PriceAlertsService {
         {
           label: 'View',
           run: () => {
-            void this.router.navigate(['/crypto', a.crypto_currency_id]);
+            void this.router.navigate(['/app/crypto', a.crypto_currency_id]);
           },
         },
         {

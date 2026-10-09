@@ -23,7 +23,7 @@ Developer-facing visual lab for exercising shared UI primitives outside product 
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — the lab should exercise established visual language, not define a competing one.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — the lab should exercise established visual language, not define a competing one.
 - [`CRYPTO_WEBSOCKETS.md`](../../../CRYPTO_WEBSOCKETS.md) — compact card behavior owns any market-data behavior it elects to start.
 - [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md), [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`agents.md`](../../../../agents.md) — shared/component boundaries and repository conventions.
 

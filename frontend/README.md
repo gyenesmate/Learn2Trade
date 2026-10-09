@@ -9,7 +9,7 @@ Project definitions and coding standards live in:
 - **`.cursor/rules/`** — always-on rules (Angular, Material, Learn2Trade project map)
 - **`.cursor/commands/`** — reusable AI commands (e.g. `/code-review`)
 - **`docs/FILE_STRUCTURES.md`** — folder layout and file-placement rules
-- **`docs/TRADING_UI_CONTEXT.md`** — trading UI design system
+- **`docs/STYLING_GUIDELINES.md`** — styling + trading UI design system
 - **`docs/CRYPTO_WEBSOCKETS.md`** — Binance WS / market-data architecture
 - **`docs/plans/00-index.md`** — per-review improvement checklists and progress
 

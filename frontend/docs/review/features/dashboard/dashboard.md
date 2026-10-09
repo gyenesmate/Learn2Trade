@@ -25,7 +25,7 @@ Loads the current user's investments and crypto catalog, excludes sold investmen
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — tabular numbers and gain/loss semantics.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — tabular numbers and gain/loss semantics.
 - [`CRYPTO_WEBSOCKETS.md`](../../../CRYPTO_WEBSOCKETS.md) — REST snapshot usage must remain distinct from live stream ownership.
 - [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md) — standalone components, signals, Material, and feature placement.
 

@@ -1,0 +1,43 @@
+﻿/* Real Tailwind v4 — theme bridges to CSS vars from _tokens.scss.
+   Skip preflight: Material + _base.scss own document defaults. */
+@import "tailwindcss/theme" layer(theme);
+@import "tailwindcss/utilities" layer(utilities);
+
+/* Angular templates are outside the CSS module graph — scan explicitly. */
+@source "../app";
+
+@theme inline {
+  /* Spacing aliases → --space-* (p-md, gap-sm, …) */
+  --spacing-xxs: var(--space-xxs);
+  --spacing-xs: var(--space-xs);
+  --spacing-sm: var(--space-sm);
+  --spacing-md: var(--space-md);
+  --spacing-lg: var(--space-lg);
+  --spacing-xl: var(--space-xl);
+  --spacing-xxl: var(--space-xxl);
+
+  /* Semantic colors used as utilities (text-primary = brand, text-muted, …) */
+  --color-primary: var(--color-primary);
+  --color-muted: var(--color-text-muted);
+  --color-surface: var(--color-surface);
+  --color-accent: var(--color-accent);
+  --color-success: var(--color-success);
+  --color-danger: var(--color-danger);
+  --color-error: var(--color-danger);
+  --color-warning: var(--color-warning);
+  --color-border: var(--color-border);
+
+  --default-border-color: var(--color-border);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+
+  --font-sans: var(--font-family-base);
+  --font-display: var(--font-family-accent);
+}

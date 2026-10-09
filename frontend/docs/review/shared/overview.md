@@ -30,7 +30,7 @@ The shared kit contains reusable presentation and interaction primitives used ac
 - [`angular-guide.mdc`](../../../.cursor/rules/angular-guide.mdc) — standalone components, OnPush, signal inputs/outputs, and modern template control flow.
 - [`material-guide.mdc`](../../../.cursor/rules/material-guide.mdc) — Material imports, dialogs, buttons, tables, and accessibility.
 - [`learn2trade.mdc`](../../../.cursor/rules/learn2trade.mdc) and [`agents.md`](../../../agents.md) — project aliases, component placement, and repository workflow.
-- [`CRYPTO_WEBSOCKETS.md`](../../CRYPTO_WEBSOCKETS.md) and [`TRADING_UI_CONTEXT.md`](../../TRADING_UI_CONTEXT.md) — stream ownership and trading UI intent.
+- [`CRYPTO_WEBSOCKETS.md`](../../CRYPTO_WEBSOCKETS.md) and [`STYLING_GUIDELINES.md`](../../STYLING_GUIDELINES.md) — stream ownership and trading UI intent.
 
 ## Diagram
 

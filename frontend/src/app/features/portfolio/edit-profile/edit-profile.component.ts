@@ -41,7 +41,7 @@ export class EditProfileComponent {
     try {
       await this.usersService.updateProfile({ username, theme });
       this.notification.success('Profile updated successfully!');
-      void this.router.navigate(['/profile']);
+      void this.router.navigate(['/app/profile']);
     } catch (error) {
       console.error('Error updating profile:', error);
       this.notification.error('Error updating profile. Please try again.');
@@ -49,6 +49,6 @@ export class EditProfileComponent {
   }
 
   cancel(): void {
-    void this.router.navigate(['/profile']);
+    void this.router.navigate(['/app/profile']);
   }
 }

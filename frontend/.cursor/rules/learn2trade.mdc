@@ -8,7 +8,7 @@ alwaysApply: true
 Use this rule as the map of the frontend. Prefer the smallest change that matches existing patterns.
 
 **File placement source of truth:** [`docs/FILE_STRUCTURES.md`](../../docs/FILE_STRUCTURES.md)  
-**UI/UX source of truth:** [`docs/TRADING_UI_CONTEXT.md`](../../docs/TRADING_UI_CONTEXT.md)
+**UI/UX source of truth:** [`docs/STYLING_GUIDELINES.md`](../../docs/STYLING_GUIDELINES.md)
 
 Also follow `angular-guide.mdc`, `material-guide.mdc`, and `agents.md`.
 
@@ -17,7 +17,7 @@ Also follow `angular-guide.mdc`, `material-guide.mdc`, and `agents.md`.
 ```text
 AppComponent (root outlet + global hosts)
   → RouterOutlet
-       → BaseLayoutComponent | AuthLayoutComponent
+       → LandingLayout | AuthLayout | BaseLayout (/app) | LectureLayout (/learn)
             → feature RouterOutlet
 ```
 
@@ -46,22 +46,24 @@ Same-folder `./` imports may stay relative.
 | Area | Path |
 | --- | --- |
 | App root / routes / config | `src/app/app.*` |
-| Shell | `src/app/core/layout/{base-layout,auth-layout,sidebar,navbar}/` |
-| Services / utils / guards / models / env | `src/app/core/{services,utils,guards,models,env}/` |
+| Shell | `src/app/core/layout/{landing,auth,base,lecture}-layout/`, `sidebar/`, `navbar/` |
+| Services / utils / guards / models / env | `src/app/core/{services,utils,guards,models,env,initializers}/` |
 | Shared UI | `src/app/shared/components/` |
-| Features | `src/app/features/{dashboard,markets,trading,portfolio,auth,system}/` |
-| Design tokens / theme | `src/styles/` (`_tokens`, `theme`, `_material-overrides`, `_components`, `tailwind`) |
+| Features | `src/app/features/{landing,learn,dashboard,markets,trading,portfolio,auth,system}/` |
+| Design tokens / theme | `src/styles/` (`_tokens`, `theme`, `_material-overrides`, `_components`, `tailwind.css`) |
 
-### Feature ↔ URL (URLs must stay stable)
+### Feature ↔ URL (prefixed shells; old flat URLs redirect)
 
 | Feature | Routes |
 | --- | --- |
-| dashboard | `/dashboard` |
-| markets | `/markets`, `/admin/crypto-currencies/...` |
-| trading | `/crypto/:id` |
-| portfolio | `/profile`, `/edit-profile` |
-| auth | `/login`, `/register`, `/banned` |
-| system | `/testing-ground`, `**` |
+| landing | `/` |
+| learn | `/learn` |
+| dashboard | `/app/dashboard` |
+| markets | `/app/markets`, `/app/admin/crypto-currencies/...` |
+| trading | `/app/crypto/:id` |
+| portfolio | `/app/profile`, `/app/edit-profile` |
+| auth | `/auth/login`, `/auth/register`, `/auth/banned` |
+| system | `/app/testing-ground`, `/app/**` |
 
 ### Docs
 
@@ -69,11 +71,11 @@ Same-folder `./` imports may stay relative.
 | --- | --- |
 | `docs/FILE_STRUCTURES.md` | Structure & placement rules |
 | `docs/CRYPTO_WEBSOCKETS.md` | Binance public market WS architecture |
-| `docs/TRADING_UI_CONTEXT.md` | Trading UI design system |
+| `docs/STYLING_GUIDELINES.md` | Styling + trading UI design system |
 | `docs/features/` | Planned per-feature guides |
 | `docs/OLD_DESCRITIONS/` | Legacy only |
 
-Visual direction: dark-first trading terminal. Semantic tokens only. Layout via Tailwind-style flex/grid utilities in `styles/tailwind.scss` / `_utilities.scss` (SCSS helpers — not the Tailwind npm package).
+Visual direction: dark-first trading terminal. Semantic tokens only. Layout via real Tailwind utilities (`src/styles/tailwind.css`, theme bridged to CSS vars).
 
 ## Guidelines
 

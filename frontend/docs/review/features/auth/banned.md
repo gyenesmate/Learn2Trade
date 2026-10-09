@@ -22,7 +22,7 @@ Public suspension notice reached when `AuthService.login` normalizes a banned AP
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — readable status messaging and accessible actions.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — readable status messaging and accessible actions.
 - [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md) — feature component and route placement.
 
 ## Notes / smells

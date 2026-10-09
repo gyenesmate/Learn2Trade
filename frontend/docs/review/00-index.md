@@ -95,7 +95,7 @@ Review pages point here; they do not replace these files.
 | --- | --- |
 | [FILE_STRUCTURES.md](../FILE_STRUCTURES.md) | Folder ownership and placement |
 | [CRYPTO_WEBSOCKETS.md](../CRYPTO_WEBSOCKETS.md) | WebSocket / Binance market-data architecture |
-| [TRADING_UI_CONTEXT.md](../TRADING_UI_CONTEXT.md) | Trading UI design system and tokens |
+| [STYLING_GUIDELINES.md](../STYLING_GUIDELINES.md) | Trading UI design system and tokens |
 | [angular-guide.mdc](../../.cursor/rules/angular-guide.mdc) | Angular implementation standards |
 | [material-guide.mdc](../../.cursor/rules/material-guide.mdc) | Material theming and component patterns |
 | [learn2trade.mdc](../../.cursor/rules/learn2trade.mdc) | Project map and frontend conventions |

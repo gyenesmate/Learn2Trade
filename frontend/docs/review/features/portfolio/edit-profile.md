@@ -24,7 +24,7 @@ Provides the auth-guarded profile editor for username and preferred theme. Initi
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — form fields, validation timing, and theme conventions.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — form fields, validation timing, and theme conventions.
 - [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md) — reactive forms and route-feature placement.
 
 ## Notes / smells

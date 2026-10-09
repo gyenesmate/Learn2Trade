@@ -39,6 +39,6 @@ erDiagram
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — dense financial hierarchy and semantic P&L presentation.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — dense financial hierarchy and semantic P&L presentation.
 - [`CRYPTO_WEBSOCKETS.md`](../../../CRYPTO_WEBSOCKETS.md) — dashboard uses Binance REST snapshots, not a feature-owned socket.
 - [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md), [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`agents.md`](../../../../agents.md) — feature boundaries and Angular/UI conventions.

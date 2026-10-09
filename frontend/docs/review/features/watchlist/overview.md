@@ -28,7 +28,7 @@ flowchart LR
 ## Rules that apply
 
 - [`CRYPTO_WEBSOCKETS.md`](../../../CRYPTO_WEBSOCKETS.md) — dialog consumers release ref-counted miniTicker subscriptions on destroy/rewire.
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — compact market values and semantic price movement.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — compact market values and semantic price movement.
 - [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md), [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`agents.md`](../../../../agents.md) — dialog placement and app-shell conventions.
 
 ## Notes / smells

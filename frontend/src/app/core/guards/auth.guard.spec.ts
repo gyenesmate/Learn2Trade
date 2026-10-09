@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { signal } from '@angular/core';
-import { ActivatedRouteSnapshot, Router, UrlTree } from '@angular/router';
+import { ActivatedRouteSnapshot, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { firstValueFrom, Observable } from 'rxjs';
 
 import { authGuard } from './auth.guard';
@@ -10,8 +10,11 @@ describe('authGuard', () => {
   let currentUser: ReturnType<typeof signal<unknown>>;
   let createUrlTree: ReturnType<typeof vi.fn>;
 
-  const routeWithPath = (path: string): ActivatedRouteSnapshot =>
-    ({ routeConfig: { path } } as ActivatedRouteSnapshot);
+  const routeSnapshot = (path: string, data: Record<string, unknown> = {}): ActivatedRouteSnapshot =>
+    ({ routeConfig: { path }, data, firstChild: null } as unknown as ActivatedRouteSnapshot);
+
+  const stateSnapshot = (url: string): RouterStateSnapshot =>
+    ({ url } as RouterStateSnapshot);
 
   beforeEach(() => {
     createUrlTree = vi.fn((commands: unknown[]) => ({ commands }) as unknown as UrlTree);
@@ -32,36 +35,53 @@ describe('authGuard', () => {
     });
   });
 
-  const runGuard = (path: string) =>
-    TestBed.runInInjectionContext(() => authGuard(routeWithPath(path), {} as never));
+  const runGuard = (path: string, url: string, data: Record<string, unknown> = {}) =>
+    TestBed.runInInjectionContext(() =>
+      authGuard(routeSnapshot(path, data), stateSnapshot(url))
+    );
 
-  it('allows unauthenticated users on public routes (/login)', async () => {
-    const result = runGuard('login') as Observable<boolean | UrlTree>;
+  it('allows guests on /auth/login', async () => {
+    const result = runGuard('login', '/auth/login') as Observable<boolean | UrlTree>;
     const resultPromise = firstValueFrom(result);
     currentUser.set(null);
 
-    const allowed = await resultPromise;
-    expect(allowed).toBe(true);
+    expect(await resultPromise).toBe(true);
     expect(createUrlTree).not.toHaveBeenCalled();
   });
 
-  it('redirects unauthenticated users from protected routes to /login', async () => {
-    const result = runGuard('dashboard') as Observable<boolean | UrlTree>;
+  it('allows guests on /app/markets when data.guest is true', async () => {
+    const result = runGuard('markets', '/app/markets', { guest: true }) as Observable<
+      boolean | UrlTree
+    >;
     const resultPromise = firstValueFrom(result);
     currentUser.set(null);
 
-    const redirected = await resultPromise;
-    expect(redirected).toEqual({ commands: ['/login'] });
-    expect(createUrlTree).toHaveBeenCalledWith(['/login']);
+    expect(await resultPromise).toBe(true);
   });
 
-  it('redirects authenticated users away from /login to /dashboard', async () => {
-    const result = runGuard('login') as Observable<boolean | UrlTree>;
+  it('redirects guests from /app/dashboard to /auth/login', async () => {
+    const result = runGuard('dashboard', '/app/dashboard') as Observable<boolean | UrlTree>;
+    const resultPromise = firstValueFrom(result);
+    currentUser.set(null);
+
+    expect(await resultPromise).toEqual({ commands: ['/auth/login'] });
+    expect(createUrlTree).toHaveBeenCalledWith(['/auth/login']);
+  });
+
+  it('redirects guests from /learn to /auth/login', async () => {
+    const result = runGuard('', '/learn') as Observable<boolean | UrlTree>;
+    const resultPromise = firstValueFrom(result);
+    currentUser.set(null);
+
+    expect(await resultPromise).toEqual({ commands: ['/auth/login'] });
+  });
+
+  it('redirects authenticated users away from /auth/login to /app/markets', async () => {
+    const result = runGuard('login', '/auth/login') as Observable<boolean | UrlTree>;
     const resultPromise = firstValueFrom(result);
     currentUser.set({ id: 'u1', username: 'tester' });
 
-    const redirected = await resultPromise;
-    expect(redirected).toEqual({ commands: ['/dashboard'] });
-    expect(createUrlTree).toHaveBeenCalledWith(['/dashboard']);
+    expect(await resultPromise).toEqual({ commands: ['/app/markets'] });
+    expect(createUrlTree).toHaveBeenCalledWith(['/app/markets']);
   });
 });

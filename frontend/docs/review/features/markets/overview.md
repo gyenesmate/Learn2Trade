@@ -36,5 +36,5 @@ flowchart LR
 ## Rules that apply
 
 - [`CRYPTO_WEBSOCKETS.md`](../../../CRYPTO_WEBSOCKETS.md) — Markets owns aggregate miniTicker targets; cards must not duplicate watches.
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — dense market-browser and card presentation.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — dense market-browser and card presentation.
 - [`FILE_STRUCTURES.md`](../../../FILE_STRUCTURES.md), [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc), [`material-guide.mdc`](../../../../.cursor/rules/material-guide.mdc), [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc), and [`agents.md`](../../../../agents.md) — placement, Angular, Material, and repository conventions.

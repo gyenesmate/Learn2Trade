@@ -27,7 +27,7 @@ Top toolbar: mobile menu button (emits `menuToggle`), centered [global search](.
 
 ## Rules that apply
 
-- [`TRADING_UI_CONTEXT.md`](../../TRADING_UI_CONTEXT.md) — dense toolbar, tabular balance numerals.
+- [`STYLING_GUIDELINES.md`](../../STYLING_GUIDELINES.md) — dense toolbar, tabular balance numerals.
 - [`material-guide.mdc`](../../../.cursor/rules/material-guide.mdc) — `mat-toolbar`, menus, icon buttons.
 - [`learn2trade.mdc`](../../../.cursor/rules/learn2trade.mdc) — bottom nav only on mobile shell breakpoint.
 

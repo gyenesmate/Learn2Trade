@@ -53,7 +53,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   readonly isDark = computed(() => this.theme() === 'dark');
   readonly activePaths = computed(() => {
     const route = this.currentRoute();
-    const paths = ['/dashboard', '/markets', '/profile', '/login'];
+    const paths = ['/app/dashboard', '/app/markets', '/app/profile', '/auth/login'];
     return new Set(paths.filter((p) => route === p || route.startsWith(`${p}/`)));
   });
 
@@ -124,7 +124,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   async logout(): Promise<void> {
     try {
       await this.authService.logout();
-      void this.router.navigate(['/markets']);
+      // AuthRedirectorService navigates away from protected URLs.
     } catch (error) {
       console.error('Logout error:', error);
     }

@@ -45,7 +45,7 @@ export class DashboardComponent implements OnInit {
   readonly headerActions: PageHeaderAction[] = [
     {
       ...DASHBOARD_HEADER_ACTIONS.browseMarkets,
-      callback: () => void this.router.navigate(['/markets']),
+      callback: () => void this.router.navigate(['/app/markets']),
     },
   ];
 

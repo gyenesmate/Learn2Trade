@@ -25,7 +25,7 @@ Maps up to five current-page assets into one `featured` and four compact positio
 ## Rules that apply
 
 - [`CRYPTO_WEBSOCKETS.md`](../../../CRYPTO_WEBSOCKETS.md) — external tickers prevent card-owned duplicate watches.
-- [`TRADING_UI_CONTEXT.md`](../../../TRADING_UI_CONTEXT.md) — compact/intermediate market-card responsibilities.
+- [`STYLING_GUIDELINES.md`](../../../STYLING_GUIDELINES.md) — compact/intermediate market-card responsibilities.
 - [`angular-guide.mdc`](../../../../.cursor/rules/angular-guide.mdc) / [`learn2trade.mdc`](../../../../.cursor/rules/learn2trade.mdc) — signal inputs and shared-component reuse.
 
 ## Slot behavior

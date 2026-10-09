@@ -2,7 +2,7 @@
 
 **Review:** [`../../review/architecture/01-app-shell.md`](../../review/architecture/01-app-shell.md)  
 **Spec:** [`../../superpowers/specs/2026-10-07-app-shell-auth-layout-design.md`](../../superpowers/specs/2026-10-07-app-shell-auth-layout-design.md)  
-**Modified:** 2026-10-08
+**Modified:** 2026-10-09
 
 ## Checklist
 
@@ -12,7 +12,7 @@
 - [x] Keep feature routes under `BaseLayoutComponent`
 - [x] Stop calling `PriceAlertsService.start()` from `AppComponent`; arm after `AuthService.bootstrap()` in `app.config.ts` (`inject()` before any `await` in the initializer)
 - [x] Update `FILE_STRUCTURES.md` + `learn2trade.mdc` for dual layout
-- [ ] **App init in AppConfig:** `provideAppInitializer` should move into dedicated initializer module(s) (e.g. `auth.initializer.ts`) for anything the app must finish before first navigation.
+- [x] **App init in AppConfig:** `provideAppInitializer(initializeApp)` — sync factory returns the bootstrap Promise (no nested `async` wrapper); lives in `core/initializers/app.initializer.ts`
 
 Guest markets-only lives under [`docs/project-plans/privileges-and-preferences.md`](../../../../docs/project-plans/privileges-and-preferences.md) (privilege/capability work), not the app shell.
 

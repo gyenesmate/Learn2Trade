@@ -1,0 +1,73 @@
+# Styling guidelines
+
+Primary UI/UX and styling reference for the Learn2Trade frontend.
+
+When ambiguous, prefer: **consistency → readability → information hierarchy → compactness → decoration.**
+
+## Stack
+
+| Layer | Owns |
+| --- | --- |
+| `src/styles/_tokens.scss` (+ private Sass maps) | Semantic CSS variables (`--color-*`, `--space-*`, `--radius-*`, …) |
+| `src/styles/theme.scss` | `mat.theme` / light–dark coordination |
+| `src/styles/_material-overrides.scss` | Official `mat.*-overrides` only — never style private `.mat-mdc-*` in features |
+| `src/styles/_base.scss` | Document defaults Tailwind preflight does not own (scrollbars, focus, headings) |
+| `src/styles/_fonts.scss` | Font face / import only |
+| `src/styles/_components.scss` | Rare global primitives with multiple call sites (`.btn*`, `.app-panel*`, `.trade-*-button`, `.price-up/down`) |
+| `src/styles/tailwind.css` | Real Tailwind v4 + `@theme inline` bridge to token CSS vars |
+| `*.component.scss` | Exception only: complex selectors, keyframes, chart hosts, Material host tweaks |
+
+**Default for new UI:** Tailwind utilities in the template. Do not add a component SCSS file unless Tailwind cannot express it cleanly.
+
+**Do not** put Tailwind classes on Material internal DOM. **Do not** grow a second utility framework in SCSS.
+
+## Product language
+
+- **Fonts:** IBM Plex Sans (UI), Space Grotesk (brand accents).
+- **Brand:** trading-terminal blue (`--color-primary` / `#3b82f6`). No purple accents in UI.
+- **Semantic P&L:** green = up/profit/buy (`--color-success` / `.price-up`); red = down/loss/sell (`--color-danger` / `.price-down`). Never decorative red/green.
+- **Theme:** dark-first; light is first-class (not a naive invert). Surface hierarchy: background → panel → raised → hover.
+- **Density:** trading workstation — prefer 8 / 12 / 16 / 24px spacing. Avoid marketing whitespace.
+- **Numbers:** `tabular-nums` on prices, %, balances, P&L, table numeric columns; right-align numeric cells.
+- **Forms:** `mat-form-field` appearance `outline`; on error, label + `mat-error` only (border stays theme-neutral / focus-primary). Validate after blur (`touched`) and submit.
+- **Buttons:** `.btn` / `.btn-primary` / `.btn-secondary` for app chrome; `.trade-buy-button` / `.trade-sell-button` for buy/sell. Heights ~36px.
+- **Panels:** reuse `.app-panel` / `__header` / `__body` — do not reinvent card chrome per feature.
+- **Page headers:** `<app-page-header>` when a title + actions row is needed; Markets may omit it for density.
+- **Feel:** professional trading terminal + Material interaction quality — not admin template, marketing site, or meme crypto UI.
+
+## Tailwind bridge
+
+`@theme inline` in `tailwind.css` maps utilities to token vars, e.g.:
+
+| Utility examples | Token |
+| --- | --- |
+| `p-md`, `gap-sm`, `mt-lg` | `--space-*` |
+| `text-primary`, `bg-primary` | brand `--color-primary` |
+| `text-muted` | `--color-text-muted` |
+| `bg-surface`, `border` | `--color-surface`, `--color-border` |
+| `rounded-md`, `shadow-sm` | `--radius-*`, `--shadow-*` |
+| Form card widths | Prefer `max-w-[400px]` / `max-w-[500px]` — named `--spacing-sm/md` collide with Tailwind `max-w-sm/md` |
+
+Use `min-w-0 min-h-0` (not a custom `min-0`) for nested flex/grid shrink safety.
+
+Preflight is **off** (theme + utilities only) so Material and `_base.scss` keep document defaults.
+
+## Layout rules
+
+- Compose page/panel structure with Tailwind flex/grid (`flex`, `flex-col`, `grid`, `gap-*`, `items-*`, `justify-*`, `w-full`, `overflow-*`).
+- Grid for macro workspaces; flex inside panels.
+- Prefer tokens over arbitrary hex in templates or component SCSS.
+- Do not communicate P&L by color alone — use signs, arrows, or labels (`↑ +2.31%`).
+
+## Shrink mandate
+
+1. Prefer Tailwind / Material / existing tokens before new SCSS.
+2. Delete dead CSS variables, unused `_components` classes, and unused Material override blocks.
+3. No parallel SCSS utility kit.
+4. Visual parity ≠ keeping every old class name.
+
+## Related docs
+
+- Placement: [`FILE_STRUCTURES.md`](./FILE_STRUCTURES.md)
+- Material mechanics: [`.cursor/rules/material-guide.mdc`](../.cursor/rules/material-guide.mdc)
+- Live streams: [`CRYPTO_WEBSOCKETS.md`](./CRYPTO_WEBSOCKETS.md)
