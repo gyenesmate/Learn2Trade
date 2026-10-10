@@ -6,7 +6,7 @@
 
 ## Commit
 
-_(filled after commit)_
+`f79d1b3412026b1d736d816f229fc01bbf4fffec` — `refactor(styles): migrate feature SCSS to Tailwind defaults`
 
 ## Build
 
