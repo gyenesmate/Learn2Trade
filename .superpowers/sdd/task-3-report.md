@@ -6,9 +6,7 @@
 
 ## Commit
 
-`refactor(styles): Tailwind layout for shell and shared components`
-
-(Hash recorded after commit.)
+`83fdf5b15f8905076e39375d762d69ae3b7c048b` — `refactor(styles): Tailwind layout for shell and shared components`
 
 ## Build
 
@@ -18,20 +16,16 @@ Output: frontend/dist/client
 Warning: crypto-card.component.scss exceeds 4 kB budget by ~525 B (pre-existing).
 ```
 
-## SCSS files deleted (10)
+## SCSS files deleted (8)
 
-| Path |
-| --- |
-| `frontend/src/app/core/layout/auth-layout/auth-layout.component.scss` |
-| `frontend/src/app/core/layout/landing-layout/landing-layout.component.scss` |
-| `frontend/src/app/core/layout/lecture-layout/lecture-layout.component.scss` |
-| `frontend/src/app/core/layout/navbar/global-search/global-search.component.scss` |
-| `frontend/src/app/core/layout/navbar/global-search/components/search-result/search-result.component.scss` |
-| `frontend/src/app/shared/components/page-header/page-header.component.scss` |
-| `frontend/src/app/shared/components/base-dialog/base-dialog.component.scss` |
-| `frontend/src/app/shared/components/confirmation-dialog/confirmation-dialog.component.scss` |
-
-(8 unique paths — brief listed layout + shared only; no duplicate counts.)
+- `frontend/src/app/core/layout/auth-layout/auth-layout.component.scss`
+- `frontend/src/app/core/layout/landing-layout/landing-layout.component.scss`
+- `frontend/src/app/core/layout/lecture-layout/lecture-layout.component.scss`
+- `frontend/src/app/core/layout/navbar/global-search/global-search.component.scss`
+- `frontend/src/app/core/layout/navbar/global-search/components/search-result/search-result.component.scss`
+- `frontend/src/app/shared/components/page-header/page-header.component.scss`
+- `frontend/src/app/shared/components/base-dialog/base-dialog.component.scss`
+- `frontend/src/app/shared/components/confirmation-dialog/confirmation-dialog.component.scss`
 
 ## What changed
 
