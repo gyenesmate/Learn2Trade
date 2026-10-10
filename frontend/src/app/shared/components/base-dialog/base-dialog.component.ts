@@ -5,10 +5,9 @@ import { MatDialogModule } from '@angular/material/dialog';
   selector: 'app-base-dialog',
   imports: [MatDialogModule],
   templateUrl: './base-dialog.component.html',
-  styleUrls: ['./base-dialog.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'base-dialog',
+    class: 'base-dialog block h-auto w-full max-w-[480px] rounded-lg bg-surface p-4 box-border',
   },
 })
 export class BaseDialogComponent {}

@@ -9,7 +9,6 @@ import { ConfirmationDialogData } from './confirmation-dialog.types';
   imports: [MatDialogModule, MatButtonModule, BaseDialogComponent],
   templateUrl: './confirmation-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./confirmation-dialog.component.scss']
 })
 export class ConfirmationDialogComponent {
   readonly dialogRef = inject<MatDialogRef<ConfirmationDialogComponent>>(MatDialogRef);

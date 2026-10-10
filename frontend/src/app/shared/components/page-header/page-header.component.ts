@@ -19,7 +19,6 @@ import { isSidebarReachablePath } from './page-header.utils';
   selector: 'app-page-header',
   imports: [MatButtonModule, MatIconModule],
   templateUrl: './page-header.component.html',
-  styleUrl: './page-header.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageHeaderComponent {

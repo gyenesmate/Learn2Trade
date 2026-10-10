@@ -1,11 +1,11 @@
-<div class="search-result flex items-center gap-3 w-full min-w-0">
+<div class="flex w-full min-w-0 items-center gap-3">
   @if (result().icon; as icon) {
-    <mat-icon class="search-result__icon shrink-0">{{ icon }}</mat-icon>
+    <mat-icon class="size-5 shrink-0 text-xl text-muted">{{ icon }}</mat-icon>
   }
-  <div class="search-result__text flex flex-col min-w-0 flex-1">
-    <span class="search-result__title">{{ result().title }}</span>
+  <div class="flex min-w-0 flex-1 flex-col">
+    <span class="truncate text-sm font-medium text-[var(--color-text-primary)]">{{ result().title }}</span>
     @if (result().description; as description) {
-      <span class="search-result__description text-muted">{{ description }}</span>
+      <span class="truncate text-xs text-muted">{{ description }}</span>
     }
   </div>
 </div>

@@ -1,20 +1,26 @@
-<header class="page-header">
-  <div class="page-header__start">
+<header
+  class="flex min-h-12 flex-col items-stretch gap-4 sm:flex-row sm:items-center sm:justify-between"
+>
+  <div class="flex min-w-0 items-center gap-2">
     @if (showBack()) {
       <button
         type="button"
         mat-icon-button
-        class="page-header__back"
+        class="shrink-0 text-[var(--color-text-primary)]"
         aria-label="Go back"
         (click)="goBack()">
         <mat-icon>arrow_back</mat-icon>
       </button>
     }
-    <h1 class="page-header__title">{{ title() }}</h1>
+    <h1
+      class="m-0 truncate text-lg font-semibold leading-tight text-[var(--color-text-primary)]"
+    >
+      {{ title() }}
+    </h1>
   </div>
 
   @if (actions().length) {
-    <div class="page-header__actions">
+    <div class="flex shrink-0 flex-wrap items-center justify-end gap-2 max-sm:w-full">
       @for (action of actions(); track action.label) {
         @if ((action.variant ?? 'primary') === 'secondary') {
           <button

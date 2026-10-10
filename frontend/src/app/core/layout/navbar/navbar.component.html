@@ -1,9 +1,12 @@
-<mat-toolbar class="toolbar" [class.mobile-toolbar]="isMobile()">
+<mat-toolbar
+  class="toolbar sticky top-0 z-[100] flex h-14 items-center gap-3 border-b border-border bg-surface px-3 text-[var(--color-text-primary)] shadow-none"
+  [class.mobile-toolbar]="isMobile()"
+>
   <div class="navbar-left flex flex-1 items-center justify-start min-w-0">
     <button
       mat-icon-button
       type="button"
-      class="menu-button"
+      class="mr-2"
       (click)="menuToggle.emit()"
       aria-label="Toggle sidebar"
       matTooltip="Toggle sidebar"
@@ -13,7 +16,7 @@
   </div>
 
   <div class="navbar-center flex flex-1 items-center justify-center min-w-0">
-    <app-global-search class="navbar-search" />
+    <app-global-search class="w-full max-w-[480px]" />
   </div>
 
   <div class="navbar-right flex flex-1 items-center justify-end min-w-0 gap-3">
@@ -29,10 +32,10 @@
 
     @if (isLoggedIn()) {
       @if (user(); as u) {
-        <div class="user-info">
+        <div class="user-info flex min-w-0 items-center gap-3">
           @if (!isMobile()) {
-            <span class="balance tabular-nums">${{ u.balance }}</span>
-            <span class="username">{{ u.username }}</span>
+            <span class="balance tabular-nums text-sm font-semibold text-[var(--color-text-primary)] whitespace-nowrap">${{ u.balance }}</span>
+            <span class="username max-w-40 truncate text-xs text-muted whitespace-nowrap">{{ u.username }}</span>
           }
           <button
             mat-icon-button
@@ -59,7 +62,10 @@
 </mat-toolbar>
 
 @if (isMobile()) {
-  <nav class="bottom-nav" aria-label="Primary">
+  <nav
+    class="bottom-nav fixed inset-x-0 bottom-0 z-[100] flex items-center justify-around border-t border-border bg-surface py-1"
+    aria-label="Primary"
+  >
     @if (isLoggedIn()) {
       <button
         type="button"

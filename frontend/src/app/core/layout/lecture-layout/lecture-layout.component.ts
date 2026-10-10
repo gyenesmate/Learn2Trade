@@ -6,7 +6,6 @@ import { RouterOutlet } from '@angular/router';
   selector: 'app-lecture-layout',
   imports: [RouterOutlet],
   templateUrl: './lecture-layout.component.html',
-  styleUrl: './lecture-layout.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LectureLayoutComponent {}

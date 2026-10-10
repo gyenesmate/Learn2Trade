@@ -31,10 +31,9 @@ import { SearchResultComponent } from './components/search-result/search-result.
     SearchResultComponent,
   ],
   templateUrl: './global-search.component.html',
-  styleUrl: './global-search.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'global-search',
+    class: 'global-search block w-full min-w-0 max-w-[480px]',
     '(document:keydown)': 'onDocumentKeydown($event)',
   },
 })

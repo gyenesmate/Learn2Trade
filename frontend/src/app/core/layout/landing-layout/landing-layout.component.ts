@@ -6,7 +6,6 @@ import { RouterOutlet } from '@angular/router';
   selector: 'app-landing-layout',
   imports: [RouterOutlet],
   templateUrl: './landing-layout.component.html',
-  styleUrl: './landing-layout.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LandingLayoutComponent {}
