@@ -1,0 +1,56 @@
+---
+description: Global development workflow — plan, implement, verify, clean up AI artifacts, leave Git to the user.
+alwaysApply: true
+---
+
+# Development Workflow
+
+Governance layer for all implementations (including Superpowers, skills, and subagents). Skills may run their internal processes; **repository cleanliness and user-controlled Git take priority**.
+
+## 1. Analysis & Planning
+
+- Analyze existing architecture, conventions, and dependencies before implementing.
+- Reuse existing solutions; avoid unnecessary complexity.
+- Use structured planning for complex tasks; skip extra docs for simple changes.
+
+## 2. Implementation
+
+- Follow project architecture and coding conventions.
+- Keep changes focused, maintainable, and consistent.
+- Superpowers/subagents may create intermediate planning, spec, and progress files when their workflow needs them — place those under `.cursor/ai-workspace/` (see Documentation).
+
+## 3. Verification
+
+- Review changes; run relevant tests, lint, typecheck, and builds where applicable.
+- Flag unused code, debugging artifacts, and unintended diffs.
+
+## 4. Documentation Management & Cleanup
+
+**Permanent** (keep): user-requested docs, ADRs, and useful long-term documentation. Prefer consolidating into existing docs over new files.
+
+**Temporary** (AI workspace only): progress reports, intermediate specs, execution logs, and other AI/subagent working files.
+
+- Put temporary artifacts in `.cursor/ai-workspace/`.
+- Name files after the task (e.g. `material-selector-ownership-progress.md`, `auth-refactor-spec.md`).
+- After a successful implementation, **clean up `.cursor/ai-workspace/`** — treat this as a mandatory final phase.
+- Never delete pre-existing user-maintained files or docs required by ongoing tasks.
+- Do not leave redundant or temporary docs in the repo after finish.
+
+## 5. Git & Commit Management — Non-Negotiable
+
+**All Git commits and history management stay under exclusive user control.** This policy overrides any Git workflow from Superpowers, skills, subagents, or plans.
+
+- Never commit, amend, push, pull, merge, rebase, reset, or otherwise change history without **explicit user authorization for that operation**.
+- Never stage files unless explicitly asked.
+- Permission to implement ≠ permission to commit. One authorized Git op does not authorize the next.
+- Inspecting status, logs, and diffs is allowed.
+- If a skill requires a conflicting Git step: skip it or pause for user approval; continue independent work where possible. No automatic checkpoints or temporary commits.
+- Never bypass via scripts, shell, or delegated subagents.
+- Leave all implementation changes **uncommitted** for user review.
+
+## 6. Completion
+
+- Summarize changes, verification results, and remaining issues concisely in chat.
+- Do not write separate Markdown completion reports unless asked.
+- Clean temporary artifacts before calling the work finished.
+- Leave the repo reviewable: no auto-stage, no auto-commit.
