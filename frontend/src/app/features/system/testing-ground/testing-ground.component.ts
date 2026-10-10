@@ -10,7 +10,6 @@ import { TESTING_GROUND_PAGE_TITLE } from './testing-ground.const';
   imports: [CryptoCardComponent, NeumorphicDirective, PageHeaderComponent],
   templateUrl: './testing-ground.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./testing-ground.component.scss'],
 })
 export class TestingGroundComponent {
   readonly pageTitle = TESTING_GROUND_PAGE_TITLE;

@@ -39,7 +39,6 @@ import {
     BaseDialogComponent,
   ],
   templateUrl: './watchlist-dialog.component.html',
-  styleUrl: './watchlist-dialog.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WatchlistDialogComponent implements OnDestroy {

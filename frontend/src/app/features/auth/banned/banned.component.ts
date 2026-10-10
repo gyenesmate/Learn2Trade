@@ -5,7 +5,6 @@ import { Router } from '@angular/router';
   selector: 'app-banned',
   templateUrl: './banned.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./banned.component.scss']
 })
 export class BannedComponent {
   private readonly router = inject(Router);

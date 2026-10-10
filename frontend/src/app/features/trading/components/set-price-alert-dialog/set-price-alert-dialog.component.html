@@ -1,21 +1,15 @@
 <app-base-dialog>
   <ng-container dialogTitle>Set alert for {{ data.crypto.name }}</ng-container>
 
-  <div class="content">
-    <p class="hint">
+  <div class="min-w-[280px] flex flex-col gap-2">
+    <p class="m-0 mb-2">
       Current price: <strong>${{ data.currentPrice | number: '1.2-6' }}</strong>
     </p>
 
     <form [formGroup]="form" (ngSubmit)="confirm()">
       <mat-form-field class="w-full" appearance="outline">
         <mat-label>Alert price</mat-label>
-        <input
-          matInput
-          type="number"
-          min="0"
-          step="0.000001"
-          formControlName="alertPrice"
-        />
+        <input matInput type="number" min="0" step="0.000001" formControlName="alertPrice" />
         @if (form.controls.alertPrice.touched && form.controls.alertPrice.invalid) {
           <mat-error>Enter a valid alert price</mat-error>
         }
@@ -27,7 +21,7 @@
       </mat-form-field>
     </form>
 
-    <p class="hint small">
+    <p class="m-0 mt-1 opacity-80 text-[0.9rem]">
       Type is set automatically: below if target is lower than current, otherwise above.
     </p>
   </div>

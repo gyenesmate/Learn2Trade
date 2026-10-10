@@ -15,7 +15,7 @@ import { EDIT_PROFILE_PAGE_TITLE } from './edit-profile.const';
   imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, PageHeaderComponent],
   templateUrl: './edit-profile.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./edit-profile.component.scss']
+  host: { class: 'block w-full max-w-[50%] mx-auto max-md:max-w-full' },
 })
 export class EditProfileComponent {
   private readonly router = inject(Router);

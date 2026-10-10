@@ -1,4 +1,9 @@
-<div class="analytics-card" [class.best]="state() === 'best'" [class.average]="state() === 'average'" [class.timeline]="state() === 'timeline'">
+<div
+  class="w-full min-w-[220px] my-2 p-4 rounded-md border border-border bg-surface"
+  [class.best]="state() === 'best'"
+  [class.average]="state() === 'average'"
+  [class.timeline]="state() === 'timeline'"
+>
   @switch (state()) {
     @case ('best') {
       <div>
@@ -6,12 +11,12 @@
         @if (bestInvestment(); as best) {
           <div>
             <div><b>Crypto:</b> {{ best.inv.crypto_currency_id }}</div>
-            <div><b>Profit:</b> ${{ best.profit | number:'1.2-2' }}</div>
-            <div><b>ROI:</b> {{ best.roiPercent | number:'1.2-2' }}%</div>
-            <div><b>Amount:</b> {{ best.inv.amount | number:'1.2-8' }}</div>
-            <div><b>Bought at:</b> ${{ best.inv.buying_price | number:'1.2-2' }}</div>
-            <div><b>Sold at:</b> ${{ best.inv.selling_price | number:'1.2-2' }}</div>
-            <div><b>Date:</b> {{ best.soldDate | date:'mediumDate' }}</div>
+            <div><b>Profit:</b> ${{ best.profit | number: '1.2-2' }}</div>
+            <div><b>ROI:</b> {{ best.roiPercent | number: '1.2-2' }}%</div>
+            <div><b>Amount:</b> {{ best.inv.amount | number: '1.2-8' }}</div>
+            <div><b>Bought at:</b> ${{ best.inv.buying_price | number: '1.2-2' }}</div>
+            <div><b>Sold at:</b> ${{ best.inv.selling_price | number: '1.2-2' }}</div>
+            <div><b>Date:</b> {{ best.soldDate | date: 'mediumDate' }}</div>
           </div>
         } @else {
           No sold investments.
@@ -22,7 +27,7 @@
       <div>
         <h3>Average Profit</h3>
         @if (averageProfit(); as avg) {
-          <div>${{ avg | number:'1.2-2' }}</div>
+          <div>${{ avg | number: '1.2-2' }}</div>
         } @else {
           No sold investments.
         }
@@ -34,9 +39,17 @@
         @if (timeline().length) {
           <div>
             @for (row of timeline(); track row.inv.id) {
-              <div class="chart-placeholder">
-                <div><b>{{ row.soldDate | date:'mediumDate' }}</b></div>
-                <div>{{ row.inv.crypto_currency_id }} — ${{ row.profit | number:'1.2-2' }} ({{ row.roiPercent | number:'1.2-2' }}%)</div>
+              <div
+                class="w-full h-[120px] mt-4 flex items-center justify-center text-sm text-muted rounded-md border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface-raised)]"
+              >
+                <div>
+                  <div><b>{{ row.soldDate | date: 'mediumDate' }}</b></div>
+                  <div>
+                    {{ row.inv.crypto_currency_id }} — ${{ row.profit | number: '1.2-2' }} ({{
+                      row.roiPercent | number: '1.2-2'
+                    }}%)
+                  </div>
+                </div>
               </div>
             }
           </div>
@@ -48,7 +61,11 @@
     @default {
       <div>
         <h3>{{ label() || 'Analytics' }}</h3>
-        <div class="chart-placeholder">[Custom chart/data will appear here]</div>
+        <div
+          class="w-full h-[120px] mt-4 flex items-center justify-center text-sm text-muted rounded-md border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface-raised)]"
+        >
+          [Custom chart/data will appear here]
+        </div>
       </div>
     }
   }

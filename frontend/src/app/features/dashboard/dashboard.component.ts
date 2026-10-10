@@ -30,7 +30,6 @@ import {
   ],
   templateUrl: './dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit {
   private readonly auth = inject(AuthService);

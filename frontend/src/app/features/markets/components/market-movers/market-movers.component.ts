@@ -10,8 +10,8 @@ const MOVER_LIMIT = 8;
   selector: 'app-market-movers',
   imports: [DecimalPipe, RouterLink, MatButtonToggleModule],
   templateUrl: './market-movers.component.html',
-  styleUrl: './market-movers.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block min-w-0 h-full' },
 })
 export class MarketMoversComponent {
   readonly rows = input.required<MarketMoverRow[]>();

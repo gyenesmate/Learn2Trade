@@ -26,7 +26,6 @@ import { NotificationService } from '@core/services/notification.service';
   ],
   templateUrl: './register.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
   private readonly authService = inject(AuthService);

@@ -43,7 +43,6 @@ import { PORTFOLIO_HEADER_ACTIONS, PORTFOLIO_PAGE_TITLE, PORTFOLIO_TABLE_ACTIONS
   ],
   templateUrl: './portfolio.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./portfolio.component.scss'],
 })
 export class PortfolioComponent {
   private readonly router = inject(Router);

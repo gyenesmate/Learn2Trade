@@ -1,9 +1,10 @@
-<div class="markets-page">
-
-  <div class="markets-page__body">
-    <section class="markets-browser" aria-label="Market card browser">
-      <div class="markets-toolbar">
-        <mat-form-field class="markets-toolbar__search" appearance="outline" subscriptSizing="dynamic">
+<div class="flex flex-col gap-4 min-h-full">
+  <div
+    class="grid grid-cols-[minmax(0,3.2fr)_minmax(16rem,1fr)] gap-6 items-start flex-auto min-h-0 max-[1100px]:grid-cols-1"
+  >
+    <section class="flex flex-col gap-4 min-w-0" aria-label="Market card browser">
+      <div class="flex flex-col gap-3">
+        <mat-form-field class="w-full" appearance="outline" subscriptSizing="dynamic">
           <mat-label>Search markets</mat-label>
           <mat-icon matPrefix>search</mat-icon>
           <input
@@ -15,9 +16,9 @@
           />
         </mat-form-field>
 
-        <div class="markets-toolbar__row">
+        <div class="flex flex-wrap gap-3 items-center justify-between">
           <mat-button-toggle-group
-            class="markets-toolbar__filters"
+            class="flex-1 min-w-0"
             [value]="filter()"
             (change)="setFilter($event.value)"
             hideSingleSelectionIndicator
@@ -27,7 +28,7 @@
             }
           </mat-button-toggle-group>
 
-          <mat-form-field class="markets-toolbar__sort" appearance="outline" subscriptSizing="dynamic">
+          <mat-form-field class="w-44 m-0" appearance="outline" subscriptSizing="dynamic">
             <mat-label>Sort</mat-label>
             <mat-select [ngModel]="sort()" (ngModelChange)="setSort($event)">
               @for (opt of sortOptions; track opt.id) {
@@ -39,22 +40,27 @@
       </div>
 
       @if (loading()) {
-        <div class="markets-status" role="status" aria-live="polite" aria-label="Loading">
+        <div
+          class="flex flex-col items-center justify-center gap-4 min-h-48 text-muted"
+          role="status"
+          aria-live="polite"
+          aria-label="Loading"
+        >
           <mat-progress-spinner mode="indeterminate" [diameter]="40" [strokeWidth]="3" />
         </div>
       } @else if (loadError()) {
-        <div class="markets-status markets-status--error" role="alert">
-          <p>{{ loadErrorMessage }}</p>
+        <div class="flex flex-col items-center justify-center gap-4 min-h-48 text-[var(--color-text-primary)]" role="alert">
+          <p class="m-0 text-center">{{ loadErrorMessage }}</p>
           <button type="button" mat-stroked-button (click)="retryLoad()">Retry</button>
         </div>
       } @else if (pageAssets().length === 0) {
-        <div class="markets-status markets-status--empty" role="status">
-          <p>{{ emptyMessage }}</p>
+        <div class="flex flex-col items-center justify-center gap-4 min-h-48 text-muted" role="status">
+          <p class="m-0 text-center">{{ emptyMessage }}</p>
         </div>
       } @else {
         <app-animated-market-card-layout [assets]="pageAssets()" [tickers]="tickers()" />
 
-        <nav class="markets-pagination" aria-label="Markets pages">
+        <nav class="flex items-center justify-center gap-1 flex-wrap" aria-label="Markets pages">
           <button
             type="button"
             mat-icon-button
@@ -68,8 +74,9 @@
           @for (page of pageNumbers(); track page) {
             <button
               type="button"
-              class="markets-pagination__page"
-              [class.is-active]="page === pageIndex()"
+              class="min-w-8 h-8 rounded-md border-0 font-semibold cursor-pointer bg-transparent text-[var(--color-text)] hover:bg-[color-mix(in_srgb,var(--color-primary)_12%,transparent)]"
+              [class.bg-primary]="page === pageIndex()"
+              [class.text-white]="page === pageIndex()"
               [attr.aria-current]="page === pageIndex() ? 'page' : null"
               (click)="goToPage(page)"
             >
@@ -90,7 +97,10 @@
       }
     </section>
 
-    <aside class="markets-aside" aria-label="Market movers">
+    <aside
+      class="min-w-0 sticky top-0 self-stretch max-h-[calc(100vh-8rem)] max-[1100px]:static max-[1100px]:max-h-none"
+      aria-label="Market movers"
+    >
       <app-market-movers
         [rows]="moverRows()"
         [emptyMessage]="

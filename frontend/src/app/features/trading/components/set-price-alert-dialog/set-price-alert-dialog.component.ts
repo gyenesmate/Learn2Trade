@@ -28,7 +28,6 @@ import {
   ],
   templateUrl: './set-price-alert-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./set-price-alert-dialog.component.scss'],
 })
 export class SetPriceAlertDialogComponent {
   private readonly dialogRef =

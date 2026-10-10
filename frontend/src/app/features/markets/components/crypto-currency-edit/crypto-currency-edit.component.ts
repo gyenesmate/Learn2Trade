@@ -50,7 +50,7 @@ function marketOptionValidator(): ValidatorFn {
   ],
   templateUrl: './crypto-currency-edit.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./crypto-currency-edit.component.scss']
+  host: { class: 'block w-full max-w-[50%] mx-auto max-md:max-w-full' },
 })
 export class CryptoCurrencyEditComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);

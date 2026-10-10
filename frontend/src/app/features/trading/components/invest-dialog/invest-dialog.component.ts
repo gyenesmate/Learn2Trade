@@ -25,7 +25,6 @@ import { InvestDialogData, InvestDialogResult } from './invest-dialog.types';
   ],
   templateUrl: './invest-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./invest-dialog.component.scss'],
 })
 export class InvestDialogComponent {
   private readonly dialogRef =

@@ -25,6 +25,7 @@ import {
   templateUrl: './animated-market-card-layout.component.html',
   styleUrl: './animated-market-card-layout.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { class: 'block min-w-0' },
 })
 export class AnimatedMarketCardLayoutComponent {
   /** Up to five assets for the current page (order = featured first). */

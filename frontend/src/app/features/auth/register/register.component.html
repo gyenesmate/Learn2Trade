@@ -1,12 +1,16 @@
-<div class="register-page flex flex-auto flex-col min-w-0 min-h-0 w-full">
-  <div class="register-page-body flex flex-1 items-center justify-center min-w-0 min-h-0 h-full overflow-hidden p-4">
-    <div class="register-container flex flex-col w-full max-w-[500px] max-h-full overflow-auto p-8 rounded-lg border bg-surface shadow-lg">
-      <div class="register-header text-center mb-6">
-        <h1 class="m-0 mb-3 text-primary">Join Learn2Trade</h1>
+<div class="flex flex-auto flex-col min-w-0 min-h-0 w-full">
+  <div
+    class="flex flex-1 items-center justify-center min-w-0 min-h-0 h-full overflow-hidden p-4 bg-gradient-to-br from-[var(--color-bg)] to-surface"
+  >
+    <div
+      class="flex flex-col w-full max-w-[500px] max-h-full overflow-auto p-8 max-[600px]:p-4 rounded-lg border bg-surface shadow-lg"
+    >
+      <div class="text-center mb-6">
+        <h1 class="m-0 mb-3 text-primary text-xl max-[600px]:text-lg">Join Learn2Trade</h1>
         <p class="m-0 text-muted">Create your account to start tracking cryptocurrencies</p>
       </div>
 
-      <form class="register-form flex flex-col gap-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="onSubmit()">
         <mat-form-field class="w-full">
           <mat-label>Username</mat-label>
           <input matInput type="text" formControlName="userName" />
@@ -69,13 +73,17 @@
           }
         </mat-form-field>
 
-        <button type="submit" class="btn btn-primary register-btn w-full">Create Account</button>
+        <button type="submit" class="btn btn-primary w-full py-3 px-4 text-sm mt-2">Create Account</button>
       </form>
 
-      <div class="register-footer text-center mt-6 pt-4">
+      <div class="text-center mt-6 pt-4 border-t border-border">
         <p class="m-0 text-muted">
           Already have an account?
-          <a [routerLink]="['/auth/login']" class="login-link">Sign in</a>
+          <a
+            [routerLink]="['/auth/login']"
+            class="text-primary font-semibold no-underline hover:underline"
+            >Sign in</a
+          >
         </p>
       </div>
     </div>

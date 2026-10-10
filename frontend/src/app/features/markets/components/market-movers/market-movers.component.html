@@ -1,8 +1,11 @@
-<section class="market-movers" aria-label="Market movers">
-  <header class="market-movers__header">
-    <h2 class="market-movers__title">Market Movers</h2>
+<section
+  class="flex flex-col gap-4 h-full min-h-0 p-4 bg-surface border border-border rounded-lg"
+  aria-label="Market movers"
+>
+  <header class="flex flex-col gap-3">
+    <h2 class="m-0 text-[0.85rem] font-bold tracking-wider uppercase text-muted">Market Movers</h2>
     <mat-button-toggle-group
-      class="market-movers__toggles"
+      class="w-full"
       [value]="mode()"
       (change)="setMode($event.value)"
       hideSingleSelectionIndicator
@@ -13,19 +16,24 @@
     </mat-button-toggle-group>
   </header>
 
-  <ol class="market-movers__list">
+  <ol class="list-none m-0 p-0 overflow-y-auto min-h-0 flex-1">
     @for (row of visibleRows(); track row.crypto.id; let i = $index) {
-      <li class="market-movers__item">
-        <a class="market-movers__link" [routerLink]="['/app/crypto', row.crypto.id]">
-          <span class="market-movers__rank">{{ i + 1 | number: '2.0-0' }}</span>
-          <span class="market-movers__identity">
-            <span class="market-movers__symbol">{{ row.crypto.symbol }}</span>
-            <span class="market-movers__name">{{ row.crypto.name }}</span>
+      <li class="border-t border-border first:border-t-0">
+        <a
+          class="group grid grid-cols-[auto_minmax(0,1fr)_auto] gap-3 items-center py-2.5 no-underline text-inherit"
+          [routerLink]="['/app/crypto', row.crypto.id]"
+        >
+          <span class="tabular-nums text-xs text-muted w-6">{{ i + 1 | number: '2.0-0' }}</span>
+          <span class="flex flex-col min-w-0">
+            <span class="font-bold text-[var(--color-text)] group-hover:text-primary">{{
+              row.crypto.symbol
+            }}</span>
+            <span class="text-xs text-muted truncate">{{ row.crypto.name }}</span>
           </span>
-          <span class="market-movers__stats">
-            <span class="market-movers__price">${{ row.price | number: '1.2-2' }}</span>
+          <span class="flex flex-col items-end gap-0.5">
+            <span class="font-semibold text-[0.85rem]">${{ row.price | number: '1.2-2' }}</span>
             <span
-              class="market-movers__change tabular-nums"
+              class="text-[0.8rem] text-muted tabular-nums"
               [class.price-up]="row.change24hPct > 0"
               [class.price-down]="row.change24hPct < 0"
             >
@@ -35,7 +43,7 @@
         </a>
       </li>
     } @empty {
-      <li class="market-movers__empty">{{ emptyMessage() }}</li>
+      <li class="py-4 text-muted text-[0.85rem]">{{ emptyMessage() }}</li>
     }
   </ol>
 </section>

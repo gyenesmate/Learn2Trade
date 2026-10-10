@@ -58,7 +58,6 @@ interface MarketRow {
   ],
   templateUrl: './markets.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./markets.component.scss'],
 })
 export class MarketsComponent implements OnInit, OnDestroy {
   private readonly cryptoService = inject(CryptoCurrenciesService);

@@ -1,41 +1,40 @@
 <app-base-dialog class="watchlist-dialog">
   <ng-container dialogTitle>Watchlist</ng-container>
 
-  <div class="watchlist-dialog__body">
+  <div class="max-h-[min(50vh,22rem)] overflow-y-auto min-h-32">
     @if (listState() === 'loading') {
-      <div class="watchlist-dialog__status" role="status">
+      <div class="flex items-center justify-center min-h-32 text-muted" role="status">
         <mat-progress-spinner mode="indeterminate" [diameter]="32" [strokeWidth]="3" />
       </div>
     } @else if (listState() === 'empty') {
-      <div class="watchlist-dialog__status watchlist-dialog__status--empty" role="status">
-        <p>No assets in your watchlist yet. Bookmark coins from Markets.</p>
+      <div class="flex items-center justify-center min-h-32 text-muted" role="status">
+        <p class="m-0 text-center">No assets in your watchlist yet. Bookmark coins from Markets.</p>
       </div>
     } @else {
-      <ul class="watchlist-dialog__list">
+      <ul class="list-none m-0 p-0">
         @for (row of rows(); track row.crypto.id) {
-          <li class="watchlist-dialog__item">
-            <div class="watchlist-dialog__meta">
-              <span class="watchlist-dialog__symbol">{{ row.crypto.symbol }}</span>
-              <span class="watchlist-dialog__name">{{ row.crypto.name }}</span>
+          <li
+            class="grid grid-cols-[minmax(0,1fr)_auto_auto] gap-3 items-center py-3 border-b border-border last:border-b-0"
+          >
+            <div class="flex flex-col min-w-0 gap-0.5">
+              <span class="font-bold text-[var(--color-text)]">{{ row.crypto.symbol }}</span>
+              <span class="text-[0.8rem] text-muted truncate">{{ row.crypto.name }}</span>
             </div>
-            <div class="watchlist-dialog__stats">
+            <div class="flex flex-col items-end gap-0.5">
               @if (row.price !== undefined) {
-                <span class="watchlist-dialog__price"
-                  >${{ row.price | number: '1.2-2' }}</span
-                >
+                <span class="font-semibold text-[var(--color-text)]">${{ row.price | number: '1.2-2' }}</span>
               }
               @if (row.change24hPct !== undefined) {
                 <span
-                  class="watchlist-dialog__change"
+                  class="text-[0.8rem] text-muted tabular-nums"
                   [class.price-up]="row.change24hPct > 0"
                   [class.price-down]="row.change24hPct < 0"
                 >
-                  {{ row.change24hPct > 0 ? '+' : ''
-                  }}{{ row.change24hPct | number: '1.2-2' }}%
+                  {{ row.change24hPct > 0 ? '+' : '' }}{{ row.change24hPct | number: '1.2-2' }}%
                 </span>
               }
             </div>
-            <div class="watchlist-dialog__row-actions">
+            <div class="flex items-center">
               <button
                 type="button"
                 mat-icon-button

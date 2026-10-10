@@ -1,12 +1,16 @@
-<div class="login-page flex flex-auto flex-col min-w-0 min-h-0 w-full">
-  <div class="login-page-body flex flex-1 items-center justify-center min-w-0 min-h-0 h-full overflow-hidden p-4">
-    <div class="login-container flex flex-col w-full max-w-[400px] max-h-full overflow-auto p-8 rounded-lg border bg-surface shadow-lg">
-      <div class="login-header flex flex-col items-center text-center mb-6">
-        <h1 class="m-0 mb-3 text-primary">Welcome to Learn2Trade</h1>
+<div class="flex flex-auto flex-col min-w-0 min-h-0 w-full">
+  <div
+    class="flex flex-1 items-center justify-center min-w-0 min-h-0 h-full overflow-hidden p-4 bg-gradient-to-br from-[var(--color-bg)] to-surface"
+  >
+    <div
+      class="flex flex-col w-full max-w-[400px] max-h-full overflow-auto p-8 max-[480px]:p-4 rounded-lg border bg-surface shadow-lg"
+    >
+      <div class="flex flex-col items-center text-center mb-6">
+        <h1 class="m-0 mb-3 text-primary text-xl max-[480px]:text-lg">Welcome to Learn2Trade</h1>
         <p class="m-0 text-muted">Sign in to your account</p>
       </div>
 
-      <form class="login-form flex flex-col gap-4" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="onSubmit()">
         <mat-form-field class="w-full">
           <mat-label>Email</mat-label>
           <input matInput type="email" formControlName="email" />
@@ -35,13 +39,17 @@
           }
         </mat-form-field>
 
-        <button type="submit" class="btn btn-primary login-btn w-full">Sign In</button>
+        <button type="submit" class="btn btn-primary w-full py-3 px-4 text-sm">Sign In</button>
       </form>
 
-      <div class="login-footer text-center mt-6 pt-4">
+      <div class="text-center mt-6 pt-4 border-t border-border">
         <p class="m-0 text-muted">
           Don't have an account?
-          <a [routerLink]="['/auth/register']" class="register-link">Sign up</a>
+          <a
+            [routerLink]="['/auth/register']"
+            class="text-primary font-semibold no-underline hover:underline"
+            >Sign up</a
+          >
         </p>
       </div>
     </div>

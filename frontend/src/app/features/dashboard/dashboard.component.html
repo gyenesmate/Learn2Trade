@@ -1,9 +1,14 @@
-<div class="dashboard">
+<div class="w-full">
   <app-page-header [title]="pageTitle" [actions]="headerActions" />
 
-  <div class="dashboard-content">
+  <div class="flex flex-col justify-start gap-6">
     @if (isLoading()) {
-      <div class="dashboard-status" role="status" aria-live="polite" aria-label="Loading">
+      <div
+        class="flex flex-col items-center justify-center gap-4 min-h-48 text-muted"
+        role="status"
+        aria-live="polite"
+        aria-label="Loading"
+      >
         <mat-progress-spinner mode="indeterminate" [diameter]="40" [strokeWidth]="3" />
       </div>
     } @else {
@@ -11,37 +16,43 @@
         <section class="app-panel">
           <header class="app-panel__header">Portfolio Overview</header>
           <div class="app-panel__body">
-            <div class="overview-grid">
-              <div class="overview-item">
-                <label>Total Value</label>
-                <span class="value tabular-nums">${{ portfolio.totalValue }}</span>
+            <div class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 max-md:grid-cols-1">
+              <div class="text-center p-6 bg-[var(--color-bg)] rounded-md">
+                <label class="block text-sm text-muted mb-2 uppercase font-bold">Total Value</label>
+                <span class="block text-xl font-bold text-[var(--color-text)] mb-2 tabular-nums"
+                  >${{ portfolio.totalValue }}</span
+                >
                 <span
-                  class="change tabular-nums"
+                  class="text-base font-bold tabular-nums"
                   [class.price-up]="portfolio.totalChange > 0"
                   [class.price-down]="portfolio.totalChange < 0"
                 >
                   {{ portfolio.totalChange > 0 ? '+' : '' }}{{ portfolio.totalChange }}%
                 </span>
               </div>
-              <div class="overview-item">
-                <label>Total Invested</label>
-                <span class="value tabular-nums">${{ portfolio.totalInvested }}</span>
+              <div class="text-center p-6 bg-[var(--color-bg)] rounded-md">
+                <label class="block text-sm text-muted mb-2 uppercase font-bold">Total Invested</label>
+                <span class="block text-xl font-bold text-[var(--color-text)] tabular-nums"
+                  >${{ portfolio.totalInvested }}</span
+                >
               </div>
-              <div class="overview-item">
-                <label>Total Profit/Loss</label>
+              <div class="text-center p-6 bg-[var(--color-bg)] rounded-md">
+                <label class="block text-sm text-muted mb-2 uppercase font-bold">Total Profit/Loss</label>
                 <span
-                  class="value tabular-nums"
+                  class="block text-xl font-bold tabular-nums"
                   [class.price-up]="portfolio.totalPnL > 0"
                   [class.price-down]="portfolio.totalPnL < 0"
                 >
                   {{ portfolio.totalPnL > 0 ? '+' : '' }}${{ portfolio.totalPnL }}
                 </span>
               </div>
-              <div class="overview-item">
-                <label>Best Performer</label>
-                <span class="value">{{ portfolio.bestPerformer.name }}</span>
+              <div class="text-center p-6 bg-[var(--color-bg)] rounded-md">
+                <label class="block text-sm text-muted mb-2 uppercase font-bold">Best Performer</label>
+                <span class="block text-xl font-bold text-[var(--color-text)] mb-2">{{
+                  portfolio.bestPerformer.name
+                }}</span>
                 <span
-                  class="change tabular-nums"
+                  class="text-base font-bold tabular-nums"
                   [class.price-up]="portfolio.bestPerformer.change > 0"
                   [class.price-down]="portfolio.bestPerformer.change < 0"
                 >
@@ -52,8 +63,8 @@
           </div>
         </section>
       } @else {
-        <section class="dashboard-status dashboard-status--empty" role="status">
-          <p>No open positions yet. Browse markets to start a practice investment.</p>
+        <section class="flex flex-col items-center justify-center gap-4 min-h-48 text-muted" role="status">
+          <p class="m-0 text-center">No open positions yet. Browse markets to start a practice investment.</p>
         </section>
       }
 
@@ -70,7 +81,7 @@
         <section class="app-panel">
           <header class="app-panel__header">Analytics</header>
           <div class="app-panel__body">
-            <div class="analytics-grid">
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
               <app-analytics-card [state]="'best'" [investments]="investments()" />
               <app-analytics-card [state]="'average'" [investments]="investments()" />
               <app-analytics-card [state]="'timeline'" [investments]="investments()" />

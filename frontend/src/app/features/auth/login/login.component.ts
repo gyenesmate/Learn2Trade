@@ -22,7 +22,6 @@ import { NotificationService } from '@core/services/notification.service';
   ],
   templateUrl: './login.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./login.component.scss']
 })
 export class LoginComponent {
   private readonly authService = inject(AuthService);

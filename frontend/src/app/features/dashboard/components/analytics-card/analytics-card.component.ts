@@ -33,7 +33,6 @@ function soldMetrics(inv: Investment): SoldView {
   imports: [DatePipe, DecimalPipe],
   templateUrl: './analytics-card.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./analytics-card.component.scss'],
 })
 export class AnalyticsCardComponent {
   readonly state = input<AnalyticsCardState>('average');

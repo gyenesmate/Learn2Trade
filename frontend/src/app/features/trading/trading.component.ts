@@ -61,7 +61,9 @@ type AlertRow = DataTableRow & {
   ],
   templateUrl: './trading.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrls: ['./trading.component.scss'],
+  host: {
+    class: 'flex flex-col flex-auto min-h-0 h-full max-[960px]:h-auto max-[960px]:overflow-visible',
+  },
 })
 export class TradingComponent {
   private readonly route = inject(ActivatedRoute);

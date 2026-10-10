@@ -1,39 +1,53 @@
-<div class="profile-page">
+<div class="w-full">
   <app-page-header [title]="pageTitle" [actions]="headerActions" />
 
-  <div class="profile-content">
+  <div class="grid grid-cols-1 gap-6">
     <section class="app-panel">
       <header class="app-panel__header">Personal Information</header>
       <div class="app-panel__body">
         @if (user(); as user) {
-          <div class="info-grid">
-            <div class="avatar-section">
-              <div class="avatar-container">
+          <div class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4 max-md:grid-cols-1">
+            <div class="col-span-full flex justify-center mb-4">
+              <div>
                 @if (user.avatar_url) {
-                  <img [src]="user.avatar_url" alt="Avatar" class="avatar-image" />
+                  <img
+                    [src]="user.avatar_url"
+                    alt="Avatar"
+                    class="w-[120px] h-[120px] rounded-full object-cover border-[3px] border-primary"
+                  />
                 }
                 @if (!user.avatar_url) {
-                  <div class="avatar-placeholder">
+                  <div
+                    class="w-[120px] h-[120px] rounded-full bg-primary text-white flex items-center justify-center text-5xl font-bold border-[3px] border-border"
+                  >
                     {{ user.username.charAt(0).toUpperCase() }}
                   </div>
                 }
               </div>
             </div>
-            <div class="info-item">
-              <label>Name:</label>
-              <span>{{ user.username }}</span>
+            <div
+              class="flex justify-between items-center gap-3 p-4 border border-border rounded-md bg-surface max-md:flex-col max-md:items-start"
+            >
+              <label class="font-bold text-[var(--color-text)]">Name:</label>
+              <span class="text-[var(--color-text)] font-semibold break-words">{{ user.username }}</span>
             </div>
-            <div class="info-item">
-              <label>Email:</label>
-              <span>{{ user.email }}</span>
+            <div
+              class="flex justify-between items-center gap-3 p-4 border border-border rounded-md bg-surface max-md:flex-col max-md:items-start"
+            >
+              <label class="font-bold text-[var(--color-text)]">Email:</label>
+              <span class="text-[var(--color-text)] font-semibold break-words">{{ user.email }}</span>
             </div>
-            <div class="info-item">
-              <label>Theme:</label>
-              <span>{{ user.theme }}</span>
+            <div
+              class="flex justify-between items-center gap-3 p-4 border border-border rounded-md bg-surface max-md:flex-col max-md:items-start"
+            >
+              <label class="font-bold text-[var(--color-text)]">Theme:</label>
+              <span class="text-[var(--color-text)] font-semibold break-words">{{ user.theme }}</span>
             </div>
-            <div class="info-item">
-              <label>Account Balance:</label>
-              <span class="balance tabular-nums">{{ formatBalance(user.balance) }}</span>
+            <div
+              class="flex justify-between items-center gap-3 p-4 border border-border rounded-md bg-surface max-md:flex-col max-md:items-start"
+            >
+              <label class="font-bold text-[var(--color-text)]">Account Balance:</label>
+              <span class="text-success font-bold text-lg tabular-nums">{{ formatBalance(user.balance) }}</span>
             </div>
           </div>
         }
@@ -43,21 +57,15 @@
     <section class="app-panel">
       <header class="app-panel__header">Add Currency to Account</header>
       <div class="app-panel__body">
-        <form class="currency-form" [formGroup]="fundsForm" (ngSubmit)="addCurrency()">
-          <mat-form-field appearance="outline" class="currency-form__field">
+        <form class="flex flex-wrap gap-4 items-start" [formGroup]="fundsForm" (ngSubmit)="addCurrency()">
+          <mat-form-field appearance="outline" class="flex-[1_1_12rem] min-w-40">
             <mat-label>Amount ($)</mat-label>
             <input matInput type="number" min="1" step="0.01" formControlName="amount" />
             @if (fundsForm.controls.amount.touched && fundsForm.controls.amount.invalid) {
               <mat-error>Enter an amount of at least 1</mat-error>
             }
           </mat-form-field>
-          <button
-            type="submit"
-            mat-flat-button
-            [disabled]="fundsForm.invalid"
-          >
-            Add Funds
-          </button>
+          <button type="submit" mat-flat-button [disabled]="fundsForm.invalid">Add Funds</button>
         </form>
       </div>
     </section>
