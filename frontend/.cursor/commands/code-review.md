@@ -21,7 +21,7 @@ Review the **latest changes on the current branch** against the Learn2Trade fron
 
 - Angular 22+ patterns: `inject()`, signals / `computed` / inputs-outputs-queries, OnPush-friendly state, control flow (`@if` / `@for`), lifecycle and cleanup
 - RxJS boundaries: no leaky subscriptions; correct use of `toSignal` / `takeUntilDestroyed` / cancellation (`switchMap`, resources)
-- Angular Material: `mat.theme` / overrides only; no private `.mat-mdc-*` / `::ng-deep` hacks; token usage
+- Angular Material: official `mat.*-overrides` first; `.mat-mdc-*` only in `_material-overrides.scss` or `_components.scss` as `docs/STYLING_GUIDELINES.md` describes; no `.mat-mdc-*` or `::ng-deep` in component stylesheets; token usage
 - Project map: changes land in the right area (pages vs shared vs services vs `src/styles`); reuse existing abstractions
 - Correctness: auth/guards, race conditions, error/loading/empty states, typing (`any` / unsafe casts)
 - Tests: missing or outdated coverage for behavior changes

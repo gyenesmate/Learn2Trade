@@ -161,35 +161,6 @@
     ));
   }
 
-  // Equal-width movers toggles (scoped; avoids component ::ng-deep)
-  .market-movers__toggles.mat-button-toggle-group,
-  .market-movers__toggles {
-    display: flex;
-    width: 100%;
-
-    .mat-button-toggle {
-      flex: 1 1 0;
-    }
-  }
-
-  // Data-table filter-row checkbox density (layout, not theme tokens)
-  .table-row--filter {
-    .mat-mdc-checkbox {
-      margin: 0;
-      vertical-align: middle;
-    }
-
-    .mat-mdc-checkbox .mdc-form-field {
-      margin: 0;
-      padding: 0;
-    }
-
-    .mat-mdc-checkbox .mdc-checkbox {
-      --mdc-checkbox-state-layer-size: 32px;
-      padding: calc((var(--mdc-checkbox-state-layer-size) - 18px) / 2);
-    }
-  }
-
   body.theme-light,
   [data-theme='light'] {
     @include mat.button-overrides((
