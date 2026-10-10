@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Material Guide (v22+)
 
-Target `@angular/material` / `@angular/cdk` versions in `frontend/package.json` (currently ^22). Follow Material 3 token APIs. Do not style via private DOM/CSS.
+Target `@angular/material` / `@angular/cdk` versions in `frontend/package.json` (currently ^22). Follow Material 3 token APIs. Private `.mat-mdc-*` selectors are limited to `_material-overrides.scss` and `_components.scss` as described in `docs/STYLING_GUIDELINES.md`. Feature and component stylesheets do not style Material's private DOM.
 
 ## Theming source of truth
 
@@ -13,11 +13,13 @@ Project theme lives under `src/styles/`:
 
 | File | Role |
 | --- | --- |
-| `_tokens.scss` | App design tokens / CSS variables |
-| `_colors.scss`, `_typography.scss`, `_radius.scss`, `_spacing.scss`, `_elevation.scss`, `_motion.scss`, `_fonts.scss` | Primitive scales |
+| `_theme-colors.scss` | Private Sass color map (`@use` from `_tokens` / `theme` only) |
+| `_tokens.scss` | Semantic **color** and **typography** CSS variables |
 | `theme.scss` | `mat.theme` + system overrides |
-| `_material-overrides.scss` | `mat.*-overrides` for components |
-| `_components.scss`, `_base.scss`, `_utilities.scss`, `tailwind.scss` | App-level styles / semantic helpers |
+| `_material-overrides.scss` | Global Material look: `mat.*-overrides`, plus `.mat-mdc-*` when the mixin cannot express the style |
+| `_components.scss` | App primitives and component-scoped `.mat-mdc-*` |
+| `_base.scss`, `_fonts.scss` | Document defaults and font imports |
+| `tailwind.css` | Real Tailwind v4; `@theme` bridges colors + fonts; default spacing/radius/shadow scales |
 
 When changing look-and-feel, prefer tokens and these files over one-off component hacks.
 
@@ -56,8 +58,8 @@ html {
 
 **Don't**
 
-- Override with `.mat-mdc-*` selectors, `::ng-deep`, `!important`, or private `--mat-*` component vars outside overrides APIs.
-- Depend on Material internal DOM structure or class names — they are not a public API.
+- Do not put `.mat-mdc-*`, `::ng-deep`, or `!important` in `*.component.scss` or feature stylesheets. Do not set private `--mat-*` component variables outside the overrides APIs.
+- Feature and component stylesheets must not depend on Material internal DOM or class names. `_material-overrides.scss` and `_components.scss` may use `.mat-mdc-*` only as `docs/STYLING_GUIDELINES.md` describes.
 - Introduce a second UI kit or ad-hoc button/input system alongside Material.
 - Add purple-on-white / generic “AI default” palettes; keep the trading blue + semantic green/red system from `docs/STYLING_GUIDELINES.md`.
 

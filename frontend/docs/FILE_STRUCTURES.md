@@ -51,13 +51,14 @@ src/
 │       └── system/
 │
 └── styles/
-    ├── _tokens.scss
+    ├── _theme-colors.scss     # private Sass color map (@use from tokens/theme only)
+    ├── _tokens.scss           # color + typography CSS vars
+    ├── theme.scss
     ├── _material-overrides.scss
     ├── _components.scss
-    ├── tailwind.css           # real Tailwind v4 + @theme bridge to tokens
-    ├── theme.scss
-    ├── _base.scss / _fonts.scss
-    └── (private token maps: _colors, _spacing, _radius, …)
+    ├── _base.scss
+    ├── _fonts.scss
+    └── tailwind.css           # real Tailwind v4; @theme → colors + fonts only
 ```
 
 Create subfolders (`services/`, `utils/`, `models/`, `components/`, `directives/`) **only when files exist**. Do not create empty directories.
@@ -298,14 +299,16 @@ Put feature-specific UI under the feature (`features/trading/components/...`), n
 
 | File | Responsibility |
 | --- | --- |
-| `_tokens.scss` | CSS variables from design tokens |
+| `_theme-colors.scss` | Private Sass color palette map (`@use` from `_tokens` / `theme` only) |
+| `_tokens.scss` | CSS variables for semantic **color** and **typography** |
 | `theme.scss` | `mat.theme` + system overrides, dark/light |
-| `_material-overrides.scss` | Centralized `mat.*-overrides` |
-| `_components.scss` | Global non-Material primitives (buttons, panels, chips, price-up/down) |
-| `tailwind.css` | Real Tailwind v4 utilities; `@theme` → token CSS vars |
-| private maps | `_colors`, `_spacing`, `_radius`, `_typography`, … (`@use` from tokens/theme only) |
+| `_material-overrides.scss` | Global Material look: `mat.*-overrides`, plus `.mat-mdc-*` when the mixin cannot express a style for every instance of a control |
+| `_components.scss` | Global primitives (buttons, panels, chips, price-up/down) and component-scoped `.mat-mdc-*` tweaks |
+| `_base.scss` | Document defaults Tailwind preflight does not own (scrollbars, focus, headings) |
+| `_fonts.scss` | Font face / import only |
+| `tailwind.css` | Real Tailwind v4 utilities; `@theme` → semantic colors + fonts; default scales for spacing/radius/shadow |
 
-No global Material overrides inside feature SCSS. Prefer tokens over arbitrary hex.
+No global Material overrides inside feature SCSS. A component-specific `.mat-mdc-*` rule goes in `_components.scss`, not in the component stylesheet. Prefer `--color-*` / `--font-*` tokens over arbitrary hex; layout spacing via Tailwind utilities in templates.
 
 ---
 

@@ -13,13 +13,15 @@ Global look-and-feel is centralized under `src/styles/`. Angular loads `tailwind
 
 | File / partial | Role |
 | --- | --- |
-| `_tokens.scss` (+ private `_colors`, `_spacing`, …) | Design tokens → CSS custom properties |
+| `_theme-colors.scss` | Private Sass color map (`@use` from `_tokens` / `theme` only) |
+| `_tokens.scss` | Color + typography CSS custom properties |
 | `theme.scss` | `mat.theme`, dark trading palette |
-| `_material-overrides.scss` | Official `mat.*-overrides` mixins (density, buttons, fields) |
+| `_material-overrides.scss` | Global Material look: `mat.*-overrides`, plus `.mat-mdc-*` when the mixin cannot express the style |
 | `_base.scss` | Reset, focus, scrollbars |
-| `_components.scss` | Shared semantic panels / trade actions / price-up |
-| `tailwind.css` | Real Tailwind v4 + `@theme` bridge to token vars |
-| Component `*.scss` | Escape hatch only; color from tokens |
+| `_fonts.scss` | Font face / import only |
+| `_components.scss` | Shared primitives and component-scoped `.mat-mdc-*` tweaks |
+| `tailwind.css` | Real Tailwind v4; `@theme` → semantic colors + fonts; default scales for spacing/radius/shadow |
+| Component `*.scss` | Escape hatch only; no `.mat-mdc-*` or `::ng-deep`; color from tokens |
 
 ## Connected to
 
@@ -29,28 +31,33 @@ Global look-and-feel is centralized under `src/styles/`. Angular loads `tailwind
 ## Rules that apply
 
 - [`STYLING_GUIDELINES.md`](../../STYLING_GUIDELINES.md) — dark-first terminal, semantic green/red, density, form error styling, typography (IBM Plex Sans / Space Grotesk).
-- [`material-guide.mdc`](../../../.cursor/rules/material-guide.mdc) — theme via `mat.theme` / overrides APIs only; no `.mat-mdc-*` hacks or private DOM styling.
-- [`learn2trade.mdc`](../../../.cursor/rules/learn2trade.mdc) — tokens + overrides globally; layout via utilities.
+- [`material-guide.mdc`](../../../.cursor/rules/material-guide.mdc) — theme via `mat.theme` / overrides APIs; `.mat-mdc-*` only in `_material-overrides.scss` and `_components.scss` as `STYLING_GUIDELINES.md` describes.
+- [`learn2trade.mdc`](../../../.cursor/rules/learn2trade.mdc) — tokens + overrides globally; layout via utilities; no `::ng-deep` in component stylesheets.
 
 ## Diagram
 
 ```mermaid
 flowchart TB
   SCSS[src/styles.scss]
-  T[_tokens + primitives]
+  TC[_theme-colors.scss]
+  T[_tokens.scss]
   TH[theme.scss]
   MO[_material-overrides.scss]
   B[_base.scss]
+  F[_fonts.scss]
   C[_components.scss]
-  TW[tailwind.scss]
+  TW[tailwind.css]
 
+  TC -.-> T
   SCSS --> T
   SCSS --> TH
   SCSS --> MO
   SCSS --> B
   SCSS --> C
+  SCSS --> F
   SCSS --> TW
   TH --> App[Global CSS on document]
   MO --> App
   T --> App
+  TW --> App
 ```

@@ -8,18 +8,31 @@ When ambiguous, prefer: **consistency → readability → information hierarchy 
 
 | Layer | Owns |
 | --- | --- |
-| `src/styles/_tokens.scss` (+ private Sass maps) | Semantic CSS variables (`--color-*`, `--space-*`, `--radius-*`, …) |
+| `src/styles/_theme-colors.scss` | Private Sass color map (`@use` from `_tokens` / `theme` only) |
+| `src/styles/_tokens.scss` | Semantic CSS variables for **color** and **typography** (`--color-*`, `--font-*`, type scale) |
 | `src/styles/theme.scss` | `mat.theme` / light–dark coordination |
-| `src/styles/_material-overrides.scss` | Official `mat.*-overrides` only — never style private `.mat-mdc-*` in features |
+| `src/styles/_material-overrides.scss` | Global Material look. Official `mat.*-overrides` first. `.mat-mdc-*` when the mixin cannot express a style for every instance of a control (buttons, inputs, and the same kind of control). |
 | `src/styles/_base.scss` | Document defaults Tailwind preflight does not own (scrollbars, focus, headings) |
 | `src/styles/_fonts.scss` | Font face / import only |
-| `src/styles/_components.scss` | Rare global primitives with multiple call sites (`.btn*`, `.app-panel*`, `.trade-*-button`, `.price-up/down`) |
-| `src/styles/tailwind.css` | Real Tailwind v4 + `@theme inline` bridge to token CSS vars |
-| `*.component.scss` | Exception only: complex selectors, keyframes, chart hosts, Material host tweaks |
+| `src/styles/_components.scss` | Rare global primitives (`.btn*`, `.app-panel*`, `.trade-*-button`, `.price-up/down`) and component-specific `.mat-mdc-*` tweaks nested under that component or primitive class. No bare `.mat-mdc-*` that hits every instance. |
+| `src/styles/tailwind.css` | Real Tailwind v4; `@theme inline` bridges **colors + fonts** to token CSS vars; spacing, radius, and shadow use Tailwind defaults |
+| `*.component.scss` | Exception only: complex selectors, keyframes, chart hosts. No `.mat-mdc-*`. No `::ng-deep`. |
 
 **Default for new UI:** Tailwind utilities in the template. Do not add a component SCSS file unless Tailwind cannot express it cleanly.
 
 **Do not** put Tailwind classes on Material internal DOM. **Do not** grow a second utility framework in SCSS.
+
+## Material selectors
+
+Prefer `mat.<component>-overrides`. Use `.mat-mdc-*` only when that mixin cannot express the style.
+
+| Need | File | What is allowed |
+| --- | --- | --- |
+| Every instance of a Material control (buttons, inputs, and the same kind of control) | `_material-overrides.scss` | `mat.*-overrides` first. `.mat-mdc-*` when the mixin cannot express that global style. |
+| One component or one app primitive (`.btn*`, `.app-panel*`, `.trade-*-button`, `.price-up/down`, or a component class) | `_components.scss` | `.mat-mdc-*` nested under that component or primitive class. No bare `.mat-mdc-*` that hits every instance. |
+| A feature or shared component stylesheet | `*.component.scss` | Complex selectors, keyframes, and chart hosts. No `.mat-mdc-*`. No `::ng-deep`. |
+
+A component that needs a Material DOM tweak gets a scoped rule in `_components.scss`. `!important` and private `--mat-*` component variables outside the overrides APIs are forbidden everywhere.
 
 ## Product language
 
@@ -27,7 +40,7 @@ When ambiguous, prefer: **consistency → readability → information hierarchy 
 - **Brand:** trading-terminal blue (`--color-primary` / `#3b82f6`). No purple accents in UI.
 - **Semantic P&L:** green = up/profit/buy (`--color-success` / `.price-up`); red = down/loss/sell (`--color-danger` / `.price-down`). Never decorative red/green.
 - **Theme:** dark-first; light is first-class (not a naive invert). Surface hierarchy: background → panel → raised → hover.
-- **Density:** trading workstation — prefer 8 / 12 / 16 / 24px spacing. Avoid marketing whitespace.
+- **Density:** trading workstation — prefer Tailwind spacing steps that map to ~8 / 12 / 16 / 24px (`gap-2`, `gap-3`, `p-4`, `p-6`). Avoid marketing whitespace.
 - **Numbers:** `tabular-nums` on prices, %, balances, P&L, table numeric columns; right-align numeric cells.
 - **Forms:** `mat-form-field` appearance `outline`; on error, label + `mat-error` only (border stays theme-neutral / focus-primary). Validate after blur (`touched`) and submit.
 - **Buttons:** `.btn` / `.btn-primary` / `.btn-secondary` for app chrome; `.trade-buy-button` / `.trade-sell-button` for buy/sell. Heights ~36px.
@@ -37,16 +50,17 @@ When ambiguous, prefer: **consistency → readability → information hierarchy 
 
 ## Tailwind bridge
 
-`@theme inline` in `tailwind.css` maps utilities to token vars, e.g.:
+**Layout scale:** use Tailwind’s built-in spacing, radius, shadow, and motion utilities (`p-4`, `gap-2`, `rounded-lg`, `shadow-sm`, …). Do not reintroduce semantic alias utilities (`p-md`, `gap-sm`, …) or `--space-*` / `--radius-*` / `--shadow-*` token bridges.
 
-| Utility examples | Token |
+`@theme inline` in `tailwind.css` maps **semantic colors and fonts** to token vars, e.g.:
+
+| Utility examples | Source |
 | --- | --- |
-| `p-md`, `gap-sm`, `mt-lg` | `--space-*` |
-| `text-primary`, `bg-primary` | brand `--color-primary` |
+| `text-primary`, `bg-primary` | `--color-primary` |
 | `text-muted` | `--color-text-muted` |
 | `bg-surface`, `border` | `--color-surface`, `--color-border` |
-| `rounded-md`, `shadow-sm` | `--radius-*`, `--shadow-*` |
-| Form card widths | Prefer `max-w-[400px]` / `max-w-[500px]` — named `--spacing-sm/md` collide with Tailwind `max-w-sm/md` |
+| `font-sans`, `font-display` | `--font-family-base`, `--font-family-accent` |
+| Form card widths | Prefer `max-w-[400px]` / `max-w-[500px]` over `max-w-sm/md` when pixel widths matter |
 
 Use `min-w-0 min-h-0` (not a custom `min-0`) for nested flex/grid shrink safety.
 

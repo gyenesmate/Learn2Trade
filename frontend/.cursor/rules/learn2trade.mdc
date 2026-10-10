@@ -50,7 +50,7 @@ Same-folder `./` imports may stay relative.
 | Services / utils / guards / models / env | `src/app/core/{services,utils,guards,models,env,initializers}/` |
 | Shared UI | `src/app/shared/components/` |
 | Features | `src/app/features/{landing,learn,dashboard,markets,trading,portfolio,auth,system}/` |
-| Design tokens / theme | `src/styles/` (`_tokens`, `theme`, `_material-overrides`, `_components`, `tailwind.css`) |
+| Design tokens / theme | `src/styles/` (`_theme-colors`, `_tokens`, `theme`, `_material-overrides`, `_components`, `_base`, `_fonts`, `tailwind.css`) |
 
 ### Feature ↔ URL (prefixed shells; old flat URLs redirect)
 
@@ -86,5 +86,5 @@ Visual direction: dark-first trading terminal. Semantic tokens only. Layout via 
 5. Reuse `shared/components` and `core/services` before inventing new abstractions.
 6. Feature-specific dialogs/components stay under the feature.
 7. Page chrome: use `app-page-header` for title + actions on pages that need that chrome; do not reinvent per-feature headers. Dense browse surfaces (e.g. Markets) may omit it when a header would waste vertical space.
-8. Styles: tokens + Material overrides globally; layout via flex/grid utilities; local SCSS for brand/surface only.
+8. Styles: tokens + Material overrides globally; layout via flex/grid utilities. `.mat-mdc-*` only as `docs/STYLING_GUIDELINES.md` describes; no `::ng-deep` in component stylesheets.
 9. Validate with `npm run build` / `npm run test:unit` when practical.
