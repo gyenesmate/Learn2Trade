@@ -21,14 +21,23 @@ import { firstValueFrom } from 'rxjs';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
 import { DataTableComponent } from '@shared/components/data-table/data-table.component';
-import { TableColumn, RowAction, TableAction } from '@shared/components/data-table/data-table.types';
+import { RowAction, TableAction } from '@shared/components/data-table/data-table.types';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
 import { PageHeaderAction } from '@shared/components/page-header/page-header.types';
 import { WatchlistSubscriptionsService } from '@core/services/watchlist-subscriptions.service';
 import { InvestmentsService } from '@core/services/investments.service';
 import { PriceAlertsService } from '@core/services/price-alerts.service';
 import { formatMoney } from '@core/utils/number.util';
-import { PORTFOLIO_HEADER_ACTIONS, PORTFOLIO_PAGE_TITLE, PORTFOLIO_TABLE_ACTIONS } from './portfolio.const';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import {
+  PORTFOLIO_ALERTS_COLUMNS,
+  PORTFOLIO_CRYPTO_COLUMNS,
+  PORTFOLIO_HEADER_ACTIONS,
+  PORTFOLIO_INVESTMENTS_COLUMNS,
+  PORTFOLIO_TABLE_ACTIONS,
+  PORTFOLIO_USER_COLUMNS,
+  PORTFOLIO_WATCHLIST_COLUMNS,
+} from './portfolio.const';
 
 @Component({
   selector: 'app-portfolio',
@@ -40,6 +49,7 @@ import { PORTFOLIO_HEADER_ACTIONS, PORTFOLIO_PAGE_TITLE, PORTFOLIO_TABLE_ACTIONS
     MatInputModule,
     DataTableComponent,
     PageHeaderComponent,
+    TranslatePipe,
   ],
   templateUrl: './portfolio.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -55,14 +65,12 @@ export class PortfolioComponent {
   private readonly dialog = inject(MatDialog);
   private readonly notification = inject(NotificationService);
   private readonly fb = inject(FormBuilder);
+  private readonly translate = inject(TranslateService);
 
-  readonly pageTitle = PORTFOLIO_PAGE_TITLE;
-  readonly headerActions: PageHeaderAction[] = [
-    {
-      ...PORTFOLIO_HEADER_ACTIONS.editProfile,
-      callback: () => this.editProfile(),
-    },
-  ];
+  readonly headerActions: PageHeaderAction[];
+
+  private readonly t = (key: string, params?: Record<string, unknown>): string =>
+    String(this.translate.instant(key, params));
 
   readonly user = this.authService.currentUser;
   readonly isAdmin = computed(() => !!this.user()?.is_admin);
@@ -75,69 +83,72 @@ export class PortfolioComponent {
   readonly users = signal<User[]>([]);
   readonly adminLoading = signal(false);
 
-  cryptoColumns: TableColumn<CryptoCurrency>[] = [
-    { key: 'name', label: 'Name', filterable: true },
-    { key: 'symbol', label: 'Symbol', filterable: true },
-    { key: 'exchange_currency', label: 'Quote', filterable: true }
+  /** Keys only — data-table / page-header translate via `| translate` on language change. */
+  readonly cryptoColumns = PORTFOLIO_CRYPTO_COLUMNS;
+  readonly userColumns = PORTFOLIO_USER_COLUMNS;
+  readonly watchlistColumns = PORTFOLIO_WATCHLIST_COLUMNS;
+  readonly investmentsColumns = PORTFOLIO_INVESTMENTS_COLUMNS;
+  readonly alertsColumns = PORTFOLIO_ALERTS_COLUMNS;
+
+  readonly cryptoRowActions: RowAction<CryptoCurrency>[] = [
+    {
+      ...PORTFOLIO_TABLE_ACTIONS.edit,
+      callback: (row) => this.editCryptoCurrency(row),
+    },
+    {
+      ...PORTFOLIO_TABLE_ACTIONS.delete,
+      callback: (row) => this.deleteCryptoCurrency(row),
+    },
   ];
 
-  userColumns: TableColumn<User>[] = [
-    { key: 'username', label: 'User name', filterable: true },
-    { key: 'email', label: 'Email', filterable: true },
-    { key: 'is_admin', label: 'Admin', type: 'boolean' }
+  readonly userRowActions: RowAction<User>[] = [
+    {
+      ...PORTFOLIO_TABLE_ACTIONS.ban,
+      callback: (row) => this.deleteUser(row),
+    },
   ];
 
-  cryptoRowActions: RowAction<CryptoCurrency>[] = [
-    { ...PORTFOLIO_TABLE_ACTIONS.edit, callback: (row) => this.editCryptoCurrency(row) },
-    { ...PORTFOLIO_TABLE_ACTIONS.delete, callback: (row) => this.deleteCryptoCurrency(row) }
+  readonly cryptoActionBar: TableAction[] = [
+    {
+      ...PORTFOLIO_TABLE_ACTIONS.addCrypto,
+      callback: () => this.addCryptoCurrency(),
+    },
   ];
 
-  userRowActions: RowAction<User>[] = [
-    { ...PORTFOLIO_TABLE_ACTIONS.ban, callback: (row) => this.deleteUser(row) }
-  ];
-
-  cryptoActionBar: TableAction[] = [
-    { ...PORTFOLIO_TABLE_ACTIONS.addCrypto, callback: () => this.addCryptoCurrency() }
-  ];
-
-  watchlistColumns: TableColumn<any>[] = [
-    { key: 'name', label: 'Name', filterable: true },
-    { key: 'symbol', label: 'Symbol', filterable: true },
-    { key: 'exchangeCurrency', label: 'Quote', filterable: true }
-  ];
   readonly watchlistRows = signal<Array<{ id: string; cryptoCurrencyId: string; name: string; symbol: string; exchangeCurrency: string }>>([]);
-  watchlistRowActions: RowAction<any>[] = [
-    { ...PORTFOLIO_TABLE_ACTIONS.delete, callback: (row) => void this.deleteWatchlistSubscription(row) }
+  readonly watchlistRowActions: RowAction<any>[] = [
+    {
+      ...PORTFOLIO_TABLE_ACTIONS.delete,
+      callback: (row) => void this.deleteWatchlistSubscription(row),
+    },
   ];
 
-  investmentsColumns: TableColumn<any>[] = [
-    { key: 'currencyName', label: 'Currency', filterable: true },
-    { key: 'exchange', label: 'Exchange', filterable: true },
-    { key: 'amount', label: 'Amount', type: 'currency' as any },
-    { key: 'soldAt', label: 'Sold at', type: 'date' },
-    { key: 'createdAt', label: 'Created at', type: 'date' }
-  ];
   readonly investmentsRows = signal<Array<{ id: string; cryptoCurrencyId: string; currencyName: string; exchange: string; amount: number; soldAt: any; createdAt: any }>>([]);
-  investmentsRowActions: RowAction<any>[] = [
-    { ...PORTFOLIO_TABLE_ACTIONS.view, callback: (row) => this.router.navigate(['/app/crypto', row.cryptoCurrencyId]) }
+  readonly investmentsRowActions: RowAction<any>[] = [
+    {
+      ...PORTFOLIO_TABLE_ACTIONS.view,
+      callback: (row) => this.router.navigate(['/app/crypto', row.cryptoCurrencyId]),
+    },
   ];
 
-  alertsColumns: TableColumn<any>[] = [
-    { key: 'currencyName', label: 'Currency', filterable: true },
-    { key: 'type', label: 'Type', filterable: true },
-    { key: 'alertPrice', label: 'Target', type: 'number' },
-    { key: 'description', label: 'Description', filterable: true },
-    { key: 'isActive', label: 'Active', type: 'boolean' },
-    { key: 'createdAt', label: 'Created at', type: 'date' }
-  ];
   readonly alertsRows = signal<Array<{ id: string; cryptoCurrencyId: string; currencyName: string; type: string; alertPrice: number; description: string; isActive: boolean; createdAt: any }>>([]);
-  alertsRowActions: RowAction<any>[] = [
-    { ...PORTFOLIO_TABLE_ACTIONS.delete, callback: (row) => void this.deleteAlert(row) }
+  readonly alertsRowActions: RowAction<any>[] = [
+    {
+      ...PORTFOLIO_TABLE_ACTIONS.delete,
+      callback: (row) => void this.deleteAlert(row),
+    },
   ];
 
   private readonly cryptoByIdCache = signal(new Map<string, CryptoCurrency>());
 
   constructor() {
+    this.headerActions = [
+      {
+        ...PORTFOLIO_HEADER_ACTIONS.editProfile,
+        callback: () => this.editProfile(),
+      },
+    ];
+
     effect(() => {
       const user = this.user();
       if (user === undefined) return;
@@ -198,11 +209,11 @@ export class PortfolioComponent {
   private async deleteAlert(row: { id: string }): Promise<void> {
     const ref = this.dialog.open(ConfirmationDialogComponent, {
       data: {
-        title: 'Delete alert',
-        message: 'Delete this alert?',
-        confirmText: 'Delete',
-        cancelText: 'Cancel'
-      }
+        title: this.t('PORTFOLIO.CONFIRM_DELETE_ALERT_TITLE'),
+        message: this.t('PORTFOLIO.CONFIRM_DELETE_ALERT_MESSAGE'),
+        confirmText: this.t('COMMON.DELETE'),
+        cancelText: this.t('COMMON.CANCEL'),
+      },
     });
 
     const confirmed = await firstValueFrom(ref.afterClosed());
@@ -210,10 +221,10 @@ export class PortfolioComponent {
 
     try {
       await this.priceAlertsService.deleteById(row.id);
-      this.notification.success('Alert deleted');
+      this.notification.success(this.t('PORTFOLIO.NOTIFY_ALERT_DELETED'));
     } catch (err) {
       console.error('Error deleting alert', err);
-      this.notification.error('Failed to delete alert');
+      this.notification.error(this.t('PORTFOLIO.NOTIFY_ALERT_DELETE_FAILED'));
     }
   }
 
@@ -284,11 +295,11 @@ export class PortfolioComponent {
   async deleteWatchlistSubscription(row: { cryptoCurrencyId: string }): Promise<void> {
     const ref = this.dialog.open(ConfirmationDialogComponent, {
       data: {
-        title: 'Delete watchlist subscription',
-        message: 'Remove this item from your watchlist? ',
-        confirmText: 'Delete',
-        cancelText: 'Cancel'
-      }
+        title: this.t('PORTFOLIO.CONFIRM_DELETE_WATCHLIST_TITLE'),
+        message: this.t('PORTFOLIO.CONFIRM_DELETE_WATCHLIST_MESSAGE'),
+        confirmText: this.t('COMMON.DELETE'),
+        cancelText: this.t('COMMON.CANCEL'),
+      },
     });
 
     const confirmed = await firstValueFrom(ref.afterClosed());
@@ -296,11 +307,11 @@ export class PortfolioComponent {
 
     try {
       await this.watchlistSubscriptionsService.deleteByCryptoCurrencyId(row.cryptoCurrencyId);
-      this.notification.success('Removed from watchlist');
+      this.notification.success(this.t('PORTFOLIO.NOTIFY_REMOVED_FROM_WATCHLIST'));
       await this.loadWatchlistTable(this.user() ?? null);
     } catch (err) {
       console.error('Error deleting watchlist subscription', err);
-      this.notification.error('Failed to remove from watchlist');
+      this.notification.error(this.t('PORTFOLIO.NOTIFY_REMOVE_WATCHLIST_FAILED'));
     }
   }
 
@@ -316,7 +327,7 @@ export class PortfolioComponent {
       this.cryptoByIdCache.set(new Map(cryptos.map((c) => [c.id, c] as const)));
     } catch (err) {
       console.error('Error loading admin tables:', err);
-      this.notification.error('Error loading admin tables');
+      this.notification.error(this.t('PORTFOLIO.NOTIFY_ADMIN_TABLES_LOAD_ERROR'));
     } finally {
       this.adminLoading.set(false);
     }
@@ -337,11 +348,11 @@ export class PortfolioComponent {
   async deleteCryptoCurrency(item: CryptoCurrency): Promise<void> {
     const ref = this.dialog.open(ConfirmationDialogComponent, {
       data: {
-        title: 'Delete crypto currency',
-        message: `Delete ${item.name}?`,
-        confirmText: 'Delete',
-        cancelText: 'Cancel'
-      }
+        title: this.t('PORTFOLIO.CONFIRM_DELETE_CRYPTO_TITLE'),
+        message: this.t('PORTFOLIO.CONFIRM_DELETE_CRYPTO_MESSAGE', { name: item.name }),
+        confirmText: this.t('COMMON.DELETE'),
+        cancelText: this.t('COMMON.CANCEL'),
+      },
     });
 
     const confirmed = await firstValueFrom(ref.afterClosed());
@@ -349,23 +360,28 @@ export class PortfolioComponent {
 
     try {
       await this.cryptoCurrenciesService.delete(item.id);
-      this.notification.success('Crypto currency deleted');
+      this.notification.success(this.t('PORTFOLIO.NOTIFY_CRYPTO_DELETED'));
       await this.loadAdminTables();
     } catch (err) {
       console.error('Error deleting crypto currency:', err);
-      this.notification.error('Error deleting crypto currency');
+      this.notification.error(this.t('PORTFOLIO.NOTIFY_CRYPTO_DELETE_ERROR'));
     }
   }
 
   async deleteUser(user: User): Promise<void> {
-    const action = user.is_banned ? 'Unban' : 'Ban';
+    const actionKey = user.is_banned ? 'PORTFOLIO.ACTION_UNBAN' : 'PORTFOLIO.ACTION_BAN';
+    const action = this.t(actionKey);
     const ref = this.dialog.open(ConfirmationDialogComponent, {
       data: {
-        title: `${action} user`,
-        message: `${action} user ${user.username} (${user.email})?`,
+        title: this.t('PORTFOLIO.CONFIRM_BAN_USER_TITLE', { action }),
+        message: this.t('PORTFOLIO.CONFIRM_BAN_USER_MESSAGE', {
+          action,
+          username: user.username,
+          email: user.email,
+        }),
         confirmText: action,
-        cancelText: 'Cancel'
-      }
+        cancelText: this.t('COMMON.CANCEL'),
+      },
     });
 
     const confirmed = await firstValueFrom(ref.afterClosed());
@@ -374,20 +390,31 @@ export class PortfolioComponent {
     try {
       if (user.is_banned) {
         await this.usersService.unbanByUid(user.id);
-        this.notification.success('User unbanned');
+        this.notification.success(this.t('PORTFOLIO.NOTIFY_USER_UNBANNED'));
       } else {
         await this.usersService.banByUid(user.id);
-        this.notification.success('User banned');
+        this.notification.success(this.t('PORTFOLIO.NOTIFY_USER_BANNED'));
       }
       await this.loadAdminTables();
     } catch (err) {
       console.error('Error updating user ban status:', err);
-      this.notification.error('Error updating user ban status');
+      this.notification.error(this.t('PORTFOLIO.NOTIFY_BAN_STATUS_ERROR'));
     }
   }
 
   formatBalance(value: number): string {
     return formatMoney(Number(value || 0));
+  }
+
+  themeLabelKey(theme: string | null | undefined): string {
+    switch (theme) {
+      case 'light':
+        return 'PROFILE.THEME_LIGHT';
+      case 'system':
+        return 'PROFILE.THEME_SYSTEM';
+      default:
+        return 'PROFILE.THEME_DARK';
+    }
   }
 
   async addCurrency(): Promise<void> {
@@ -398,10 +425,10 @@ export class PortfolioComponent {
     try {
       await this.usersService.addCurrencyToBalance(amount);
       this.fundsForm.reset({ amount: 0 });
-      this.notification.success('Currency added successfully!');
+      this.notification.success(this.t('PORTFOLIO.NOTIFY_CURRENCY_ADDED'));
     } catch (error) {
       console.error('Error adding currency:', error);
-      this.notification.error('Error adding currency. Please try again.');
+      this.notification.error(this.t('PORTFOLIO.NOTIFY_CURRENCY_ADD_ERROR'));
     }
   }
 }

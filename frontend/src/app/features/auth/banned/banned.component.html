@@ -1,8 +1,9 @@
 <div class="max-w-[720px] mx-auto my-12 p-6 text-center">
-  <h1 class="mb-3">Your account has been banned</h1>
+  <h1 class="mb-3">{{ 'AUTH.BANNED_TITLE' | translate }}</h1>
   <p>
-    Your account has been suspended. If you think this is a mistake, please contact our support team at
-    <a href="mailto:{{ supportEmail }}">{{ supportEmail }}</a> to request an unban.
+    {{ 'AUTH.BANNED_BODY_PREFIX' | translate }}
+    <a [href]="'mailto:' + supportEmail">{{ supportEmail }}</a>
+    {{ 'AUTH.BANNED_BODY_SUFFIX' | translate }}
   </p>
-  <button class="mt-4 py-2 px-4" (click)="goHome()">Return to home</button>
+  <button class="mt-4 py-2 px-4" (click)="goHome()">{{ 'AUTH.RETURN_HOME' | translate }}</button>
 </div>

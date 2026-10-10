@@ -25,6 +25,7 @@ import { NotificationService } from '@core/services/notification.service';
 import { BinanceRestService } from '@core/binance/binance-rest.service';
 import { BinanceMarketOption } from '@core/binance/binance.types';
 import { formatMarketOptionLabel, normalizeBinanceQuote, toBinancePair } from '@core/binance/binance.utils';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
 import { CRYPTO_CURRENCY_EDIT_TITLES } from './crypto-currency-edit.const';
 
@@ -47,6 +48,7 @@ function marketOptionValidator(): ValidatorFn {
     MatInputModule,
     MatAutocompleteModule,
     PageHeaderComponent,
+    TranslatePipe,
   ],
   templateUrl: './crypto-currency-edit.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -59,6 +61,7 @@ export class CryptoCurrencyEditComponent implements OnInit {
   private readonly notification = inject(NotificationService);
   private readonly binanceRest = inject(BinanceRestService);
   private readonly fb = inject(FormBuilder);
+  private readonly translate = inject(TranslateService);
 
   id: string | null = null;
   readonly loading = signal(false);
@@ -159,7 +162,7 @@ export class CryptoCurrencyEditComponent implements OnInit {
 
       if (this.id) {
         if (!existing) {
-          this.notification.error('Crypto currency not found');
+          this.notification.error(this.translate.instant('MARKETS.NOTIFY_NOT_FOUND'));
           void this.router.navigate(['/app/profile']);
           return;
         }
@@ -186,7 +189,7 @@ export class CryptoCurrencyEditComponent implements OnInit {
       }
     } catch (err) {
       console.error('Error loading crypto currency edit:', err);
-      this.notification.error('Error loading form data');
+      this.notification.error(this.translate.instant('MARKETS.NOTIFY_LOAD_FORM_ERROR'));
     } finally {
       this.loading.set(false);
       this.marketsLoading.set(false);
@@ -201,7 +204,7 @@ export class CryptoCurrencyEditComponent implements OnInit {
   async save(): Promise<void> {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.notification.error('Please select a Binance market and enter a name');
+      this.notification.error(this.translate.instant('MARKETS.NOTIFY_SELECT_MARKET_AND_NAME'));
       return;
     }
 
@@ -216,15 +219,15 @@ export class CryptoCurrencyEditComponent implements OnInit {
     try {
       if (this.id) {
         await this.cryptoCurrencies.update(this.id, payload);
-        this.notification.success('Crypto currency updated');
+        this.notification.success(this.translate.instant('MARKETS.NOTIFY_UPDATED'));
       } else {
         await this.cryptoCurrencies.create(payload);
-        this.notification.success('Crypto currency created');
+        this.notification.success(this.translate.instant('MARKETS.NOTIFY_CREATED'));
       }
       void this.router.navigate(['/app/profile']);
     } catch (err) {
       console.error('Error saving crypto currency:', err);
-      this.notification.error('Error saving crypto currency');
+      this.notification.error(this.translate.instant('MARKETS.NOTIFY_SAVE_ERROR'));
     } finally {
       this.saving.set(false);
     }

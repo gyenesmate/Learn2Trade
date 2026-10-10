@@ -3,7 +3,7 @@
     <mat-icon class="size-5 shrink-0 text-xl text-muted">{{ icon }}</mat-icon>
   }
   <div class="flex min-w-0 flex-1 flex-col">
-    <span class="truncate text-sm font-medium text-[var(--color-text-primary)]">{{ result().title }}</span>
+    <span class="truncate text-sm font-medium text-[var(--color-text-primary)]">{{ result().title | translate }}</span>
     @if (result().description; as description) {
       <span class="truncate text-xs text-muted">{{ description }}</span>
     }

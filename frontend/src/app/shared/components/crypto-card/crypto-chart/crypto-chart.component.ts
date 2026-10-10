@@ -22,6 +22,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { TranslatePipe } from '@ngx-translate/core';
 import {
   CandlestickSeries,
   ColorType,
@@ -84,6 +85,7 @@ function defaultIndicators(): IndicatorEnabledMap {
     MatCheckboxModule,
     MatIconModule,
     MatMenuModule,
+    TranslatePipe,
   ],
   templateUrl: './crypto-chart.component.html',
   styleUrl: './crypto-chart.component.scss',

@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { AuthService } from '@core/services/auth.service';
 import { NotificationService } from '@core/services/notification.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-register',
@@ -23,6 +24,7 @@ import { NotificationService } from '@core/services/notification.service';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    TranslatePipe,
   ],
   templateUrl: './register.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,6 +32,7 @@ import { NotificationService } from '@core/services/notification.service';
 export class RegisterComponent {
   private readonly authService = inject(AuthService);
   private readonly notifications = inject(NotificationService);
+  private readonly translate = inject(TranslateService);
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
 
@@ -84,7 +87,10 @@ export class RegisterComponent {
       void this.router.navigate(['/app/dashboard']);
     } catch (error) {
       console.error('Registration error:', error);
-      this.notifications.error('Registration failed. Please try again.', 'Registration failed');
+      this.notifications.error(
+        this.translate.instant('AUTH.REGISTRATION_FAILED_MESSAGE'),
+        this.translate.instant('AUTH.REGISTRATION_FAILED_TITLE'),
+      );
     }
   }
 

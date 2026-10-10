@@ -7,7 +7,7 @@
         type="button"
         mat-icon-button
         class="shrink-0 text-[var(--color-text-primary)]"
-        aria-label="Go back"
+        [attr.aria-label]="'COMMON.GO_BACK' | translate"
         (click)="goBack()">
         <mat-icon>arrow_back</mat-icon>
       </button>
@@ -15,7 +15,7 @@
     <h1
       class="m-0 truncate text-lg font-semibold leading-tight text-[var(--color-text-primary)]"
     >
-      {{ title() }}
+      {{ title() | translate }}
     </h1>
   </div>
 
@@ -31,7 +31,7 @@
             @if (action.icon) {
               <mat-icon>{{ action.icon }}</mat-icon>
             }
-            {{ action.label }}
+            {{ action.label | translate }}
           </button>
         } @else {
           <button
@@ -42,7 +42,7 @@
             @if (action.icon) {
               <mat-icon>{{ action.icon }}</mat-icon>
             }
-            {{ action.label }}
+            {{ action.label | translate }}
           </button>
         }
       }

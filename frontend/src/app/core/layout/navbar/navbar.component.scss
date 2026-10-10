@@ -8,6 +8,34 @@
   text-overflow: ellipsis;
 }
 
+.language-selector {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.15rem;
+  min-width: auto;
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  padding: 0 0.35rem;
+  line-height: 1;
+  color: var(--color-text-primary);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+
+  .language-selector__code {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.04em;
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
 .nav-item {
   display: flex;
   flex-direction: column;

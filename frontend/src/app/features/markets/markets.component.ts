@@ -17,6 +17,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
+import { TranslatePipe } from '@ngx-translate/core';
 import { CryptoCurrency } from '@core/models/models';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { BinanceMarketDataService } from '@core/binance/binance-market-data.service';
@@ -28,6 +29,8 @@ import {
   MARKETS_EMPTY_MESSAGE,
   MARKETS_FILTERS,
   MARKETS_LOAD_ERROR,
+  MARKETS_MOVERS_EMPTY_NO_MARKETS,
+  MARKETS_MOVERS_EMPTY_WAITING,
   MARKETS_PAGE_SIZE,
   MARKETS_SORT_OPTIONS,
   MarketsFilter,
@@ -55,6 +58,7 @@ interface MarketRow {
     MatSelectModule,
     AnimatedMarketCardLayoutComponent,
     MarketMoversComponent,
+    TranslatePipe,
   ],
   templateUrl: './markets.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -65,6 +69,8 @@ export class MarketsComponent implements OnInit, OnDestroy {
 
   readonly emptyMessage = MARKETS_EMPTY_MESSAGE;
   readonly loadErrorMessage = MARKETS_LOAD_ERROR;
+  readonly moversEmptyNoMarketsKey = MARKETS_MOVERS_EMPTY_NO_MARKETS;
+  readonly moversEmptyWaitingKey = MARKETS_MOVERS_EMPTY_WAITING;
   readonly filters = MARKETS_FILTERS;
   readonly sortOptions = MARKETS_SORT_OPTIONS;
   readonly pageSize = MARKETS_PAGE_SIZE;

@@ -19,6 +19,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslatePipe } from '@ngx-translate/core';
 import { formatDecimal, formatMoney, toNumber } from '@core/utils/number.util';
 import { TABLE_COMPACT_MAX_PX } from '@core/layout/layout-breakpoints';
 import { TableColumn, TableAction, RowAction } from './data-table.types';
@@ -35,6 +36,7 @@ import { TableColumn, TableAction, RowAction } from './data-table.types';
     MatCheckboxModule,
     MatProgressSpinnerModule,
     DatePipe,
+    TranslatePipe,
   ],
   providers: [DatePipe],
   templateUrl: './data-table.component.html',
@@ -216,11 +218,11 @@ export class DataTableComponent<T> {
     return this.expandedRow() === row;
   }
 
-  rowSelectLabel(row: T): string {
+  rowSelectIdentity(row: T): string {
     const record = row as Record<string, unknown>;
     const label =
       record['symbol'] ?? record['name'] ?? record['type'] ?? this.resolveRowId(row) ?? 'row';
-    return `Select ${label}`;
+    return String(label);
   }
 
   formatCell(row: Record<string, unknown>, column: TableColumn<T>): string {
@@ -234,7 +236,7 @@ export class DataTableComponent<T> {
       case 'number':
         return formatDecimal(toNumber(value));
       case 'boolean':
-        return value ? 'Yes' : 'No';
+        return value ? 'COMMON.YES' : 'COMMON.NO';
       default:
         return value !== undefined && value !== null ? String(value) : '';
     }

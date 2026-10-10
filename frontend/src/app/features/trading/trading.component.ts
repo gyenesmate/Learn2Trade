@@ -16,8 +16,13 @@ import { CryptoCurrency, Investment, PriceAlert } from '@core/models/models';
 import { CryptoCurrenciesService } from '@core/services/crypto-currencies.service';
 import { CryptoCardComponent } from '@shared/components/crypto-card/crypto-card.component';
 import { ConfirmationDialogComponent } from '@shared/components/confirmation-dialog/confirmation-dialog.component';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { DataTableComponent } from '@shared/components/data-table/data-table.component';
-import { DataTableRow, RowAction, TableAction } from '@shared/components/data-table/data-table.types';
+import {
+  DataTableRow,
+  RowAction,
+  TableAction,
+} from '@shared/components/data-table/data-table.types';
 import { InvestDialogComponent } from '@features/trading/components/invest-dialog/invest-dialog.component';
 import { InvestDialogResult } from '@features/trading/components/invest-dialog/invest-dialog.types';
 import { AuthService } from '@core/services/auth.service';
@@ -58,6 +63,7 @@ type AlertRow = DataTableRow & {
     MatButtonModule,
     PageHeaderComponent,
     DataTableComponent,
+    TranslatePipe,
   ],
   templateUrl: './trading.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -73,6 +79,7 @@ export class TradingComponent {
   private readonly investments = inject(InvestmentsService);
   private readonly priceAlerts = inject(PriceAlertsService);
   private readonly notification = inject(NotificationService);
+  private readonly translate = inject(TranslateService);
 
   private readonly routeId = toSignal(
     this.route.paramMap.pipe(map((params) => params.get('id'))),
@@ -88,9 +95,13 @@ export class TradingComponent {
   /** Latest price from the detailed card chart (via livePriceChange). */
   readonly livePrice = signal(0);
 
+  /** Crypto name, or i18n key when missing — page-header pipes `| translate`. */
   readonly pageTitle = computed(
     () => this.selectedCrypto()?.name ?? TRADING_PAGE_TITLE_FALLBACK
   );
+
+  readonly investmentsTableTitle = 'TRADING.TABLE_INVESTMENTS';
+  readonly alertsTableTitle = 'TRADING.TABLE_ALERTS';
 
   readonly investmentColumns = TRADING_INVESTMENT_COLUMNS;
   readonly alertColumns = TRADING_ALERT_COLUMNS;
@@ -257,13 +268,13 @@ export class TradingComponent {
     try {
       const user = this.auth.currentUser();
       if (!user?.id) {
-        this.notification.warning('Please log in to set alerts');
+        this.notification.warning(this.translate.instant('ALERTS.NOTIFY_LOGIN_TO_SET'));
         return;
       }
 
       const alertPrice = Number(result.alertPrice);
       if (!Number.isFinite(alertPrice) || alertPrice <= 0) {
-        this.notification.error('Invalid alert price');
+        this.notification.error(this.translate.instant('ALERTS.NOTIFY_INVALID_PRICE'));
         return;
       }
 
@@ -278,11 +289,13 @@ export class TradingComponent {
         is_active: true,
       });
 
-      this.notification.success('Alert created');
+      this.notification.success(this.translate.instant('ALERTS.NOTIFY_CREATED'));
       await this.loadCryptoAlerts();
     } catch (err: unknown) {
       console.error('confirmSetAlert failed', err);
-      this.notification.error((err as Error)?.message || 'Failed to create alert');
+      this.notification.error(
+        (err as Error)?.message || this.translate.instant('ALERTS.NOTIFY_CREATE_FAILED')
+      );
     }
   }
 
@@ -295,25 +308,25 @@ export class TradingComponent {
     try {
       const user = this.auth.currentUser();
       if (!user?.id) {
-        this.notification.warning('Please log in to invest');
+        this.notification.warning(this.translate.instant('TRADING.NOTIFY_LOGIN_TO_INVEST'));
         return;
       }
 
       const amount = Number(result.amount);
       if (!Number.isFinite(amount) || amount <= 0) {
-        this.notification.error('Invalid amount');
+        this.notification.error(this.translate.instant('TRADING.NOTIFY_INVALID_AMOUNT'));
         return;
       }
 
       const balance = Number(user.balance || 0);
       if (balance < amount) {
-        this.notification.error('Insufficient balance');
+        this.notification.error(this.translate.instant('TRADING.NOTIFY_INSUFFICIENT_BALANCE'));
         return;
       }
 
       const currentPrice = this.livePrice();
       if (!Number.isFinite(currentPrice) || currentPrice <= 0) {
-        this.notification.error('Current price unavailable');
+        this.notification.error(this.translate.instant('TRADING.NOTIFY_PRICE_UNAVAILABLE'));
         return;
       }
 
@@ -325,10 +338,12 @@ export class TradingComponent {
       });
 
       this.activeInvestments.update((list) => [...list, newInv]);
-      this.notification.success('Investment created');
+      this.notification.success(this.translate.instant('TRADING.NOTIFY_INVESTMENT_CREATED'));
     } catch (err: unknown) {
       console.error('confirmInvest failed', err);
-      this.notification.error((err as Error)?.message || 'Failed to invest');
+      this.notification.error(
+        (err as Error)?.message || this.translate.instant('TRADING.NOTIFY_INVEST_FAILED')
+      );
     } finally {
       this.investing.set(false);
     }
@@ -341,10 +356,10 @@ export class TradingComponent {
       this.dialog
         .open(ConfirmationDialogComponent, {
           data: {
-            title: 'Sell investment',
-            message: 'Sell this investment at the current market price?',
-            confirmText: 'Sell',
-            cancelText: 'Cancel',
+            title: this.translate.instant('TRADING.CONFIRM_SELL_TITLE'),
+            message: this.translate.instant('TRADING.CONFIRM_SELL_MESSAGE'),
+            confirmText: this.translate.instant('TRADING.ACTION_SELL'),
+            cancelText: this.translate.instant('COMMON.CANCEL'),
           },
         })
         .afterClosed()
@@ -356,7 +371,7 @@ export class TradingComponent {
     try {
       const currentPrice = this.livePrice();
       if (!Number.isFinite(currentPrice) || currentPrice <= 0) {
-        throw new Error('Current price unavailable');
+        throw new Error(this.translate.instant('TRADING.NOTIFY_PRICE_UNAVAILABLE'));
       }
 
       const list = this.activeInvestments();
@@ -366,17 +381,19 @@ export class TradingComponent {
       } else if (list.length === 1) {
         inv = list[0];
       } else {
-        throw new Error('Select an investment to sell');
+        throw new Error(this.translate.instant('TRADING.NOTIFY_SELECT_INVESTMENT_TO_SELL'));
       }
 
-      if (!inv) throw new Error('Investment not found');
+      if (!inv) throw new Error(this.translate.instant('TRADING.NOTIFY_INVESTMENT_NOT_FOUND'));
 
       await this.investments.sell(inv.id, currentPrice);
-      this.notification.success('Investment sold');
+      this.notification.success(this.translate.instant('TRADING.NOTIFY_INVESTMENT_SOLD'));
       this.activeInvestments.update((items) => items.filter((i) => i.id !== inv!.id));
     } catch (err: unknown) {
       console.error('sellActiveInvestment failed', err);
-      this.notification.error((err as Error)?.message || 'Failed to sell');
+      this.notification.error(
+        (err as Error)?.message || this.translate.instant('TRADING.NOTIFY_SELL_FAILED')
+      );
     } finally {
       this.selling.set(false);
     }
@@ -386,10 +403,13 @@ export class TradingComponent {
     try {
       await this.priceAlerts.deleteById(id);
       this.cryptoAlerts.update((list) => list.filter((a) => a.id !== id));
-      this.notification.info('Alert deleted');
+      this.notification.info(this.translate.instant('ALERTS.NOTIFY_DELETED'));
     } catch (err: unknown) {
       console.error('deleteAlert failed', err);
-      this.notification.error((err as Error)?.message || 'Failed to delete alert');
+      this.notification.error(
+        (err as Error)?.message || this.translate.instant('ALERTS.NOTIFY_DELETE_FAILED')
+      );
     }
   }
+
 }

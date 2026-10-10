@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { Observable, Subject } from 'rxjs';
 import {
   AppSnackbarAction,
@@ -10,26 +11,27 @@ const AUTO_DISMISS_MS = 3500;
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService {
+  private readonly translate = inject(TranslateService);
   private readonly requestsSubject = new Subject<AppSnackbarRequest>();
 
   /** Stream of snackbar requests for the notification stack host. */
   readonly requests$: Observable<AppSnackbarRequest> = this.requestsSubject.asObservable();
 
-  success(message: string, title = 'Success'): void {
-    this.emit('success', message, title, AUTO_DISMISS_MS);
+  success(message: string, title?: string): void {
+    this.emit('success', message, title ?? this.translate.instant('NOTIFY.SUCCESS'), AUTO_DISMISS_MS);
   }
 
-  info(message: string, title = 'Info'): void {
-    this.emit('info', message, title, AUTO_DISMISS_MS);
+  info(message: string, title?: string): void {
+    this.emit('info', message, title ?? this.translate.instant('NOTIFY.INFO'), AUTO_DISMISS_MS);
   }
 
-  warning(message: string, title = 'Warning'): void {
-    this.emit('warning', message, title, AUTO_DISMISS_MS);
+  warning(message: string, title?: string): void {
+    this.emit('warning', message, title ?? this.translate.instant('NOTIFY.WARNING'), AUTO_DISMISS_MS);
   }
 
   /** Persists until the user dismisses via the close control. */
-  error(message: string, title = 'Error'): void {
-    this.emit('error', message, title, 0);
+  error(message: string, title?: string): void {
+    this.emit('error', message, title ?? this.translate.instant('NOTIFY.ERROR'), 0);
   }
 
   /**
@@ -38,10 +40,16 @@ export class NotificationService {
    */
   alert(
     message: string,
-    title = 'Crypto Alert',
+    title?: string,
     actions?: readonly AppSnackbarAction[]
   ): void {
-    this.emit('alert', message, title, 0, actions);
+    this.emit(
+      'alert',
+      message,
+      title ?? this.translate.instant('NOTIFY.CRYPTO_ALERT'),
+      0,
+      actions
+    );
   }
 
   private emit(

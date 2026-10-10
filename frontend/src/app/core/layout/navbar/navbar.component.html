@@ -1,5 +1,5 @@
 <mat-toolbar
-  class="toolbar sticky top-0 z-[100] flex h-14 items-center gap-3 border-b border-border bg-surface px-3 text-[var(--color-text-primary)] shadow-none"
+  class="toolbar sticky top-0 z-[100] flex h-14 min-h-14 max-h-14 items-center gap-3 overflow-hidden border-b border-border bg-surface px-3 text-[var(--color-text-primary)] shadow-none"
   [class.mobile-toolbar]="isMobile()"
 >
   <div class="navbar-left flex flex-1 items-center justify-start min-w-0">
@@ -8,8 +8,8 @@
       type="button"
       class="mr-2"
       (click)="menuToggle.emit()"
-      aria-label="Toggle sidebar"
-      matTooltip="Toggle sidebar"
+      [attr.aria-label]="'SHELL.TOGGLE_SIDEBAR' | translate"
+      [matTooltip]="'SHELL.TOGGLE_SIDEBAR' | translate"
     >
       <mat-icon>menu</mat-icon>
     </button>
@@ -21,11 +21,35 @@
 
   <div class="navbar-right flex flex-1 items-center justify-end min-w-0 gap-3">
     <button
+      mat-button
+      type="button"
+      class="language-selector"
+      [matMenuTriggerFor]="langMenu"
+      [attr.aria-label]="'COMMON.SELECT_LANGUAGE' | translate"
+      aria-haspopup="menu"
+    >
+      <mat-icon>language</mat-icon>
+      @if (!isMobile()) {
+        <span class="language-selector__code">{{ currentLangCode() }}</span>
+      }
+    </button>
+    <mat-menu #langMenu="matMenu" panelClass="language-menu">
+      @for (lang of languages; track lang.code) {
+        <button mat-menu-item type="button" (click)="selectLanguage(lang.code)">
+          <span class="language-menu__row">
+            <span>{{ lang.nativeName }}</span>
+            <span class="language-menu__meta">{{ lang.code | uppercase }}</span>
+          </span>
+        </button>
+      }
+    </mat-menu>
+
+    <button
       mat-icon-button
       type="button"
       (click)="toggleTheme()"
-      [attr.aria-label]="isDark() ? 'Switch to light theme' : 'Switch to dark theme'"
-      [matTooltip]="isDark() ? 'Light theme' : 'Dark theme'"
+      [attr.aria-label]="(isDark() ? 'SHELL.SWITCH_TO_LIGHT' : 'SHELL.SWITCH_TO_DARK') | translate"
+      [matTooltip]="(isDark() ? 'SHELL.LIGHT_THEME' : 'SHELL.DARK_THEME') | translate"
     >
       <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
     </button>
@@ -41,18 +65,18 @@
             mat-icon-button
             type="button"
             [matMenuTriggerFor]="userMenu"
-            aria-label="User menu"
+            [attr.aria-label]="'SHELL.USER_MENU' | translate"
           >
             <mat-icon>account_circle</mat-icon>
           </button>
           <mat-menu #userMenu="matMenu">
             <button mat-menu-item type="button" (click)="navigateTo('/app/profile')">
               <mat-icon>person</mat-icon>
-              Profile
+              {{ 'NAV.PROFILE' | translate }}
             </button>
             <button mat-menu-item type="button" (click)="logout()">
               <mat-icon>logout</mat-icon>
-              Logout
+              {{ 'NAV.LOGOUT' | translate }}
             </button>
           </mat-menu>
         </div>
@@ -64,7 +88,7 @@
 @if (isMobile()) {
   <nav
     class="bottom-nav fixed inset-x-0 bottom-0 z-[100] flex items-center justify-around border-t border-border bg-surface py-1"
-    aria-label="Primary"
+    [attr.aria-label]="'SHELL.PRIMARY_NAV' | translate"
   >
     @if (isLoggedIn()) {
       <button
@@ -75,7 +99,7 @@
         [attr.aria-current]="isActive('/app/dashboard') ? 'page' : null"
       >
         <mat-icon>dashboard</mat-icon>
-        <span>Dashboard</span>
+        <span>{{ 'NAV.DASHBOARD' | translate }}</span>
       </button>
     }
     <button
@@ -86,7 +110,7 @@
       [attr.aria-current]="isActive('/app/markets') ? 'page' : null"
     >
       <mat-icon>show_chart</mat-icon>
-      <span>Markets</span>
+      <span>{{ 'NAV.MARKETS' | translate }}</span>
     </button>
     @if (isLoggedIn()) {
       <button
@@ -97,7 +121,7 @@
         [attr.aria-current]="isActive('/app/profile') ? 'page' : null"
       >
         <mat-icon>account_balance_wallet</mat-icon>
-        <span>Portfolio</span>
+        <span>{{ 'NAV.PORTFOLIO' | translate }}</span>
       </button>
     } @else {
       <button
@@ -108,7 +132,7 @@
         [attr.aria-current]="isActive('/auth/login') ? 'page' : null"
       >
         <mat-icon>login</mat-icon>
-        <span>Login</span>
+        <span>{{ 'NAV.LOGIN' | translate }}</span>
       </button>
     }
   </nav>

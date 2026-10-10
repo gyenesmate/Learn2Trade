@@ -10,7 +10,7 @@
     <div class="app-snackbar__actions">
       @for (action of data().actions; track action.label) {
         <button mat-button type="button" class="app-snackbar__action" (click)="run(action)">
-          {{ action.label }}
+          {{ action.label | translate }}
         </button>
       }
     </div>
@@ -21,7 +21,7 @@
   mat-icon-button
   type="button"
   class="app-snackbar__close"
-  aria-label="Dismiss"
+  [attr.aria-label]="'COMMON.DISMISS' | translate"
   (click)="dismiss()"
 >
   <mat-icon>close</mat-icon>

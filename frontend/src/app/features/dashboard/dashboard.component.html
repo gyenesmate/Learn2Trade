@@ -1,5 +1,5 @@
 <div class="w-full">
-  <app-page-header [title]="pageTitle" [actions]="headerActions" />
+  <app-page-header [title]="'DASHBOARD.PAGE_TITLE'" [actions]="headerActions" />
 
   <div class="flex flex-col justify-start gap-6">
     @if (isLoading()) {
@@ -7,18 +7,20 @@
         class="flex flex-col items-center justify-center gap-4 min-h-48 text-muted"
         role="status"
         aria-live="polite"
-        aria-label="Loading"
+        [attr.aria-label]="'COMMON.LOADING' | translate"
       >
         <mat-progress-spinner mode="indeterminate" [diameter]="40" [strokeWidth]="3" />
       </div>
     } @else {
       @if (portfolio(); as portfolio) {
         <section class="app-panel">
-          <header class="app-panel__header">Portfolio Overview</header>
+          <header class="app-panel__header">{{ 'DASHBOARD.OVERVIEW_TITLE' | translate }}</header>
           <div class="app-panel__body">
             <div class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6 max-md:grid-cols-1">
               <div class="text-center p-6 bg-[var(--color-bg)] rounded-md">
-                <label class="block text-sm text-muted mb-2 uppercase font-bold">Total Value</label>
+                <label class="block text-sm text-muted mb-2 uppercase font-bold">{{
+                  'DASHBOARD.OVERVIEW_TOTAL_VALUE' | translate
+                }}</label>
                 <span class="block text-xl font-bold text-[var(--color-text)] mb-2 tabular-nums"
                   >${{ portfolio.totalValue }}</span
                 >
@@ -31,13 +33,17 @@
                 </span>
               </div>
               <div class="text-center p-6 bg-[var(--color-bg)] rounded-md">
-                <label class="block text-sm text-muted mb-2 uppercase font-bold">Total Invested</label>
+                <label class="block text-sm text-muted mb-2 uppercase font-bold">{{
+                  'DASHBOARD.OVERVIEW_TOTAL_INVESTED' | translate
+                }}</label>
                 <span class="block text-xl font-bold text-[var(--color-text)] tabular-nums"
                   >${{ portfolio.totalInvested }}</span
                 >
               </div>
               <div class="text-center p-6 bg-[var(--color-bg)] rounded-md">
-                <label class="block text-sm text-muted mb-2 uppercase font-bold">Total Profit/Loss</label>
+                <label class="block text-sm text-muted mb-2 uppercase font-bold">{{
+                  'DASHBOARD.OVERVIEW_TOTAL_PNL' | translate
+                }}</label>
                 <span
                   class="block text-xl font-bold tabular-nums"
                   [class.price-up]="portfolio.totalPnL > 0"
@@ -47,7 +53,9 @@
                 </span>
               </div>
               <div class="text-center p-6 bg-[var(--color-bg)] rounded-md">
-                <label class="block text-sm text-muted mb-2 uppercase font-bold">Best Performer</label>
+                <label class="block text-sm text-muted mb-2 uppercase font-bold">{{
+                  'DASHBOARD.OVERVIEW_BEST_PERFORMER' | translate
+                }}</label>
                 <span class="block text-xl font-bold text-[var(--color-text)] mb-2">{{
                   portfolio.bestPerformer.name
                 }}</span>
@@ -64,13 +72,13 @@
         </section>
       } @else {
         <section class="flex flex-col items-center justify-center gap-4 min-h-48 text-muted" role="status">
-          <p class="m-0 text-center">No open positions yet. Browse markets to start a practice investment.</p>
+          <p class="m-0 text-center">{{ 'DASHBOARD.EMPTY_NO_POSITIONS' | translate }}</p>
         </section>
       }
 
       @if (holdings().length) {
         <section class="app-panel">
-          <header class="app-panel__header">Holdings</header>
+          <header class="app-panel__header">{{ 'DASHBOARD.HOLDINGS_TITLE' | translate }}</header>
           <div class="app-panel__body app-panel__body--flush">
             <app-data-table [columns]="holdingsColumns" [data]="holdings()" />
           </div>
@@ -79,7 +87,7 @@
 
       @if (investments().length) {
         <section class="app-panel">
-          <header class="app-panel__header">Analytics</header>
+          <header class="app-panel__header">{{ 'DASHBOARD.ANALYTICS_TITLE' | translate }}</header>
           <div class="app-panel__body">
             <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
               <app-analytics-card [state]="'best'" [investments]="investments()" />

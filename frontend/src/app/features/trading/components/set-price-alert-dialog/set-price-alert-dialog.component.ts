@@ -9,6 +9,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BaseDialogComponent } from '@shared/components/base-dialog/base-dialog.component';
 import {
   SetPriceAlertDialogData,
@@ -25,6 +26,7 @@ import {
     MatInputModule,
     DecimalPipe,
     BaseDialogComponent,
+    TranslatePipe,
   ],
   templateUrl: './set-price-alert-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

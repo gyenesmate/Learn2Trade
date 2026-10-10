@@ -19,7 +19,7 @@
         <div class="app-panel flex-1 min-h-0 overflow-auto">
           <div class="app-panel__body app-panel__body--flush">
             <app-data-table
-              [title]="'Investments'"
+              [title]="investmentsTableTitle"
               [columns]="investmentColumns"
               [data]="investmentRows()"
               [actionBar]="investmentActionBar"
@@ -31,7 +31,7 @@
         <div class="app-panel flex-1 min-h-0 overflow-auto">
           <div class="app-panel__body app-panel__body--flush">
             <app-data-table
-              [title]="'Alerts'"
+              [title]="alertsTableTitle"
               [columns]="alertColumns"
               [data]="alertRows()"
               [actionBar]="alertActionBar"
@@ -44,9 +44,9 @@
   } @else {
     <div class="app-panel max-w-lg">
       <div class="app-panel__body">
-        <h2 class="m-0">Crypto not found</h2>
-        <p>No crypto with id: <strong>{{ selectedId() }}</strong></p>
-        <a mat-flat-button routerLink="/app/markets">Go back</a>
+        <h2 class="m-0">{{ 'TRADING.NOT_FOUND_TITLE' | translate }}</h2>
+        <p>{{ 'TRADING.NOT_FOUND_BODY' | translate: { id: selectedId() } }}</p>
+        <a mat-flat-button routerLink="/app/markets">{{ 'TRADING.GO_BACK' | translate }}</a>
       </div>
     </div>
   }

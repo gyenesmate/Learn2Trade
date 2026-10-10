@@ -5,7 +5,7 @@
   }
 </div>
 
-<nav class="sidebar__nav" aria-label="Primary">
+<nav class="sidebar__nav" [attr.aria-label]="'SHELL.PRIMARY_NAV' | translate">
   @for (row of mainLinks(); track row.link.id) {
     <button
       type="button"
@@ -13,24 +13,24 @@
       [class.sidebar__link--active]="row.active"
       [class.sidebar__link--disabled]="row.disabled"
       [disabled]="row.disabled"
-      [attr.aria-label]="row.link.label"
+      [attr.aria-label]="row.link.label | translate"
       [attr.aria-current]="row.active ? 'page' : null"
-      [matTooltip]="collapsed() ? row.link.label : ''"
+      [matTooltip]="collapsed() ? (row.link.label | translate) : ''"
       matTooltipPosition="right"
       (click)="navigateTo(row.link)"
     >
       <mat-icon class="sidebar__link-icon" aria-hidden="true">{{ row.link.icon }}</mat-icon>
       @if (!collapsed()) {
-        <span class="sidebar__link-label">{{ row.link.label }}</span>
+        <span class="sidebar__link-label">{{ row.link.label | translate }}</span>
       }
     </button>
   }
 </nav>
 
 @if (adminLinks().length > 0) {
-  <nav class="sidebar__admin" aria-label="Admin">
+  <nav class="sidebar__admin" [attr.aria-label]="'SHELL.ADMIN_SECTION' | translate">
     @if (!collapsed()) {
-      <span class="sidebar__section-label">Admin</span>
+      <span class="sidebar__section-label">{{ 'COMMON.ADMIN' | translate }}</span>
     }
     @for (row of adminLinks(); track row.link.id) {
       <button
@@ -39,15 +39,15 @@
         [class.sidebar__link--active]="row.active"
         [class.sidebar__link--disabled]="row.disabled"
         [disabled]="row.disabled"
-        [attr.aria-label]="row.link.label"
+        [attr.aria-label]="row.link.label | translate"
         [attr.aria-current]="row.active ? 'page' : null"
-        [matTooltip]="collapsed() ? row.link.label : ''"
+        [matTooltip]="collapsed() ? (row.link.label | translate) : ''"
         matTooltipPosition="right"
         (click)="navigateTo(row.link)"
       >
         <mat-icon class="sidebar__link-icon" aria-hidden="true">{{ row.link.icon }}</mat-icon>
         @if (!collapsed()) {
-          <span class="sidebar__link-label">{{ row.link.label }}</span>
+          <span class="sidebar__link-label">{{ row.link.label | translate }}</span>
         }
       </button>
     }
@@ -55,7 +55,7 @@
 }
 
 @if (footerLinks().length > 0) {
-  <nav class="sidebar__footer" aria-label="Account">
+  <nav class="sidebar__footer" [attr.aria-label]="'SHELL.ACCOUNT_NAV' | translate">
     @for (row of footerLinks(); track row.link.id) {
       <button
         type="button"
@@ -63,15 +63,15 @@
         [class.sidebar__link--active]="row.active"
         [class.sidebar__link--disabled]="row.disabled"
         [disabled]="row.disabled"
-        [attr.aria-label]="row.link.label"
+        [attr.aria-label]="row.link.label | translate"
         [attr.aria-current]="row.active ? 'page' : null"
-        [matTooltip]="collapsed() ? row.link.label : ''"
+        [matTooltip]="collapsed() ? (row.link.label | translate) : ''"
         matTooltipPosition="right"
         (click)="navigateTo(row.link)"
       >
         <mat-icon class="sidebar__link-icon" aria-hidden="true">{{ row.link.icon }}</mat-icon>
         @if (!collapsed()) {
-          <span class="sidebar__link-label">{{ row.link.label }}</span>
+          <span class="sidebar__link-label">{{ row.link.label | translate }}</span>
         }
       </button>
     }

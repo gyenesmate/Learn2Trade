@@ -5,7 +5,7 @@ export const SIDEBAR_LINKS: readonly SidebarLink[] = [
   {
     id: 'dashboard',
     route: '/app/dashboard',
-    label: 'Dashboard',
+    label: 'NAV.DASHBOARD',
     icon: 'dashboard',
     visibility: 'authenticated',
     section: 'main',
@@ -16,7 +16,7 @@ export const SIDEBAR_LINKS: readonly SidebarLink[] = [
   {
     id: 'markets',
     route: '/app/markets',
-    label: 'Markets',
+    label: 'NAV.MARKETS',
     icon: 'show_chart',
     visibility: 'always',
     section: 'main',
@@ -27,7 +27,7 @@ export const SIDEBAR_LINKS: readonly SidebarLink[] = [
   {
     id: 'portfolio',
     route: '/app/profile',
-    label: 'Portfolio',
+    label: 'NAV.PORTFOLIO',
     icon: 'account_balance_wallet',
     visibility: 'authenticated',
     section: 'main',
@@ -37,7 +37,7 @@ export const SIDEBAR_LINKS: readonly SidebarLink[] = [
   },
   {
     id: 'watchlist',
-    label: 'Watchlist',
+    label: 'NAV.WATCHLIST',
     icon: 'bookmark',
     visibility: 'authenticated',
     section: 'main',
@@ -48,7 +48,7 @@ export const SIDEBAR_LINKS: readonly SidebarLink[] = [
   {
     id: 'admin-crypto',
     route: '/app/admin/crypto-currencies/new',
-    label: 'Crypto admin',
+    label: 'NAV.CRYPTO_ADMIN',
     icon: 'currency_bitcoin',
     visibility: 'admin',
     section: 'admin',
@@ -57,7 +57,7 @@ export const SIDEBAR_LINKS: readonly SidebarLink[] = [
   {
     id: 'login',
     route: '/auth/login',
-    label: 'Login',
+    label: 'NAV.LOGIN',
     icon: 'login',
     visibility: 'anonymous',
     section: 'footer',
@@ -66,7 +66,7 @@ export const SIDEBAR_LINKS: readonly SidebarLink[] = [
   {
     id: 'register',
     route: '/auth/register',
-    label: 'Register',
+    label: 'NAV.REGISTER',
     icon: 'person_add',
     visibility: 'anonymous',
     section: 'footer',

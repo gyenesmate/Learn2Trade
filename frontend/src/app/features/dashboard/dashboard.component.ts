@@ -13,10 +13,10 @@ import { NotificationService } from '@core/services/notification.service';
 import { BinanceRestService } from '@core/binance/binance-rest.service';
 import { toBinancePair } from '@core/binance/binance.utils';
 import { isInvestmentSold } from '@core/utils/investment.util';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   DASHBOARD_HEADER_ACTIONS,
   DASHBOARD_HOLDINGS_COLUMNS,
-  DASHBOARD_PAGE_TITLE,
   DashboardHoldingRow,
 } from './dashboard.const';
 
@@ -27,6 +27,7 @@ import {
     PageHeaderComponent,
     DataTableComponent,
     MatProgressSpinnerModule,
+    TranslatePipe,
   ],
   templateUrl: './dashboard.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -38,8 +39,9 @@ export class DashboardComponent implements OnInit {
   private readonly notification = inject(NotificationService);
   private readonly binanceRest = inject(BinanceRestService);
   private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
 
-  readonly pageTitle = DASHBOARD_PAGE_TITLE;
+  /** Keys only — table / page-header translate reactively. */
   readonly holdingsColumns = DASHBOARD_HOLDINGS_COLUMNS;
   readonly headerActions: PageHeaderAction[] = [
     {
@@ -90,7 +92,7 @@ export class DashboardComponent implements OnInit {
       );
     } catch (error) {
       console.error('Failed to load dashboard data', error);
-      this.notification.error('Failed to load dashboard data');
+      this.notification.error(this.translate.instant('DASHBOARD.NOTIFY_LOAD_ERROR'));
     } finally {
       this.isLoading.set(false);
     }

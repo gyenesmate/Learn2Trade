@@ -2,26 +2,26 @@
   <app-page-header [title]="pageTitle" />
 
   @if (loading()) {
-    <div class="text-muted">Loading...</div>
+    <div class="text-muted">{{ 'COMMON.LOADING' | translate }}</div>
   }
 
   @if (!loading()) {
     <form class="grid gap-4" [formGroup]="form" (ngSubmit)="save()">
       <mat-form-field class="w-full">
-        <mat-label>Name</mat-label>
+        <mat-label>{{ 'MARKETS.ADMIN_NAME' | translate }}</mat-label>
         <input matInput formControlName="name" />
         @if (form.controls.name.touched && form.controls.name.invalid) {
-          <mat-error>Name is required.</mat-error>
+          <mat-error>{{ 'MARKETS.ADMIN_NAME_REQUIRED' | translate }}</mat-error>
         }
       </mat-form-field>
 
       <mat-form-field class="w-full">
-        <mat-label>Binance market</mat-label>
+        <mat-label>{{ 'MARKETS.ADMIN_BINANCE_MARKET' | translate }}</mat-label>
         <input
           matInput
           formControlName="market"
           [matAutocomplete]="marketAuto"
-          placeholder="Search base / quote / symbol"
+          [placeholder]="'MARKETS.ADMIN_MARKET_SEARCH_PLACEHOLDER' | translate"
           autocomplete="off"
         />
         <mat-autocomplete
@@ -30,9 +30,9 @@
           (optionSelected)="onMarketSelected($event.option.value)"
         >
           @if (marketsLoading()) {
-            <mat-option disabled>Loading markets…</mat-option>
+            <mat-option disabled>{{ 'MARKETS.ADMIN_MARKET_LOADING' | translate }}</mat-option>
           } @else if (filteredMarkets().length === 0) {
-            <mat-option disabled>No matching markets</mat-option>
+            <mat-option disabled>{{ 'MARKETS.ADMIN_NO_MATCHING_MARKETS' | translate }}</mat-option>
           } @else {
             @for (m of filteredMarkets(); track m.symbol) {
               <mat-option [value]="m">
@@ -43,20 +43,24 @@
           }
         </mat-autocomplete>
         @if (form.controls.market.touched && form.controls.market.invalid) {
-          <mat-error>Select a valid Binance market.</mat-error>
+          <mat-error>{{ 'MARKETS.ADMIN_MARKET_INVALID' | translate }}</mat-error>
         }
       </mat-form-field>
 
       @if (marketMissingWarning()) {
         <p class="text-warning m-0 text-sm">
-          This crypto’s symbol/quote is not a TRADING Binance spot market. Pick a valid market before saving.
+          {{ 'MARKETS.ADMIN_MARKET_WARNING' | translate }}
         </p>
       }
 
       <div class="flex justify-end gap-3">
-        <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+        <button type="button" class="btn btn-secondary" (click)="cancel()">{{ 'COMMON.CANCEL' | translate }}</button>
         <button type="submit" class="btn btn-primary" [disabled]="saving() || form.invalid">
-          {{ saving() ? 'Saving...' : 'Save' }}
+          @if (saving()) {
+            {{ 'COMMON.SAVING' | translate }}
+          } @else {
+            {{ 'COMMON.SAVE' | translate }}
+          }
         </button>
       </div>
     </form>

@@ -22,6 +22,7 @@ import { BinanceMarketDataService } from '@core/binance/binance-market-data.serv
 import { MarketTicker } from '@core/binance/binance.types';
 import { toBinancePair } from '@core/binance/binance.utils';
 import { BaseDialogComponent } from '@shared/components/base-dialog/base-dialog.component';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import {
   WatchlistDialogListState,
   WatchlistDialogRow,
@@ -37,6 +38,7 @@ import {
     MatProgressSpinnerModule,
     MatTooltipModule,
     BaseDialogComponent,
+    TranslatePipe,
   ],
   templateUrl: './watchlist-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,6 +50,7 @@ export class WatchlistDialogComponent implements OnDestroy {
   private readonly marketData = inject(BinanceMarketDataService);
   private readonly notification = inject(NotificationService);
   private readonly router = inject(Router);
+  private readonly translate = inject(TranslateService);
 
   private readonly cryptos = signal<CryptoCurrency[]>([]);
   private readonly tickers = signal(new Map<string, MarketTicker>());
@@ -90,10 +93,10 @@ export class WatchlistDialogComponent implements OnDestroy {
   async remove(cryptoId: string): Promise<void> {
     try {
       await this.watchlist.deleteByCryptoCurrencyId(cryptoId);
-      this.notification.info('Removed from watchlist');
+      this.notification.info(this.translate.instant('WATCHLIST.NOTIFY_REMOVED'));
       this.wireTickers();
     } catch {
-      this.notification.error('Failed to remove from watchlist');
+      this.notification.error(this.translate.instant('WATCHLIST.NOTIFY_REMOVE_FAILED'));
     }
   }
 

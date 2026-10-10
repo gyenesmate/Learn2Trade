@@ -15,6 +15,7 @@ import { MatAutocompleteModule, MatAutocompleteTrigger } from '@angular/material
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Subject, startWith } from 'rxjs';
 import { GlobalSearchService } from '@core/search/global-search.service';
 import { SearchResult } from '@core/search/search.types';
@@ -28,6 +29,7 @@ import { SearchResultComponent } from './components/search-result/search-result.
     MatInputModule,
     MatAutocompleteModule,
     MatIconModule,
+    TranslatePipe,
     SearchResultComponent,
   ],
   templateUrl: './global-search.component.html',

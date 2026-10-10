@@ -9,6 +9,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BaseDialogComponent } from '@shared/components/base-dialog/base-dialog.component';
 import { InvestDialogData, InvestDialogResult } from './invest-dialog.types';
 
@@ -22,6 +23,7 @@ import { InvestDialogData, InvestDialogResult } from './invest-dialog.types';
     MatInputModule,
     DecimalPipe,
     BaseDialogComponent,
+    TranslatePipe,
   ],
   templateUrl: './invest-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -30,7 +32,13 @@ export class InvestDialogComponent {
   private readonly dialogRef =
     inject<MatDialogRef<InvestDialogComponent, InvestDialogResult | null>>(MatDialogRef);
   private readonly fb = inject(FormBuilder);
+  private readonly decimalPipe = inject(DecimalPipe);
   readonly data = inject<InvestDialogData>(MAT_DIALOG_DATA);
+
+  get availableBalanceText(): string {
+    const formatted = this.decimalPipe.transform(this.data.availableBalance, '1.2-2') ?? '0.00';
+    return `$${formatted}`;
+  }
 
   readonly form = this.fb.nonNullable.group({
     amount: [0 as number, [Validators.required, Validators.min(0.01)]],

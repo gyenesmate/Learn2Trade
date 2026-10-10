@@ -13,11 +13,11 @@ export const DEFAULT_KLINE_INTERVAL = '15m' as const;
 export const KLINE_HISTORY_LIMIT = 500;
 
 export const CHART_INDICATORS = [
-  { id: 'volume', label: 'Volume', defaultEnabled: true },
-  { id: 'sma20', label: 'SMA 20', defaultEnabled: false },
-  { id: 'ema20', label: 'EMA 20', defaultEnabled: false },
-  { id: 'ema50', label: 'EMA 50', defaultEnabled: false },
-  { id: 'rsi14', label: 'RSI 14', defaultEnabled: false },
+  { id: 'volume', label: 'TRADING.IND_VOLUME', defaultEnabled: true },
+  { id: 'sma20', label: 'TRADING.IND_SMA20', defaultEnabled: false },
+  { id: 'ema20', label: 'TRADING.IND_EMA20', defaultEnabled: false },
+  { id: 'ema50', label: 'TRADING.IND_EMA50', defaultEnabled: false },
+  { id: 'rsi14', label: 'TRADING.IND_RSI14', defaultEnabled: false },
 ] as const;
 
 export const SMA_PERIOD = 20;

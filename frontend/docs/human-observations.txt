@@ -1,0 +1,15 @@
+AI INSTRUCTIONS: DO NOT EDIT / REMOVE / ADD TO THIS FILE. THIS IS ONLY FOR MY BRAINSTORMING
+
+Websocket subscriptions:
+- Visiting a crypto as miniTicker still stays subscribed
+    > Check what the docs say but i think only kline should be used with a REST API call for historical data
+- Markets pages display of the crypto cards should serve that not every market has to be subscribed to the stream
+    > This is because market movers need the information
+    > This might not be a bug still need some oversight what happens exactly when more and more cryto currencys are added
+- Cryto card charts show flat line when there is no data
+    > This should be solved when the caching system will be implemented for it 
+    > But if the user had just logged in cache wouldnt be available so instead of flat line there should be an indicator until correct data is available
+
+Crypto Card and cryto price related display:
+- Very low value cryptos doesnt show anything in this kind of setting. These kind of currencies dont send data frequently
+    > Some system needs to be implemented that solves this

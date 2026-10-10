@@ -1,32 +1,41 @@
 <app-base-dialog>
-  <ng-container dialogTitle>Invest in {{ data.crypto.name }}</ng-container>
+  <ng-container dialogTitle>{{
+    'TRADING.INVEST_DIALOG_TITLE' | translate: { name: data.crypto.name }
+  }}</ng-container>
 
   <div class="flex flex-col gap-3">
-    <div class="text-[var(--color-text)]"><strong>Symbol:</strong> {{ data.crypto.symbol }}</div>
-    <div class="text-[var(--color-text)]"><strong>Exchange:</strong> {{ data.crypto.exchange_currency }}</div>
     <div class="text-[var(--color-text)]">
-      <strong>Current price:</strong> {{ data.currentPrice | number: '1.2-6' }}
+      <strong>{{ 'TRADING.INVEST_SYMBOL' | translate }}</strong> {{ data.crypto.symbol }}
     </div>
-    <p class="m-0 text-muted text-sm">Available: ${{ data.availableBalance | number: '1.2-2' }}</p>
+    <div class="text-[var(--color-text)]">
+      <strong>{{ 'TRADING.INVEST_EXCHANGE' | translate }}</strong> {{ data.crypto.exchange_currency }}
+    </div>
+    <div class="text-[var(--color-text)]">
+      <strong>{{ 'TRADING.INVEST_CURRENT_PRICE' | translate }}</strong>
+      {{ data.currentPrice | number: '1.2-6' }}
+    </div>
+    <p class="m-0 text-muted text-sm">
+      {{ 'TRADING.INVEST_AVAILABLE' | translate: { amount: availableBalanceText } }}
+    </p>
 
     <form class="flex flex-col gap-2 mt-3" [formGroup]="form" (ngSubmit)="confirm()">
       <mat-form-field class="w-full" appearance="outline">
-        <mat-label>Amount ($)</mat-label>
+        <mat-label>{{ 'TRADING.INVEST_AMOUNT_LABEL' | translate }}</mat-label>
         <input matInput type="number" min="0.01" step="0.01" formControlName="amount" />
         @if (form.controls.amount.touched && form.controls.amount.invalid) {
-          <mat-error>Enter an amount greater than 0</mat-error>
+          <mat-error>{{ 'TRADING.INVEST_AMOUNT_INVALID' | translate }}</mat-error>
         }
       </mat-form-field>
 
       <mat-form-field class="w-full" appearance="outline">
-        <mat-label>Description</mat-label>
+        <mat-label>{{ 'TRADING.INVEST_DESCRIPTION_LABEL' | translate }}</mat-label>
         <textarea matInput rows="3" formControlName="description"></textarea>
       </mat-form-field>
     </form>
   </div>
 
   <ng-container dialogActions>
-    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-button type="button" (click)="cancel()">{{ 'COMMON.CANCEL' | translate }}</button>
     <button
       mat-flat-button
       color="primary"
@@ -34,7 +43,7 @@
       (click)="confirm()"
       [disabled]="form.invalid"
     >
-      Invest
+      {{ 'TRADING.ACTION_INVEST' | translate }}
     </button>
   </ng-container>
 </app-base-dialog>

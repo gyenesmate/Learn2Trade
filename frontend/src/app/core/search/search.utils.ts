@@ -2,12 +2,13 @@ import { SearchResult, SearchResultGroup, SearchResultType } from './search.type
 
 const GROUP_ORDER: SearchResultType[] = ['market', 'navigation', 'action', 'asset', 'setting'];
 
+/** Translation keys under SEARCH.*; templates pipe with `| translate`. */
 const GROUP_LABELS: Record<SearchResultType, string> = {
-  market: 'Markets',
-  navigation: 'Navigation',
-  action: 'Actions',
-  asset: 'Assets',
-  setting: 'Settings',
+  market: 'SEARCH.GROUP_MARKETS',
+  navigation: 'SEARCH.GROUP_NAVIGATION',
+  action: 'SEARCH.GROUP_ACTIONS',
+  asset: 'SEARCH.GROUP_ASSETS',
+  setting: 'SEARCH.GROUP_SETTINGS',
 };
 
 export function normalizeQuery(query: string): string {

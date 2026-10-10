@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AnalyticsCardState } from './analytics-card.types';
 import { Investment } from '@core/models/models';
 import { isInvestmentSold } from '@core/utils/investment.util';
@@ -30,7 +31,7 @@ function soldMetrics(inv: Investment): SoldView {
 
 @Component({
   selector: 'app-analytics-card',
-  imports: [DatePipe, DecimalPipe],
+  imports: [DatePipe, DecimalPipe, TranslatePipe],
   templateUrl: './analytics-card.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

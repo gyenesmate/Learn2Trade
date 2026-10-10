@@ -6,6 +6,7 @@ import {
   signal,
 } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { SidebarComponent } from '../sidebar/sidebar.component';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { SHELL_MOBILE_MAX_PX } from '../layout-breakpoints';
@@ -13,7 +14,7 @@ import { SHELL_MOBILE_MAX_PX } from '../layout-breakpoints';
 /** Persistent shell for main application routes. */
 @Component({
   selector: 'app-base-layout',
-  imports: [RouterOutlet, SidebarComponent, NavbarComponent],
+  imports: [RouterOutlet, SidebarComponent, NavbarComponent, TranslatePipe],
   templateUrl: './base-layout.component.html',
   styleUrl: './base-layout.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

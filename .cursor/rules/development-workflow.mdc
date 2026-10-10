@@ -19,10 +19,21 @@ Governance layer for all implementations (including Superpowers, skills, and sub
 - Keep changes focused, maintainable, and consistent.
 - Superpowers/subagents may create intermediate planning, spec, and progress files when their workflow needs them — place those under `.cursor/ai-workspace/` (see Documentation).
 
+### i18n language catalogs
+
+When adding or changing keys under `frontend/public/i18n/`:
+
+- Add the same key path to **every** language file (`en.json`, `hu.json`, `de.json`, and any future locale).
+- Translate each new or changed value into that file’s language — do not leave other locales on English (or missing) copy.
+- All language files must always contain the **same set and count of keys** (same nested structure). Prefer updating catalogs in one change set so they never drift.
+- Preserve interpolation placeholders (`{{param}}`) identically across locales.
+- See [`frontend/docs/I18N_CONVENTIONS.md`](../../frontend/docs/I18N_CONVENTIONS.md) for naming and usage rules.
+
 ## 3. Verification
 
 - Review changes; run relevant tests, lint, typecheck, and builds where applicable.
 - Flag unused code, debugging artifacts, and unintended diffs.
+- If i18n catalogs changed: confirm all `frontend/public/i18n/*.json` files share the same key set/count and that non-English files are translated (not English leftovers).
 
 ## 4. Documentation Management & Cleanup
 

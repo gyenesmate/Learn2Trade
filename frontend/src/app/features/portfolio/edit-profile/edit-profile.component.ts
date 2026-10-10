@@ -8,11 +8,19 @@ import { AuthService } from '@core/services/auth.service';
 import { UsersService } from '@core/services/users.service';
 import { NotificationService } from '@core/services/notification.service';
 import { PageHeaderComponent } from '@shared/components/page-header/page-header.component';
-import { EDIT_PROFILE_PAGE_TITLE } from './edit-profile.const';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { EDIT_PROFILE_THEME_OPTIONS } from './edit-profile.const';
 
 @Component({
   selector: 'app-edit-profile',
-  imports: [ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatSelectModule, PageHeaderComponent],
+  imports: [
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    PageHeaderComponent,
+    TranslatePipe,
+  ],
   templateUrl: './edit-profile.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block w-full max-w-[50%] mx-auto max-md:max-w-full' },
@@ -23,8 +31,9 @@ export class EditProfileComponent {
   private readonly usersService = inject(UsersService);
   private readonly notification = inject(NotificationService);
   private readonly fb = inject(FormBuilder);
+  private readonly translate = inject(TranslateService);
 
-  readonly pageTitle = EDIT_PROFILE_PAGE_TITLE;
+  readonly themeOptions = EDIT_PROFILE_THEME_OPTIONS;
 
   readonly form = this.fb.nonNullable.group({
     username: [this.authService.currentUser()?.username ?? '', Validators.required],
@@ -40,11 +49,11 @@ export class EditProfileComponent {
     const { username, theme } = this.form.getRawValue();
     try {
       await this.usersService.updateProfile({ username, theme });
-      this.notification.success('Profile updated successfully!');
+      this.notification.success(this.translate.instant('PROFILE.NOTIFY_UPDATED'));
       void this.router.navigate(['/app/profile']);
     } catch (error) {
       console.error('Error updating profile:', error);
-      this.notification.error('Error updating profile. Please try again.');
+      this.notification.error(this.translate.instant('PROFILE.NOTIFY_UPDATE_ERROR'));
     }
   }
 

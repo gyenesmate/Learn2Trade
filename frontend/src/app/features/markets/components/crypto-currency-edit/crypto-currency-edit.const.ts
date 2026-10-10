@@ -1,4 +1,4 @@
 export const CRYPTO_CURRENCY_EDIT_TITLES = {
-  add: 'Add crypto currency',
-  edit: 'Edit crypto currency',
+  add: 'MARKETS.ADMIN_TITLE_ADD',
+  edit: 'MARKETS.ADMIN_TITLE_EDIT',
 } as const;

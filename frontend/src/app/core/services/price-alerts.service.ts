@@ -278,13 +278,13 @@ export class PriceAlertsService {
 
       this.notification.alert(message, label, [
         {
-          label: 'View',
+          label: 'ALERTS.VIEW',
           run: () => {
             void this.router.navigate(['/app/crypto', a.crypto_currency_id]);
           },
         },
         {
-          label: 'Stop',
+          label: 'ALERTS.STOP',
           run: () => {
             void this.deactivate(a.id);
           },

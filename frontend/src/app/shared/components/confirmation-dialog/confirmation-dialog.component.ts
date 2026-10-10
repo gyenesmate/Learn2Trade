@@ -1,12 +1,13 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslatePipe } from '@ngx-translate/core';
 import { BaseDialogComponent } from '../base-dialog/base-dialog.component';
 import { ConfirmationDialogData } from './confirmation-dialog.types';
 
 @Component({
   selector: 'app-confirmation-dialog',
-  imports: [MatDialogModule, MatButtonModule, BaseDialogComponent],
+  imports: [MatDialogModule, MatButtonModule, BaseDialogComponent, TranslatePipe],
   templateUrl: './confirmation-dialog.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

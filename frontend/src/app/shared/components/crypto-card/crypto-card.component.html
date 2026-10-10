@@ -22,11 +22,11 @@
           >
             <span class="crypto-live__dot" aria-hidden="true"></span>
             @if (isReconnecting()) {
-              Reconnecting
+              {{ 'MARKETS.LIVE_RECONNECTING' | translate }}
             } @else if (isLive()) {
-              Live
+              {{ 'MARKETS.LIVE_ON' | translate }}
             } @else {
-              Offline
+              {{ 'MARKETS.LIVE_OFF' | translate }}
             }
           </span>
         }
@@ -36,8 +36,8 @@
             type="button"
             mat-icon-button
             class="crypto-card__expand"
-            matTooltip="Expand to featured"
-            aria-label="Expand to featured"
+            [matTooltip]="'MARKETS.EXPAND_TO_FEATURED' | translate"
+            [attr.aria-label]="'MARKETS.EXPAND_TO_FEATURED' | translate"
             (click)="onExpandClick($event)"
           >
             <mat-icon>unfold_more</mat-icon>
@@ -51,8 +51,15 @@
             [class.is-in-watchlist]="isInWatchlist()"
             (click)="saveToWatchlist()"
             [disabled]="watchlistSaving()"
-            [attr.aria-label]="isInWatchlist() ? 'Remove from watchlist' : 'Save to watchlist'"
-            [matTooltip]="isInWatchlist() ? 'In watchlist' : (watchlistSaving() ? 'Saving...' : 'Save to watchlist')"
+            [attr.aria-label]="(isInWatchlist() ? 'WATCHLIST.REMOVE' : 'WATCHLIST.SAVE') | translate"
+            [matTooltip]="
+              (isInWatchlist()
+                ? 'WATCHLIST.IN_WATCHLIST'
+                : watchlistSaving()
+                  ? 'COMMON.SAVING'
+                  : 'WATCHLIST.SAVE'
+              ) | translate
+            "
           >
             <mat-icon>{{ isInWatchlist() ? 'bookmark' : 'bookmark_border' }}</mat-icon>
           </button>
@@ -73,7 +80,7 @@
         class="crypto-chart-compact-wrap"
         tabindex="0"
         role="img"
-        [attr.aria-label]="'Sparkline, last price $' + (livePrice() | number: '1.2-2')"
+        [attr.aria-label]="'MARKETS.SPARKLINE_ARIA' | translate: { price: (livePrice() | number: '1.2-2') }"
         (focus)="onCompactFocus()"
         (blur)="onCompactBlur()"
       >
@@ -94,7 +101,7 @@
         </span>
       </div>
       <a class="btn btn-primary crypto-card__view-chart" [routerLink]="['/app/crypto', coin.id]">
-        View Chart
+        {{ 'MARKETS.VIEW_CHART' | translate }}
       </a>
     } @else if (state() === 'intermediate') {
       <div class="crypto-info crypto-info--intermediate">
@@ -125,7 +132,7 @@
         class="crypto-chart-compact-wrap crypto-chart-compact-wrap--intermediate"
         tabindex="0"
         role="img"
-        [attr.aria-label]="'Sparkline, last price $' + (livePrice() | number: '1.2-2')"
+        [attr.aria-label]="'MARKETS.SPARKLINE_ARIA' | translate: { price: (livePrice() | number: '1.2-2') }"
         (focus)="onCompactFocus()"
         (blur)="onCompactBlur()"
       >
@@ -148,7 +155,7 @@
 
       <div class="crypto-stats">
         <div class="crypto-stats__item">
-          <span class="crypto-stats__label">24h Volume</span>
+          <span class="crypto-stats__label">{{ 'MARKETS.STAT_24H_VOLUME' | translate }}</span>
           <span class="crypto-stats__value">
             @if (quoteVolume24h(); as vol) {
               ${{ vol | number: '1.0-0' }}
@@ -158,7 +165,7 @@
           </span>
         </div>
         <div class="crypto-stats__item">
-          <span class="crypto-stats__label">24h High</span>
+          <span class="crypto-stats__label">{{ 'MARKETS.STAT_24H_HIGH' | translate }}</span>
           <span class="crypto-stats__value">
             @if (high24h(); as high) {
               ${{ high | number: '1.2-2' }}
@@ -168,7 +175,7 @@
           </span>
         </div>
         <div class="crypto-stats__item">
-          <span class="crypto-stats__label">24h Low</span>
+          <span class="crypto-stats__label">{{ 'MARKETS.STAT_24H_LOW' | translate }}</span>
           <span class="crypto-stats__value">
             @if (low24h(); as low) {
               ${{ low | number: '1.2-2' }}
@@ -181,21 +188,21 @@
       </div>
 
       <a class="btn btn-primary crypto-card__view-chart" [routerLink]="['/app/crypto', coin.id]">
-        View market →
+        {{ 'MARKETS.VIEW_MARKET' | translate }}
       </a>
     } @else if (binancePair(); as pair) {
       <div class="crypto-card__chart">
         <app-crypto-chart [pair]="pair" (livePriceChange)="onChartLivePrice($event)" />
       </div>
     } @else {
-      <p class="crypto-card__unsupported">No Binance market mapping for this symbol.</p>
+      <p class="crypto-card__unsupported">{{ 'MARKETS.NO_BINANCE_PAIR' | translate }}</p>
     }
   </mat-card>
 } @else {
   <mat-card appearance="outlined" class="crypto-card placeholder">
     <div class="crypto-header">
       <div class="crypto-header__identity">
-        <span class="crypto-name">Loading...</span>
+        <span class="crypto-name">{{ 'COMMON.LOADING' | translate }}</span>
         <span class="crypto-exchange">&nbsp;</span>
       </div>
     </div>

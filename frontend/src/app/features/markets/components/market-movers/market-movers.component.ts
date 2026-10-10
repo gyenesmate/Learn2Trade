@@ -2,21 +2,22 @@ import { ChangeDetectionStrategy, Component, computed, input, signal } from '@an
 import { DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { TranslatePipe } from '@ngx-translate/core';
 import { MarketMoverMode, MarketMoverRow } from './market-movers.types';
 
 const MOVER_LIMIT = 8;
 
 @Component({
   selector: 'app-market-movers',
-  imports: [DecimalPipe, RouterLink, MatButtonToggleModule],
+  imports: [DecimalPipe, RouterLink, MatButtonToggleModule, TranslatePipe],
   templateUrl: './market-movers.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'block min-w-0 h-full' },
 })
 export class MarketMoversComponent {
   readonly rows = input.required<MarketMoverRow[]>();
-  /** Shown when the list is empty (catalog empty vs waiting for tickers). */
-  readonly emptyMessage = input('Waiting for live market data…');
+  /** i18n key when the list is empty (catalog empty vs waiting for tickers). */
+  readonly emptyMessageKey = input('MARKETS.MOVERS_EMPTY_WAITING');
   readonly mode = signal<MarketMoverMode>('gainers');
 
   readonly visibleRows = computed(() => {

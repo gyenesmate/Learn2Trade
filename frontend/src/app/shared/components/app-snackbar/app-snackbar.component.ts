@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AppSnackbarAction, AppSnackbarData } from './app-snackbar.types';
 
 @Component({
   selector: 'app-snackbar',
-  imports: [MatButtonModule, MatIconModule],
+  imports: [MatButtonModule, MatIconModule, TranslatePipe],
   templateUrl: './app-snackbar.component.html',
   styleUrl: './app-snackbar.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

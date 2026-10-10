@@ -1,18 +1,18 @@
 <section
   class="flex flex-col gap-4 h-full min-h-0 p-4 bg-surface border border-border rounded-lg"
-  aria-label="Market movers"
+  [attr.aria-label]="'MARKETS.MOVERS_ARIA_LABEL' | translate"
 >
   <header class="flex flex-col gap-3">
-    <h2 class="m-0 text-[0.85rem] font-bold tracking-wider uppercase text-muted">Market Movers</h2>
+    <h2 class="m-0 text-[0.85rem] font-bold tracking-wider uppercase text-muted">{{ 'MARKETS.MOVERS_TITLE' | translate }}</h2>
     <mat-button-toggle-group
       class="w-full"
       [value]="mode()"
       (change)="setMode($event.value)"
       hideSingleSelectionIndicator
     >
-      <mat-button-toggle value="gainers">Gainers</mat-button-toggle>
-      <mat-button-toggle value="losers">Losers</mat-button-toggle>
-      <mat-button-toggle value="active">Active</mat-button-toggle>
+      <mat-button-toggle value="gainers">{{ 'MARKETS.MOVER_GAINERS' | translate }}</mat-button-toggle>
+      <mat-button-toggle value="losers">{{ 'MARKETS.MOVER_LOSERS' | translate }}</mat-button-toggle>
+      <mat-button-toggle value="active">{{ 'MARKETS.MOVER_ACTIVE' | translate }}</mat-button-toggle>
     </mat-button-toggle-group>
   </header>
 
@@ -43,7 +43,7 @@
         </a>
       </li>
     } @empty {
-      <li class="py-4 text-muted text-[0.85rem]">{{ emptyMessage() }}</li>
+      <li class="py-4 text-muted text-[0.85rem]">{{ emptyMessageKey() | translate }}</li>
     }
   </ol>
 </section>

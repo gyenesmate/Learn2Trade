@@ -1,5 +1,5 @@
 <app-base-dialog class="watchlist-dialog">
-  <ng-container dialogTitle>Watchlist</ng-container>
+  <ng-container dialogTitle>{{ 'WATCHLIST.DIALOG_TITLE' | translate }}</ng-container>
 
   <div class="max-h-[min(50vh,22rem)] overflow-y-auto min-h-32">
     @if (listState() === 'loading') {
@@ -8,7 +8,7 @@
       </div>
     } @else if (listState() === 'empty') {
       <div class="flex items-center justify-center min-h-32 text-muted" role="status">
-        <p class="m-0 text-center">No assets in your watchlist yet. Bookmark coins from Markets.</p>
+        <p class="m-0 text-center">{{ 'WATCHLIST.EMPTY' | translate }}</p>
       </div>
     } @else {
       <ul class="list-none m-0 p-0">
@@ -38,8 +38,8 @@
               <button
                 type="button"
                 mat-icon-button
-                matTooltip="View market"
-                aria-label="View market"
+                [matTooltip]="'WATCHLIST.VIEW_MARKET_TOOLTIP' | translate"
+                [attr.aria-label]="'WATCHLIST.VIEW_MARKET' | translate"
                 (click)="view(row.crypto.id)"
               >
                 <mat-icon>visibility</mat-icon>
@@ -47,8 +47,8 @@
               <button
                 type="button"
                 mat-icon-button
-                matTooltip="Remove from watchlist"
-                aria-label="Remove from watchlist"
+                [matTooltip]="'WATCHLIST.REMOVE_TOOLTIP' | translate"
+                [attr.aria-label]="'WATCHLIST.REMOVE' | translate"
                 (click)="remove(row.crypto.id)"
               >
                 <mat-icon>bookmark_remove</mat-icon>
@@ -61,6 +61,6 @@
   </div>
 
   <ng-container dialogActions>
-    <button mat-button type="button" (click)="close()">Close</button>
+    <button mat-button type="button" (click)="close()">{{ 'COMMON.CLOSE' | translate }}</button>
   </ng-container>
 </app-base-dialog>

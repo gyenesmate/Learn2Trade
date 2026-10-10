@@ -1,9 +1,9 @@
 <div class="w-full">
-  <app-page-header [title]="pageTitle" [actions]="headerActions" />
+  <app-page-header [title]="'PORTFOLIO.PAGE_TITLE'" [actions]="headerActions" />
 
   <div class="grid grid-cols-1 gap-6">
     <section class="app-panel">
-      <header class="app-panel__header">Personal Information</header>
+      <header class="app-panel__header">{{ 'PORTFOLIO.SECTION_PERSONAL_INFO' | translate }}</header>
       <div class="app-panel__body">
         @if (user(); as user) {
           <div class="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-4 max-md:grid-cols-1">
@@ -12,7 +12,7 @@
                 @if (user.avatar_url) {
                   <img
                     [src]="user.avatar_url"
-                    alt="Avatar"
+                    [alt]="'PORTFOLIO.AVATAR_ALT' | translate"
                     class="w-[120px] h-[120px] rounded-full object-cover border-[3px] border-primary"
                   />
                 }
@@ -28,25 +28,25 @@
             <div
               class="flex justify-between items-center gap-3 p-4 border border-border rounded-md bg-surface max-md:flex-col max-md:items-start"
             >
-              <label class="font-bold text-[var(--color-text)]">Name:</label>
+              <label class="font-bold text-[var(--color-text)]">{{ 'PORTFOLIO.LABEL_NAME' | translate }}</label>
               <span class="text-[var(--color-text)] font-semibold break-words">{{ user.username }}</span>
             </div>
             <div
               class="flex justify-between items-center gap-3 p-4 border border-border rounded-md bg-surface max-md:flex-col max-md:items-start"
             >
-              <label class="font-bold text-[var(--color-text)]">Email:</label>
+              <label class="font-bold text-[var(--color-text)]">{{ 'PORTFOLIO.LABEL_EMAIL' | translate }}</label>
               <span class="text-[var(--color-text)] font-semibold break-words">{{ user.email }}</span>
             </div>
             <div
               class="flex justify-between items-center gap-3 p-4 border border-border rounded-md bg-surface max-md:flex-col max-md:items-start"
             >
-              <label class="font-bold text-[var(--color-text)]">Theme:</label>
-              <span class="text-[var(--color-text)] font-semibold break-words">{{ user.theme }}</span>
+              <label class="font-bold text-[var(--color-text)]">{{ 'PORTFOLIO.LABEL_THEME' | translate }}</label>
+              <span class="text-[var(--color-text)] font-semibold break-words">{{ themeLabelKey(user.theme) | translate }}</span>
             </div>
             <div
               class="flex justify-between items-center gap-3 p-4 border border-border rounded-md bg-surface max-md:flex-col max-md:items-start"
             >
-              <label class="font-bold text-[var(--color-text)]">Account Balance:</label>
+              <label class="font-bold text-[var(--color-text)]">{{ 'PORTFOLIO.LABEL_ACCOUNT_BALANCE' | translate }}</label>
               <span class="text-success font-bold text-lg tabular-nums">{{ formatBalance(user.balance) }}</span>
             </div>
           </div>
@@ -55,17 +55,19 @@
     </section>
 
     <section class="app-panel">
-      <header class="app-panel__header">Add Currency to Account</header>
+      <header class="app-panel__header">{{ 'PORTFOLIO.SECTION_ADD_CURRENCY' | translate }}</header>
       <div class="app-panel__body">
         <form class="flex flex-wrap gap-4 items-start" [formGroup]="fundsForm" (ngSubmit)="addCurrency()">
           <mat-form-field appearance="outline" class="flex-[1_1_12rem] min-w-40">
-            <mat-label>Amount ($)</mat-label>
+            <mat-label>{{ 'PORTFOLIO.ADD_FUNDS_AMOUNT_LABEL' | translate }}</mat-label>
             <input matInput type="number" min="1" step="0.01" formControlName="amount" />
             @if (fundsForm.controls.amount.touched && fundsForm.controls.amount.invalid) {
-              <mat-error>Enter an amount of at least 1</mat-error>
+              <mat-error>{{ 'PORTFOLIO.ADD_FUNDS_AMOUNT_INVALID' | translate }}</mat-error>
             }
           </mat-form-field>
-          <button type="submit" mat-flat-button [disabled]="fundsForm.invalid">Add Funds</button>
+          <button type="submit" mat-flat-button [disabled]="fundsForm.invalid">
+            {{ 'PORTFOLIO.ADD_FUNDS_BUTTON' | translate }}
+          </button>
         </form>
       </div>
     </section>
@@ -73,7 +75,7 @@
     <section class="app-panel" id="watchlist">
       <div class="app-panel__body app-panel__body--flush">
         <app-data-table
-          [title]="'My watchlist'"
+          [title]="'PORTFOLIO.TABLE_WATCHLIST'"
           [columns]="watchlistColumns"
           [data]="watchlistRows()"
           [actionBar]="[]"
@@ -85,7 +87,7 @@
     <section class="app-panel" id="investments">
       <div class="app-panel__body app-panel__body--flush">
         <app-data-table
-          [title]="'My investments'"
+          [title]="'PORTFOLIO.TABLE_INVESTMENTS'"
           [columns]="investmentsColumns"
           [data]="investmentsRows()"
           [actionBar]="[]"
@@ -97,7 +99,7 @@
     <section class="app-panel">
       <div class="app-panel__body app-panel__body--flush">
         <app-data-table
-          [title]="'My alerts'"
+          [title]="'PORTFOLIO.TABLE_ALERTS'"
           [columns]="alertsColumns"
           [data]="alertsRows()"
           [actionBar]="[]"
@@ -110,7 +112,7 @@
       <section class="app-panel">
         <div class="app-panel__body app-panel__body--flush">
           <app-data-table
-            [title]="'Crypto currencies'"
+            [title]="'PORTFOLIO.TABLE_CRYPTO_CURRENCIES'"
             [columns]="cryptoColumns"
             [data]="cryptoCurrencies()"
             [actionBar]="cryptoActionBar"
@@ -123,7 +125,7 @@
       <section class="app-panel">
         <div class="app-panel__body app-panel__body--flush">
           <app-data-table
-            [title]="'Users'"
+            [title]="'PORTFOLIO.TABLE_USERS'"
             [columns]="userColumns"
             [data]="users()"
             [actionBar]="[]"

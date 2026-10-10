@@ -47,9 +47,10 @@ Same-folder `./` imports may stay relative.
 | --- | --- |
 | App root / routes / config | `src/app/app.*` |
 | Shell | `src/app/core/layout/{landing,auth,base,lecture}-layout/`, `sidebar/`, `navbar/` |
-| Services / utils / guards / models / env | `src/app/core/{services,utils,guards,models,env,initializers}/` |
+| Services / utils / guards / models / env / i18n | `src/app/core/{services,utils,guards,models,env,initializers,i18n}/` |
 | Shared UI | `src/app/shared/components/` |
 | Features | `src/app/features/{landing,learn,dashboard,markets,trading,portfolio,auth,system}/` |
+| Static files | `public/` (`i18n/`, `icons/`, `images/`, …) — not `src/assets/` |
 | Design tokens / theme | `src/styles/` (`_theme-colors`, `_tokens`, `theme`, `_material-overrides`, `_components`, `_base`, `_fonts`, `tailwind.css`) |
 
 ### Feature ↔ URL (prefixed shells; old flat URLs redirect)
@@ -70,6 +71,7 @@ Same-folder `./` imports may stay relative.
 | Path | Role |
 | --- | --- |
 | `docs/FILE_STRUCTURES.md` | Structure & placement rules |
+| [`docs/I18N_CONVENTIONS.md`](../../docs/I18N_CONVENTIONS.md) | ngx-translate / keys / language switching SoT |
 | `docs/CRYPTO_WEBSOCKETS.md` | Binance public market WS architecture |
 | `docs/STYLING_GUIDELINES.md` | Styling + trading UI design system |
 | `docs/features/` | Planned per-feature guides |

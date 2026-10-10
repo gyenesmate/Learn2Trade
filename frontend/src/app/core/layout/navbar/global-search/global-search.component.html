@@ -4,11 +4,11 @@
     #queryInput
     matInput
     type="search"
-    placeholder="Search markets, features or commands..."
+    [placeholder]="'SEARCH.PLACEHOLDER' | translate"
     [formControl]="queryControl"
     [matAutocomplete]="searchAutocomplete"
     autocomplete="off"
-    aria-label="Global search"
+    [attr.aria-label]="'SEARCH.ARIA_LABEL' | translate"
   />
 </mat-form-field>
 
@@ -21,12 +21,12 @@
   (closed)="panelOpen.set(false)"
 >
   @if (state().loading) {
-    <mat-option disabled>Searching…</mat-option>
+    <mat-option disabled>{{ 'SEARCH.SEARCHING' | translate }}</mat-option>
   } @else if (state().query && state().groups.length === 0) {
-    <mat-option disabled>No results for "{{ state().query }}"</mat-option>
+    <mat-option disabled>{{ 'SEARCH.NO_RESULTS' | translate: { query: state().query } }}</mat-option>
   } @else {
     @for (group of state().groups; track group.type) {
-      <mat-optgroup [label]="group.label">
+      <mat-optgroup [label]="group.label | translate">
         @for (result of group.results; track result.id) {
           <mat-option [value]="result">
             <app-search-result [result]="result" />

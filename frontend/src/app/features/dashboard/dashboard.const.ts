@@ -1,11 +1,11 @@
 import { PageHeaderActionDef } from '@shared/components/page-header/page-header.types';
 import { TableColumn } from '@shared/components/data-table/data-table.types';
 
-export const DASHBOARD_PAGE_TITLE = 'Dashboard';
+export const DASHBOARD_PAGE_TITLE = 'DASHBOARD.PAGE_TITLE';
 
 export const DASHBOARD_HEADER_ACTIONS = {
   browseMarkets: {
-    label: 'Browse markets',
+    label: 'DASHBOARD.ACTION_BROWSE_MARKETS',
     icon: 'show_chart',
     variant: 'primary',
   } satisfies PageHeaderActionDef,
@@ -23,11 +23,11 @@ export interface DashboardHoldingRow {
 }
 
 export const DASHBOARD_HOLDINGS_COLUMNS: TableColumn<DashboardHoldingRow>[] = [
-  { key: 'name', label: 'Asset', type: 'text' },
-  { key: 'symbol', label: 'Symbol', type: 'text' },
-  { key: 'amount', label: 'Amount', type: 'number' },
-  { key: 'avgPrice', label: 'Avg. Price', type: 'currency' },
-  { key: 'currentPrice', label: 'Current Price', type: 'currency' },
-  { key: 'pnl', label: 'P&L', type: 'currency' },
-  { key: 'change', label: '% Change', type: 'number' },
+  { key: 'name', label: 'DASHBOARD.HOLDINGS_COL_ASSET', type: 'text' },
+  { key: 'symbol', label: 'DASHBOARD.HOLDINGS_COL_SYMBOL', type: 'text' },
+  { key: 'amount', label: 'DASHBOARD.HOLDINGS_COL_AMOUNT', type: 'number' },
+  { key: 'avgPrice', label: 'DASHBOARD.HOLDINGS_COL_AVG_PRICE', type: 'currency' },
+  { key: 'currentPrice', label: 'DASHBOARD.HOLDINGS_COL_CURRENT_PRICE', type: 'currency' },
+  { key: 'pnl', label: 'DASHBOARD.HOLDINGS_COL_PNL', type: 'currency' },
+  { key: 'change', label: 'DASHBOARD.HOLDINGS_COL_CHANGE', type: 'number' },
 ];

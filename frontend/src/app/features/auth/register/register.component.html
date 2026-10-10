@@ -6,51 +6,53 @@
       class="flex flex-col w-full max-w-[500px] max-h-full overflow-auto p-8 max-[600px]:p-4 rounded-lg border bg-surface shadow-lg"
     >
       <div class="text-center mb-6">
-        <h1 class="m-0 mb-3 text-primary text-xl max-[600px]:text-lg">Join Learn2Trade</h1>
-        <p class="m-0 text-muted">Create your account to start tracking cryptocurrencies</p>
+        <h1 class="m-0 mb-3 text-primary text-xl max-[600px]:text-lg">
+          {{ 'AUTH.REGISTER_TITLE' | translate }}
+        </h1>
+        <p class="m-0 text-muted">{{ 'AUTH.REGISTER_SUBTITLE' | translate }}</p>
       </div>
 
       <form class="flex flex-col gap-4" [formGroup]="form" (ngSubmit)="onSubmit()">
         <mat-form-field class="w-full">
-          <mat-label>Username</mat-label>
+          <mat-label>{{ 'AUTH.USERNAME' | translate }}</mat-label>
           <input matInput type="text" formControlName="userName" />
           @if (userNameControl?.hasError('required')) {
-            <mat-error>Username is required.</mat-error>
+            <mat-error>{{ 'AUTH.USERNAME_REQUIRED' | translate }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field class="w-full">
-          <mat-label>Email</mat-label>
+          <mat-label>{{ 'AUTH.EMAIL' | translate }}</mat-label>
           <input matInput type="email" formControlName="email" />
           @if (emailControl?.hasError('required')) {
-            <mat-error>Email is required.</mat-error>
+            <mat-error>{{ 'AUTH.EMAIL_REQUIRED' | translate }}</mat-error>
           } @else if (emailControl?.hasError('email')) {
-            <mat-error>Please enter a valid email.</mat-error>
+            <mat-error>{{ 'AUTH.EMAIL_INVALID' | translate }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field class="w-full">
-          <mat-label>Password</mat-label>
+          <mat-label>{{ 'AUTH.PASSWORD' | translate }}</mat-label>
           <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" />
           <button
             mat-icon-button
             matSuffix
             type="button"
             (click)="hidePassword.set(!hidePassword())"
-            [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'"
+            [attr.aria-label]="
+              (hidePassword() ? 'AUTH.SHOW_PASSWORD' : 'AUTH.HIDE_PASSWORD') | translate
+            "
             [attr.aria-pressed]="!hidePassword()"
           >
             <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
           </button>
           @if (passwordControl?.invalid) {
-            <mat-error>
-              Password must be at least 8 characters and include a capital letter and a number.
-            </mat-error>
+            <mat-error>{{ 'AUTH.PASSWORD_REQUIREMENTS' | translate }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field class="w-full">
-          <mat-label>Confirm Password</mat-label>
+          <mat-label>{{ 'AUTH.CONFIRM_PASSWORD' | translate }}</mat-label>
           <input
             matInput
             [type]="hideConfirmPassword() ? 'password' : 'text'"
@@ -61,28 +63,32 @@
             matSuffix
             type="button"
             (click)="hideConfirmPassword.set(!hideConfirmPassword())"
-            [attr.aria-label]="hideConfirmPassword() ? 'Show password' : 'Hide password'"
+            [attr.aria-label]="
+              (hideConfirmPassword() ? 'AUTH.SHOW_PASSWORD' : 'AUTH.HIDE_PASSWORD') | translate
+            "
             [attr.aria-pressed]="!hideConfirmPassword()"
           >
             <mat-icon>{{ hideConfirmPassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
           </button>
           @if (confirmPasswordControl?.hasError('required')) {
-            <mat-error>Please confirm your password.</mat-error>
+            <mat-error>{{ 'AUTH.CONFIRM_PASSWORD_REQUIRED' | translate }}</mat-error>
           } @else if (confirmPasswordControl?.hasError('passwordMismatch')) {
-            <mat-error>Passwords do not match.</mat-error>
+            <mat-error>{{ 'AUTH.PASSWORDS_DO_NOT_MATCH' | translate }}</mat-error>
           }
         </mat-form-field>
 
-        <button type="submit" class="btn btn-primary w-full py-3 px-4 text-sm mt-2">Create Account</button>
+        <button type="submit" class="btn btn-primary w-full py-3 px-4 text-sm mt-2">
+          {{ 'AUTH.CREATE_ACCOUNT' | translate }}
+        </button>
       </form>
 
       <div class="text-center mt-6 pt-4 border-t border-border">
         <p class="m-0 text-muted">
-          Already have an account?
+          {{ 'AUTH.HAVE_ACCOUNT_PROMPT' | translate }}
           <a
             [routerLink]="['/auth/login']"
             class="text-primary font-semibold no-underline hover:underline"
-            >Sign in</a
+            >{{ 'AUTH.SIGN_IN_LINK' | translate }}</a
           >
         </p>
       </div>

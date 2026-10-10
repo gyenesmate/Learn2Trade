@@ -36,6 +36,7 @@ import { CryptoCurrency } from '@core/models/models';
 import { AuthService } from '@core/services/auth.service';
 import { WatchlistSubscriptionsService } from '@core/services/watchlist-subscriptions.service';
 import { NotificationService } from '@core/services/notification.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { BinanceMarketDataService } from '@core/binance/binance-market-data.service';
 import { BinanceRestService } from '@core/binance/binance-rest.service';
 import { toBinancePair } from '@core/binance/binance.utils';
@@ -65,6 +66,7 @@ interface CompactHoverTooltip {
     MatTooltipModule,
     DecimalPipe,
     RouterLink,
+    TranslatePipe,
     CryptoChartComponent,
   ],
   providers: [DecimalPipe],
@@ -82,6 +84,7 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
   private readonly auth = inject(AuthService);
   private readonly watchlistSubscriptions = inject(WatchlistSubscriptionsService);
   private readonly notification = inject(NotificationService);
+  private readonly translate = inject(TranslateService);
   private readonly marketData = inject(BinanceMarketDataService);
   private readonly binanceRest = inject(BinanceRestService);
   private readonly wsTransport = inject(WebSocketService);
@@ -228,20 +231,20 @@ export class CryptoCardComponent implements AfterViewInit, OnDestroy {
     try {
       const user = this.auth.currentUser();
       if (!user?.id) {
-        this.notification.warning('Please log in to save to watchlist');
+        this.notification.warning(this.translate.instant('WATCHLIST.NOTIFY_LOGIN_REQUIRED'));
         return;
       }
       const cryptoId = this.data().id;
       if (this.isInWatchlist()) {
         await this.watchlistSubscriptions.deleteByCryptoCurrencyId(cryptoId);
-        this.notification.info('Removed from watchlist');
+        this.notification.info(this.translate.instant('WATCHLIST.NOTIFY_REMOVED'));
         return;
       }
       await this.watchlistSubscriptions.create(cryptoId);
-      this.notification.success('Saved to watchlist');
+      this.notification.success(this.translate.instant('WATCHLIST.NOTIFY_SAVED'));
     } catch (err) {
       console.error('saveToWatchlist failed', err);
-      this.notification.error('Failed to save to watchlist');
+      this.notification.error(this.translate.instant('WATCHLIST.NOTIFY_SAVE_FAILED'));
     } finally {
       this.watchlistSaving.set(false);
     }

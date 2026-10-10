@@ -335,8 +335,17 @@
     color: var(--color-crypto-neutral);
   }
 
+  // Navbar search: keep form-field under the 56px toolbar (matches sidebar brand)
   app-global-search .global-search__field {
     width: 100%;
+    --mat-form-field-container-height: 40px;
+    --mat-form-field-container-vertical-padding: 6px;
+  }
+
+  app-navbar .toolbar.mat-toolbar {
+    height: 56px;
+    min-height: 56px;
+    max-height: 56px;
   }
 
   // Equal-width movers toggles (scoped; avoids component ::ng-deep)
@@ -365,6 +374,27 @@
     .mat-mdc-checkbox .mdc-checkbox {
       padding: 7px;
     }
+  }
+
+  // Language selector menu
+  .language-menu.mat-mdc-menu-panel {
+    min-width: 200px;
+    max-width: 240px;
+    width: 220px;
+  }
+
+  .language-menu__row {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .language-menu__meta {
+    color: var(--color-text-muted, var(--color-text-secondary));
+    font-size: var(--font-size-xs, 0.75rem);
+    letter-spacing: 0.02em;
   }
 
   app-data-table {

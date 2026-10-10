@@ -2,16 +2,16 @@
   <div
     class="grid grid-cols-[minmax(0,3.2fr)_minmax(16rem,1fr)] gap-6 items-start flex-auto min-h-0 max-[1100px]:grid-cols-1"
   >
-    <section class="flex flex-col gap-4 min-w-0" aria-label="Market card browser">
+    <section class="flex flex-col gap-4 min-w-0" [attr.aria-label]="'MARKETS.BROWSER_ARIA_LABEL' | translate">
       <div class="flex flex-col gap-3">
         <mat-form-field class="w-full" appearance="outline" subscriptSizing="dynamic">
-          <mat-label>Search markets</mat-label>
+          <mat-label>{{ 'MARKETS.SEARCH_PLACEHOLDER' | translate }}</mat-label>
           <mat-icon matPrefix>search</mat-icon>
           <input
             matInput
             [ngModel]="search()"
             (ngModelChange)="onSearchInput($event)"
-            placeholder="Search markets..."
+            [placeholder]="'MARKETS.SEARCH_PLACEHOLDER' | translate"
             autocomplete="off"
           />
         </mat-form-field>
@@ -24,15 +24,15 @@
             hideSingleSelectionIndicator
           >
             @for (item of filters; track item.id) {
-              <mat-button-toggle [value]="item.id">{{ item.label }}</mat-button-toggle>
+              <mat-button-toggle [value]="item.id">{{ item.labelKey | translate }}</mat-button-toggle>
             }
           </mat-button-toggle-group>
 
           <mat-form-field class="w-44 m-0" appearance="outline" subscriptSizing="dynamic">
-            <mat-label>Sort</mat-label>
+            <mat-label>{{ 'MARKETS.SORT_LABEL' | translate }}</mat-label>
             <mat-select [ngModel]="sort()" (ngModelChange)="setSort($event)">
               @for (opt of sortOptions; track opt.id) {
-                <mat-option [value]="opt.id">{{ opt.label }}</mat-option>
+                <mat-option [value]="opt.id">{{ opt.labelKey | translate }}</mat-option>
               }
             </mat-select>
           </mat-form-field>
@@ -44,27 +44,27 @@
           class="flex flex-col items-center justify-center gap-4 min-h-48 text-muted"
           role="status"
           aria-live="polite"
-          aria-label="Loading"
+          [attr.aria-label]="'COMMON.LOADING' | translate"
         >
           <mat-progress-spinner mode="indeterminate" [diameter]="40" [strokeWidth]="3" />
         </div>
       } @else if (loadError()) {
         <div class="flex flex-col items-center justify-center gap-4 min-h-48 text-[var(--color-text-primary)]" role="alert">
-          <p class="m-0 text-center">{{ loadErrorMessage }}</p>
-          <button type="button" mat-stroked-button (click)="retryLoad()">Retry</button>
+          <p class="m-0 text-center">{{ loadErrorMessage | translate }}</p>
+          <button type="button" mat-stroked-button (click)="retryLoad()">{{ 'COMMON.RETRY' | translate }}</button>
         </div>
       } @else if (pageAssets().length === 0) {
         <div class="flex flex-col items-center justify-center gap-4 min-h-48 text-muted" role="status">
-          <p class="m-0 text-center">{{ emptyMessage }}</p>
+          <p class="m-0 text-center">{{ emptyMessage | translate }}</p>
         </div>
       } @else {
         <app-animated-market-card-layout [assets]="pageAssets()" [tickers]="tickers()" />
 
-        <nav class="flex items-center justify-center gap-1 flex-wrap" aria-label="Markets pages">
+        <nav class="flex items-center justify-center gap-1 flex-wrap" [attr.aria-label]="'MARKETS.PAGINATION_ARIA_LABEL' | translate">
           <button
             type="button"
             mat-icon-button
-            aria-label="Previous page"
+            [attr.aria-label]="'MARKETS.PAGINATION_PREVIOUS' | translate"
             [disabled]="pageIndex() === 0"
             (click)="prevPage()"
           >
@@ -87,7 +87,7 @@
           <button
             type="button"
             mat-icon-button
-            aria-label="Next page"
+            [attr.aria-label]="'MARKETS.PAGINATION_NEXT' | translate"
             [disabled]="pageIndex() >= pageCount() - 1"
             (click)="nextPage()"
           >
@@ -99,14 +99,14 @@
 
     <aside
       class="min-w-0 sticky top-0 self-stretch max-h-[calc(100vh-8rem)] max-[1100px]:static max-[1100px]:max-h-none"
-      aria-label="Market movers"
+      [attr.aria-label]="'MARKETS.MOVERS_ARIA_LABEL' | translate"
     >
       <app-market-movers
         [rows]="moverRows()"
-        [emptyMessage]="
+        [emptyMessageKey]="
           cryptocurrencies().length === 0
-            ? 'No markets available.'
-            : 'Waiting for live market data…'
+            ? moversEmptyNoMarketsKey
+            : moversEmptyWaitingKey
         "
       />
     </aside>

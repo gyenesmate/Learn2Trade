@@ -1,10 +1,10 @@
-<a class="skip-link" href="#main-content">Skip to content</a>
+<a class="skip-link" href="#main-content">{{ 'SHELL.SKIP_TO_CONTENT' | translate }}</a>
 
 <div
   class="app-layout"
   [class.app-layout--sidebar-collapsed]="!sidebarExpanded()"
 >
-  <aside class="app-layout__sidebar" aria-label="Application sidebar">
+  <aside class="app-layout__sidebar" [attr.aria-label]="'SHELL.APPLICATION_SIDEBAR' | translate">
     <app-sidebar
       [collapsed]="!sidebarExpanded()"
       (navigated)="onSidebarNavigated()"

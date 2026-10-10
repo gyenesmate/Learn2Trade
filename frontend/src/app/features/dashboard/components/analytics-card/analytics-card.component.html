@@ -7,35 +7,53 @@
   @switch (state()) {
     @case ('best') {
       <div>
-        <h3>Best Investment</h3>
+        <h3>{{ 'DASHBOARD.ANALYTICS_BEST_INVESTMENT' | translate }}</h3>
         @if (bestInvestment(); as best) {
           <div>
-            <div><b>Crypto:</b> {{ best.inv.crypto_currency_id }}</div>
-            <div><b>Profit:</b> ${{ best.profit | number: '1.2-2' }}</div>
-            <div><b>ROI:</b> {{ best.roiPercent | number: '1.2-2' }}%</div>
-            <div><b>Amount:</b> {{ best.inv.amount | number: '1.2-8' }}</div>
-            <div><b>Bought at:</b> ${{ best.inv.buying_price | number: '1.2-2' }}</div>
-            <div><b>Sold at:</b> ${{ best.inv.selling_price | number: '1.2-2' }}</div>
-            <div><b>Date:</b> {{ best.soldDate | date: 'mediumDate' }}</div>
+            <div>
+              <b>{{ 'DASHBOARD.ANALYTICS_LABEL_CRYPTO' | translate }}</b> {{ best.inv.crypto_currency_id }}
+            </div>
+            <div>
+              <b>{{ 'DASHBOARD.ANALYTICS_LABEL_PROFIT' | translate }}</b> ${{ best.profit | number: '1.2-2' }}
+            </div>
+            <div>
+              <b>{{ 'DASHBOARD.ANALYTICS_LABEL_ROI' | translate }}</b> {{ best.roiPercent | number: '1.2-2' }}%
+            </div>
+            <div>
+              <b>{{ 'DASHBOARD.ANALYTICS_LABEL_AMOUNT' | translate }}</b> {{ best.inv.amount | number: '1.2-8' }}
+            </div>
+            <div>
+              <b>{{ 'DASHBOARD.ANALYTICS_LABEL_BOUGHT_AT' | translate }}</b> ${{
+                best.inv.buying_price | number: '1.2-2'
+              }}
+            </div>
+            <div>
+              <b>{{ 'DASHBOARD.ANALYTICS_LABEL_SOLD_AT' | translate }}</b> ${{
+                best.inv.selling_price | number: '1.2-2'
+              }}
+            </div>
+            <div>
+              <b>{{ 'DASHBOARD.ANALYTICS_LABEL_DATE' | translate }}</b> {{ best.soldDate | date: 'mediumDate' }}
+            </div>
           </div>
         } @else {
-          No sold investments.
+          {{ 'DASHBOARD.ANALYTICS_NO_SOLD' | translate }}
         }
       </div>
     }
     @case ('average') {
       <div>
-        <h3>Average Profit</h3>
+        <h3>{{ 'DASHBOARD.ANALYTICS_AVERAGE_PROFIT' | translate }}</h3>
         @if (averageProfit(); as avg) {
           <div>${{ avg | number: '1.2-2' }}</div>
         } @else {
-          No sold investments.
+          {{ 'DASHBOARD.ANALYTICS_NO_SOLD' | translate }}
         }
       </div>
     }
     @case ('timeline') {
       <div>
-        <h3>Investment Timeline</h3>
+        <h3>{{ 'DASHBOARD.ANALYTICS_TIMELINE' | translate }}</h3>
         @if (timeline().length) {
           <div>
             @for (row of timeline(); track row.inv.id) {
@@ -54,17 +72,21 @@
             }
           </div>
         } @else {
-          No sold investments.
+          {{ 'DASHBOARD.ANALYTICS_NO_SOLD' | translate }}
         }
       </div>
     }
     @default {
       <div>
-        <h3>{{ label() || 'Analytics' }}</h3>
+        @if (label()) {
+          <h3>{{ label() }}</h3>
+        } @else {
+          <h3>{{ 'DASHBOARD.ANALYTICS_DEFAULT_TITLE' | translate }}</h3>
+        }
         <div
           class="w-full h-[120px] mt-4 flex items-center justify-center text-sm text-muted rounded-md border border-dashed border-[var(--color-border-strong)] bg-[var(--color-surface-raised)]"
         >
-          [Custom chart/data will appear here]
+          {{ 'DASHBOARD.ANALYTICS_PLACEHOLDER' | translate }}
         </div>
       </div>
     }

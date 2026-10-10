@@ -10,6 +10,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { NavigationEnd, Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { filter, map, startWith } from 'rxjs';
 import { SIDEBAR_REACHABLE_ROUTES } from './page-header.const';
 import { PageHeaderAction } from './page-header.types';
@@ -17,7 +18,7 @@ import { isSidebarReachablePath } from './page-header.utils';
 
 @Component({
   selector: 'app-page-header',
-  imports: [MatButtonModule, MatIconModule],
+  imports: [MatButtonModule, MatIconModule, TranslatePipe],
   templateUrl: './page-header.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

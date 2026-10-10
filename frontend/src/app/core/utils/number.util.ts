@@ -1,3 +1,14 @@
+/** Active `Intl` locale; updated by `AppLanguageService` on language change. */
+let activeNumberLocale = 'en-US';
+
+export function setNumberLocale(locale: string): void {
+  activeNumberLocale = locale || 'en-US';
+}
+
+export function getNumberLocale(): string {
+  return activeNumberLocale;
+}
+
 /** Coerce API decimal values to number (never leave as string). */
 export function toNumber(value: unknown, fallback = 0): number {
   if (typeof value === 'number' && Number.isFinite(value)) {
@@ -17,10 +28,10 @@ export function toNumberOrNull(value: unknown): number | null {
   return toNumber(value);
 }
 
-/** USD money for balances / P&L (always 2 fraction digits). */
+/** USD money for balances / P&L (always 2 fraction digits). Locale from active language. */
 export function formatMoney(value: number, digits = 2): string {
   if (!Number.isFinite(value)) return '—';
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat(activeNumberLocale, {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: digits,
@@ -28,21 +39,24 @@ export function formatMoney(value: number, digits = 2): string {
   }).format(value);
 }
 
-/** Plain decimal (table `number` columns). */
+/** Plain decimal (table `number` columns). Locale from active language. */
 export function formatDecimal(value: number, minDigits = 2, maxDigits = 6): string {
   if (!Number.isFinite(value)) return '—';
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat(activeNumberLocale, {
     minimumFractionDigits: minDigits,
     maximumFractionDigits: maxDigits,
   }).format(value);
 }
 
-/** Spot price: more digits for sub-$1 alts. */
+/**
+ * Spot price: more digits for sub-$1 alts (trading digit tiers stay fixed).
+ * Separators follow the active language locale.
+ */
 export function formatPrice(value: number): string {
   if (!Number.isFinite(value)) return '—';
   const abs = Math.abs(value);
   const digits = abs >= 1 ? 2 : abs >= 0.01 ? 4 : 6;
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat(activeNumberLocale, {
     style: 'currency',
     currency: 'USD',
     minimumFractionDigits: digits,

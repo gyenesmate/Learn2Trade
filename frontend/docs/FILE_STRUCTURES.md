@@ -2,13 +2,22 @@
 
 Source of truth for Learn2Trade frontend folder layout, ownership, and where new files belong.
 
-Also see: `.cursor/rules/learn2trade.mdc`, `docs/STYLING_GUIDELINES.md`, `docs/CRYPTO_WEBSOCKETS.md`, `agents.md`.
+Also see: `.cursor/rules/learn2trade.mdc`, `docs/STYLING_GUIDELINES.md`, `docs/CRYPTO_WEBSOCKETS.md`, [`docs/I18N_CONVENTIONS.md`](./I18N_CONVENTIONS.md), `agents.md`.
 
 ---
 
 ## 1. High-level tree
 
 ```text
+public/                              # static files (Angular public root; URLs mirror paths)
+├── images/{logos,backgrounds,illustrations,placeholders}/
+├── icons/custom/
+├── fonts/
+├── i18n/{en,hu,de}.json             # ngx-translate catalogs → /i18n/{lang}.json
+├── favicon.ico
+├── manifest.webmanifest
+└── robots.txt
+
 src/
 ├── app/
 │   ├── app.component.*
@@ -22,11 +31,12 @@ src/
 │   │   │   ├── sidebar/
 │   │   │   └── navbar/
 │   │   │       └── global-search/   # search UI (mat-autocomplete); engine lives in core/search
+│   │   ├── i18n/                    # ngx-translate helpers (config, AppLanguageService, missing handler)
 │   │   ├── search/                  # app-wide search infrastructure (providers, ranking)
 │   │   ├── websocket/               # single physical WS transport
 │   │   ├── binance/                 # market-data (miniTicker) + REST helpers
 │   │   ├── services/
-│   │   ├── initializers/            # provideAppInitializer factories (e.g. app.initializer)
+│   │   ├── initializers/            # provideAppInitializer (app + i18n)
 │   │   ├── utils/
 │   │   ├── guards/
 │   │   ├── models/
@@ -101,7 +111,9 @@ AppComponent
 Do **not** put Sidebar/Navbar into `AppComponent`.  
 Do **not** use `app-shell` naming.  
 Use **prefixed** shells (`/auth`, `/app`, `/learn`) so empty-path parents do not fight.  
-Arm `PriceAlertsService` and `AuthRedirectorService` after `AuthService.bootstrap()` in `core/initializers/app.initializer.ts`.
+Arm `PriceAlertsService` and `AuthRedirectorService` after `AuthService.bootstrap()` in `core/initializers/app.initializer.ts`.  
+Language bootstrap: `initializeI18n` in `core/initializers/i18n.initializer.ts`, awaited with `initializeApp` from one `provideAppInitializer` (see [`docs/I18N_CONVENTIONS.md`](./I18N_CONVENTIONS.md)).  
+Static assets live under `public/` only — do **not** add `src/assets/`.
 
 ---
 
