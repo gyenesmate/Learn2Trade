@@ -15,7 +15,7 @@
 }
 
 .login-btn {
-  padding: var(--space-sm) var(--space-md);
+  padding: 0.75rem 1rem;
   font-size: var(--font-size-sm);
 }
 
@@ -35,7 +35,7 @@
 
 @media (max-width: 480px) {
   .login-container {
-    padding: var(--space-md);
+    padding: 1rem;
   }
 
   .login-header h1 {

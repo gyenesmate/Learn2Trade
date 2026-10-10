@@ -2,7 +2,7 @@
   position: fixed;
   right: 16px;
   bottom: 16px;
-  z-index: var(--z-index-toast);
+  z-index: 1000;
   display: block;
   width: fit-content;
   max-width: min(420px, calc(100vw - 32px));

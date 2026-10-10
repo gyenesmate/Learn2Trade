@@ -12,7 +12,7 @@
 
 .crypto-card {
 	display: grid;
-	gap: var(--space-sm);
+	gap: 0.75rem;
 	align-content: start;
 	padding: 1rem;
 	min-width: 220px;
@@ -42,7 +42,7 @@
 	display: grid;
 	grid-template-columns: minmax(0, 1fr) auto;
 	align-items: start;
-	gap: var(--space-sm);
+	gap: 0.75rem;
 }
 
 .crypto-header__identity {
@@ -67,7 +67,7 @@
 .crypto-header__actions {
 	display: flex;
 	align-items: center;
-	gap: var(--space-sm);
+	gap: 0.75rem;
 	flex-shrink: 0;
 }
 
@@ -137,7 +137,7 @@
 	height: 36px;
 	background: transparent;
 	color: var(--color-primary);
-	transition: color var(--transition-fast);
+	transition: color 0.15s ease;
 
 	&:hover:not(:disabled) {
 		background: transparent;
@@ -206,7 +206,7 @@
 .crypto-stats {
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
-	gap: var(--space-sm);
+	gap: 0.75rem;
 }
 
 .crypto-stats__item {
@@ -282,7 +282,7 @@
 	background: var(--color-surface);
 	border: 1px solid var(--color-border);
 	border-radius: 4px;
-	box-shadow: var(--shadow-sm);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
 }
 
 .crypto-card__chart {

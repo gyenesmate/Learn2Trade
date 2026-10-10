@@ -12,7 +12,7 @@
   flex: 1 1 auto;
   min-height: 0;
   height: 100%;
-  gap: var(--space-md);
+  gap: 1rem;
   overflow: hidden;
 }
 
@@ -21,7 +21,7 @@
   min-height: 0;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: var(--space-md);
+  gap: 1rem;
 }
 
 .crypto-detail-chart {
@@ -38,7 +38,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-md);
+  gap: 1rem;
   overflow: auto;
 }
 

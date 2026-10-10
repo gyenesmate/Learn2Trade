@@ -2,9 +2,8 @@
 @use 'sass:list';
 @use '@angular/material' as mat;
 @use 'sass:map';
-@use 'colors';
-@use 'typography';
-@use 'radius';
+@use 'theme-colors' as colors;
+@use 'tokens' as tokens;
 
 @mixin apply {
   html {
@@ -18,11 +17,11 @@
           theme-type: dark,
         ),
         typography: (
-          plain-family: list.nth(typography.$family-base, 1),
-          brand-family: list.nth(typography.$family-brand, 1),
-          bold-weight: typography.$weight-bold,
-          medium-weight: typography.$weight-semibold,
-          regular-weight: typography.$weight-regular,
+          plain-family: list.nth(tokens.$family-base, 1),
+          brand-family: list.nth(tokens.$family-brand, 1),
+          bold-weight: tokens.$weight-bold,
+          medium-weight: tokens.$weight-semibold,
+          regular-weight: tokens.$weight-regular,
         ),
         density: -1,
       )
@@ -54,30 +53,30 @@
       inverse-surface: map.get(colors.$text, primary),
       inverse-on-surface: map.get(colors.$neutral, 0),
       inverse-primary: map.get(colors.$primary, dark),
-      corner-extra-small: map.get(radius.$scale, xs),
-      corner-small: map.get(radius.$scale, md),
-      corner-medium: map.get(radius.$scale, lg),
-      corner-large: map.get(radius.$scale, xl),
-      corner-extra-large: map.get(radius.$scale, 2xl),
-      body-large-size: map.get(map.get(typography.$scale, body-lg), size),
+      corner-extra-small: 6px,
+      corner-small: 8px,
+      corner-medium: 12px,
+      corner-large: 14px,
+      corner-extra-large: 16px,
+      body-large-size: map.get(map.get(tokens.$type-scale, body-lg), size),
       body-large-line-height: 1.5,
-      body-medium-size: map.get(map.get(typography.$scale, body), size),
+      body-medium-size: map.get(map.get(tokens.$type-scale, body), size),
       body-medium-line-height: 1.43,
-      body-small-size: map.get(map.get(typography.$scale, caption), size),
+      body-small-size: map.get(map.get(tokens.$type-scale, caption), size),
       body-small-line-height: 1.5,
-      headline-large-size: map.get(map.get(typography.$scale, h1), size),
+      headline-large-size: map.get(map.get(tokens.$type-scale, h1), size),
       headline-large-line-height: 1.33,
-      headline-large-weight: typography.$weight-semibold,
-      headline-medium-size: map.get(map.get(typography.$scale, h2), size),
+      headline-large-weight: tokens.$weight-semibold,
+      headline-medium-size: map.get(map.get(tokens.$type-scale, h2), size),
       headline-medium-line-height: 1.44,
-      headline-medium-weight: typography.$weight-semibold,
-      headline-small-size: map.get(map.get(typography.$scale, h3), size),
+      headline-medium-weight: tokens.$weight-semibold,
+      headline-small-size: map.get(map.get(tokens.$type-scale, h3), size),
       headline-small-line-height: 1.43,
-      headline-small-weight: typography.$weight-semibold,
-      display-small-size: map.get(map.get(typography.$scale, display), size),
+      headline-small-weight: tokens.$weight-semibold,
+      display-small-size: map.get(map.get(tokens.$type-scale, display), size),
       display-small-line-height: 1.2,
-      display-small-weight: typography.$weight-semibold,
-      label-small-size: map.get(map.get(typography.$scale, overline), size),
+      display-small-weight: tokens.$weight-semibold,
+      label-small-size: map.get(map.get(tokens.$type-scale, overline), size),
       label-small-line-height: 1.45,
     ));
   }

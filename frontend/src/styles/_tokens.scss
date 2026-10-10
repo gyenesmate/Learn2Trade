@@ -1,12 +1,65 @@
-// Emits CSS custom properties from the distinct token maps
+// Emits CSS custom properties from theme colors + typography
 @use 'sass:map';
-@use 'colors';
-@use 'typography';
-@use 'spacing';
-@use 'radius';
-@use 'elevation';
-@use 'motion';
-@use 'breakpoints';
+@use 'theme-colors' as colors;
+
+// Typography — IBM Plex Sans UI + Space Grotesk brand
+$family-base: (
+  'IBM Plex Sans',
+  ui-sans-serif,
+  system-ui,
+  -apple-system,
+  'Segoe UI',
+  sans-serif
+);
+$family-brand: ('Space Grotesk', 'IBM Plex Sans', ui-sans-serif, sans-serif);
+
+$weight-regular: 400;
+$weight-medium: 500;
+$weight-semibold: 600;
+$weight-bold: 600;
+
+$type-scale: (
+  display: (
+    size: 32px,
+    line-height: 1.2,
+    weight: $weight-semibold,
+  ),
+  h1: (
+    size: 24px,
+    line-height: 1.33,
+    weight: $weight-semibold,
+  ),
+  h2: (
+    size: 18px,
+    line-height: 1.44,
+    weight: $weight-semibold,
+  ),
+  h3: (
+    size: 14px,
+    line-height: 1.43,
+    weight: $weight-semibold,
+  ),
+  body-lg: (
+    size: 16px,
+    line-height: 1.5,
+    weight: $weight-regular,
+  ),
+  body: (
+    size: 14px,
+    line-height: 1.43,
+    weight: $weight-regular,
+  ),
+  caption: (
+    size: 12px,
+    line-height: 1.5,
+    weight: $weight-regular,
+  ),
+  overline: (
+    size: 11px,
+    line-height: 1.45,
+    weight: $weight-regular,
+  ),
+);
 
 @mixin _color-scheme($palette) {
   --color-background: #{map.get($palette, bg)};
@@ -66,52 +119,24 @@
   --gradient-accent-purple: #{map.get(colors.$gradients, secondary)};
   --gradient-accent-dark: #{map.get(colors.$gradients, dark)};
 
-  --font-family-base: #{typography.$family-base};
-  --font-family-accent: #{typography.$family-brand};
-  --font-weight-normal: #{typography.$weight-regular};
-  --font-weight-medium: #{typography.$weight-medium};
-  --font-weight-semibold: #{typography.$weight-semibold};
-  --font-weight-bold: #{typography.$weight-bold};
-  --font-size-display: #{map.get(map.get(typography.$scale, display), size)};
-  --font-size-xxl: #{map.get(map.get(typography.$scale, display), size)};
-  --font-size-xl: #{map.get(map.get(typography.$scale, h1), size)};
-  --font-size-lg: #{map.get(map.get(typography.$scale, h2), size)};
-  --font-size-h3: #{map.get(map.get(typography.$scale, h3), size)};
-  --font-size-md: #{map.get(map.get(typography.$scale, body-lg), size)};
-  --font-size-sm: #{map.get(map.get(typography.$scale, body), size)};
-  --font-size-xs: #{map.get(map.get(typography.$scale, caption), size)};
-  --font-size-overline: #{map.get(map.get(typography.$scale, overline), size)};
-  --line-height-display: #{map.get(map.get(typography.$scale, display), line-height)};
-  --line-height-heading: #{map.get(map.get(typography.$scale, h1), line-height)};
-  --line-height-body: #{map.get(map.get(typography.$scale, body), line-height)};
-
-  @each $name, $value in spacing.$scale {
-    --space-#{$name}: #{$value};
-  }
-
-  @each $name, $value in spacing.$aliases {
-    --space-#{$name}: #{$value};
-  }
-
-  @each $name, $value in radius.$scale {
-    --radius-#{$name}: #{$value};
-  }
-
-  @each $name, $value in elevation.$shadows {
-    --shadow-#{$name}: #{$value};
-  }
-
-  @each $name, $value in elevation.$z-index {
-    --z-index-#{$name}: #{$value};
-  }
-
-  @each $name, $value in motion.$transition {
-    --transition-#{$name}: #{$value};
-  }
-
-  @each $name, $value in breakpoints.$scale {
-    --breakpoint-#{$name}: #{$value};
-  }
+  --font-family-base: #{$family-base};
+  --font-family-accent: #{$family-brand};
+  --font-weight-normal: #{$weight-regular};
+  --font-weight-medium: #{$weight-medium};
+  --font-weight-semibold: #{$weight-semibold};
+  --font-weight-bold: #{$weight-bold};
+  --font-size-display: #{map.get(map.get($type-scale, display), size)};
+  --font-size-xxl: #{map.get(map.get($type-scale, display), size)};
+  --font-size-xl: #{map.get(map.get($type-scale, h1), size)};
+  --font-size-lg: #{map.get(map.get($type-scale, h2), size)};
+  --font-size-h3: #{map.get(map.get($type-scale, h3), size)};
+  --font-size-md: #{map.get(map.get($type-scale, body-lg), size)};
+  --font-size-sm: #{map.get(map.get($type-scale, body), size)};
+  --font-size-xs: #{map.get(map.get($type-scale, caption), size)};
+  --font-size-overline: #{map.get(map.get($type-scale, overline), size)};
+  --line-height-display: #{map.get(map.get($type-scale, display), line-height)};
+  --line-height-heading: #{map.get(map.get($type-scale, h1), line-height)};
+  --line-height-body: #{map.get(map.get($type-scale, body), line-height)};
 
   --neu-offset: 5px;
   --neu-blur: 12px;

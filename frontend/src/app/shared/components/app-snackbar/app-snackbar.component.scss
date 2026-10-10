@@ -10,14 +10,14 @@
   color: var(--color-text-primary);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
 .app-snackbar__accent {
   flex: 0 0 3px;
   align-self: stretch;
-  border-radius: var(--radius-sm);
+  border-radius: 0.375rem;
   background: var(--color-primary);
 }
 

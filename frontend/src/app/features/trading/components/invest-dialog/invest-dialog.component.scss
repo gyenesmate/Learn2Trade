@@ -1,7 +1,7 @@
 .dialog-content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-sm);
+  gap: 0.75rem;
 }
 
 .row {
@@ -17,6 +17,6 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-xs);
-  margin-top: var(--space-sm);
+  gap: 0.5rem;
+  margin-top: 0.75rem;
 }

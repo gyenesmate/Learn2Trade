@@ -15,9 +15,9 @@
 }
 
 .register-btn {
-  padding: var(--space-sm) var(--space-md);
+  padding: 0.75rem 1rem;
   font-size: var(--font-size-sm);
-  margin-top: var(--space-xs);
+  margin-top: 0.5rem;
 }
 
 .register-footer {
@@ -36,7 +36,7 @@
 
 @media (max-width: 600px) {
   .register-container {
-    padding: var(--space-md);
+    padding: 1rem;
   }
 
   .register-header h1 {

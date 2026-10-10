@@ -4,6 +4,7 @@
 @use './styles/base';
 @use './styles/components';
 @use './styles/fonts';
+@use './styles/tailwind.css';
 
 @include tokens.properties;
 @include theme.apply;
